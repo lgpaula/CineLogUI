@@ -5,27 +5,39 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="CineLog.Views.MainWindow"
         Title="CineLog"
+        Width="1200"
+        Height="700"
+        MinWidth="800"
+        MinHeight="500"
 
-        TransparencyLevelHint="AcrylicBlur"
-        Background="Transparent"
-        ExtendClientAreaToDecorationsHint="True">
+        Background="DarkSlateGray">
 
-    <Panel>
-        <ExperimentalAcrylicBorder IsHitTestVisible="False">
-            <ExperimentalAcrylicBorder.Material>
-                <ExperimentalAcrylicMaterial
-                    BackgroundSource="Digger"
-                    TintColor="Black"
-                    TintOpacity="1"
-                    MaterialOpacity="0.45" />
-            </ExperimentalAcrylicBorder.Material>
-        </ExperimentalAcrylicBorder>
+    <SplitView IsPaneOpen="True"
+            DisplayMode="Inline"
+            OpenPaneLength="80">
 
-        <Panel Margin="40">
-            <Button Content="Buy Music" 
-                HorizontalAlignment="Right" VerticalAlignment="Top" />
-        </Panel>
-    </Panel>
+        <SplitView.Pane>
+            <!-- <Border Background="DarkSlateGray" Padding="10"> -->
+                <StackPanel>
+                    <TextBlock Text="Pane"
+                            FontSize="24"
+                            Foreground="White"
+                            HorizontalAlignment="Center"/>
+                    <Button Content="Click Me"
+                            Margin="10"/>
+                </StackPanel>
+            <!-- </Border> -->
+        </SplitView.Pane>
+
+        <SplitView.Content>
+            <Grid>
+                <TextBlock Text="Content"
+                        FontSize="24"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
+            </Grid>
+        </SplitView.Content>
+    </SplitView>
 
 
 </Window>

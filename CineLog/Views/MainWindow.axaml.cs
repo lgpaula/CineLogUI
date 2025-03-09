@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using CineLog.ViewModels;
 
 namespace CineLog.Views;
 
