@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:CineLog.ViewModels"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="CineLog.Views.MainWindow"
         Title="CineLog"
@@ -9,8 +10,11 @@
         Height="700"
         MinWidth="800"
         MinHeight="500"
-
         Background="DarkSlateGray">
+
+    <Window.DataContext>
+        <vm:MainWindowViewModel/>
+    </Window.DataContext>
 
     <SplitView IsPaneOpen="True"
             DisplayMode="Inline"
@@ -19,11 +23,14 @@
         <SplitView.Pane>
             <!-- <Border Background="DarkSlateGray" Padding="10"> -->
                 <StackPanel>
-                    <TextBlock Text="Pane"
+                    <!-- <TextBlock Text="Pane"
                             FontSize="24"
                             Foreground="White"
-                            HorizontalAlignment="Center"/>
-                    <Button Content="Click Me"
+                            HorizontalAlignment="Center"/> -->
+                    <Button Click="ClickHandler"
+                            Content="Click"
+                            Margin="10"/>
+                    <Button Content="Click"
                             Margin="10"/>
                 </StackPanel>
             <!-- </Border> -->
