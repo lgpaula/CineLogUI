@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:CineLog.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="CineLog.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="CineLog"
+        Width="1200"
+        Height="700"
+        MinWidth="800"
+        MinHeight="500"
+        Background="DarkSlateGray">
+
+    <Window.DataContext>
+        <vm:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <DockPanel>
+        <!-- Sidebar with Buttons -->
+        <StackPanel DockPanel.Dock="Left" Width="200" Background="Gray">
+            <Button Content="Home" Click="ClickHandler" Tag="Home"/>
+            <Button Content="Settings" Click="ClickHandler" Tag="Settings"/>
+            <Button Content="Profile" Click="ClickHandler" Tag="Profile"/>
+        </StackPanel>
+
+        <!-- Dynamic Content Area -->
+        <ContentControl Content="{Binding CurrentView}" DockPanel.Dock="Right"/>
+    </DockPanel>
+
+
+</Window>

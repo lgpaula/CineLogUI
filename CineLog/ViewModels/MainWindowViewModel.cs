@@ -1,22 +1,43 @@
 // handle logic, button clicks and binds data to the UI
 using System;
-using System.Collections.ObjectModel;
+using Avalonia.Controls;
 using System.Reactive;
 using ReactiveUI;
+using CineLog.Views;
+using Avalonia.Threading;
 
-namespace CineLog.ViewModels;
-
-public class MainWindowViewModel : ReactiveObject
+namespace CineLog.ViewModels
 {
-
-    // ObservableCollection is like a List, but updates the UI when changed
-    public ObservableCollection<string> Buttons { get; } = new()
+    public class MainWindowViewModel : ReactiveObject
     {
-        "Button 1", "Button 2", "Button 3", "Button 4", "Button 5"
-    };
+        private UserControl _currentView;
+        public UserControl CurrentView
+        {
+            get => _currentView;
+            set => this.RaiseAndSetIfChanged(ref _currentView, value);
+        }
 
-    public void HandleButtonClick()
-    {
-        Console.WriteLine("Button clicked from ViewModel");
+        public MainWindowViewModel() {
+            _currentView = new HomeView(); // Default view
+        }
+
+        public void HandleButtonClick(string viewName)
+        {
+            switch (viewName)
+            {
+                case "Home":
+                    CurrentView = new HomeView();
+                    break;
+                case "Settings":
+                    CurrentView = new SettingsView();
+                    break;
+                case "Profile":
+                    CurrentView = new ProfileView();
+                    break;
+                default:
+                    Console.WriteLine("Unknown view");
+                    break;
+            }
+        }
     }
 }
