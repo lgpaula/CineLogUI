@@ -1,5 +1,26 @@
 <UserControl x:Class="CineLog.Views.ProfileView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <TextBlock Text="Profile View" FontSize="24"/>
+    <Border Background="Black" BorderBrush="White" BorderThickness="1" CornerRadius="10" Padding="20">
+        <StackPanel Spacing="10">
+
+            <!-- Profile Box -->
+            <Border BorderBrush="White" BorderThickness="1" CornerRadius="20" Padding="10">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <Button Content="user" Width="60" Height="60" Foreground="White" Background="Transparent" BorderBrush="White"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Account Management Buttons -->
+            <Border BorderBrush="White" BorderThickness="1" CornerRadius="20" Padding="20">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button Content="create new user" Width="100" Height="80" Foreground="White" Background="Transparent" BorderBrush="White"/>
+                    <Button Content="switch accounts" Width="100" Height="80" Foreground="White" Background="Transparent" BorderBrush="White"/>
+                    <Button Content="clear cache" Width="100" Height="80" Foreground="White" Background="Transparent" BorderBrush="White"/>
+                    <Button Content="delete account" Width="100" Height="80" Foreground="White" Background="Transparent" BorderBrush="White"/>
+                    <Button Content="update account" Width="100" Height="80" Foreground="White" Background="Transparent" BorderBrush="White"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Border>
 </UserControl>
