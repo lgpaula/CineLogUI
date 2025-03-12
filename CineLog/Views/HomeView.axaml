@@ -36,13 +36,8 @@
                         <Button Content="- hide" DockPanel.Dock="Right" Name="HideCollectionButton" Foreground="White" Background="Transparent" BorderBrush="White"/>
                     </DockPanel>
                     <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Name="CollectionContainer">
-                        <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                            <StackPanel Orientation="Horizontal">
-                                <Button Width="60" Height="80" Content="O" Foreground="White" Background="Transparent" BorderBrush="White"/>
-                                <Button Width="60" Height="80" Content="O" Foreground="White" Background="Transparent" BorderBrush="White"/>
-                                <Button Width="60" Height="80" Content="O" Foreground="White" Background="Transparent" BorderBrush="White"/>
-                                <Button Width="60" Height="80" Content="See More" Foreground="White" Background="Transparent" BorderBrush="White"/>
-                            </StackPanel>
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                            <StackPanel Orientation="Horizontal" Name="MoviesContainer"/>
                         </ScrollViewer>
                     </Border>
                 </StackPanel>

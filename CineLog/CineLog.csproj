@@ -24,6 +24,7 @@
     </PackageReference>
     <PackageReference Include="ReactiveUI" Version="20.1.63" />
     <AvaloniaXaml Include="Views\**\*.axaml" />
-    <AvaloniaResource Include="MainWindow.axaml"/>
+    <AvaloniaResource Include="MainWindow.axaml" />
+    <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
   </ItemGroup>
 </Project>
