@@ -1,5 +1,42 @@
 <UserControl x:Class="CineLog.Views.SettingsView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <TextBlock Text="Settings View" FontSize="24"/>
+    <Border Background="Black" BorderBrush="White" BorderThickness="1" CornerRadius="20" Padding="20">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="10">
+                <!-- Title -->
+                <TextBlock Text="SCRAPER" Foreground="White" FontSize="18" HorizontalAlignment="Center"/>
+
+                <!-- Genre Selection -->
+                <TextBlock Text="genres" Foreground="White"/>
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <Button Content="X" Width="30" Height="30" Foreground="White" Background="Transparent" BorderBrush="White"/>
+                </StackPanel>
+                <WrapPanel>
+                    <TextBox Width="100" Height="30" Margin="5"/>
+                    <TextBox Width="150" Height="30" Margin="5"/>
+                    <CheckBox Content="Action" Foreground="White" Margin="5"/>
+                    <CheckBox Content="Comedy" Foreground="White" Margin="5"/>
+                    <CheckBox Content="Drama" Foreground="White" Margin="5"/>
+                    <TextBox Width="120" Height="30" Margin="5"/>
+                    <CheckBox Content="Horror" Foreground="White" Margin="5"/>
+                </WrapPanel>
+
+                <!-- Separator -->
+                <Line Stroke="White" StrokeThickness="1"/>
+
+                <!-- Release Year Selection -->
+                <TextBlock Text="release year" Foreground="White"/>
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <TextBox Width="50" Height="30"/>
+                    <Slider Minimum="1900" Maximum="2025" TickFrequency="5"/>
+                    <TextBlock Text="2005" Foreground="Red"/>
+                    <TextBlock Text="2010" Foreground="Red"/>
+                </StackPanel>
+
+                <!-- Scrape Button -->
+                <Button Content="scrape" Width="100" Height="40" Foreground="Black" Background="White"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
 </UserControl>
