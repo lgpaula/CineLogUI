@@ -23,25 +23,19 @@
             <Grid ColumnDefinitions="1*, 3*, 1*" VerticalAlignment="Center">
                 
                 <!-- Logo -->
-                <TextBlock Text="MyApp" FontSize="24" FontWeight="Bold" VerticalAlignment="Center"
-                        Margin="10" Grid.Column="0"/>
+                <Button Content="MyApp" Click="ClickHandler" Tag="Home" Margin="10" FontSize="24"
+                        FontWeight="Bold" VerticalAlignment="Center" Grid.Column="0"/>
 
                 <!-- Search Box (Centered) -->
                 <TextBox Grid.Column="1" Height="30" VerticalAlignment="Center" HorizontalAlignment="Center"
                         Width="300" Watermark="Search..."/>
 
                 <!-- Account Button (Right) -->
-                <Button Content="Account" Width="100" Height="30" VerticalAlignment="Center"
+                <Button Content="Profile" Click="ClickHandler" Tag="Profile"
+                        Width="100" Height="30" VerticalAlignment="Center"
                         HorizontalAlignment="Right" Margin="10" Grid.Column="2"/>
             </Grid>
         </Border>
-
-        <!-- Sidebar -->
-        <StackPanel DockPanel.Dock="Left" Width="200" Background="Gray">
-            <Button Content="Home" Click="ClickHandler" Tag="Home" Margin="20"/>
-            <Button Content="Settings" Click="ClickHandler" Tag="Settings" Margin="20"/>
-            <Button Content="Profile" Click="ClickHandler" Tag="Profile" Margin="20"/>
-        </StackPanel>
 
         <!-- Scrollable Content -->
         <ScrollViewer DockPanel.Dock="Right">

@@ -9,7 +9,7 @@
                 <!-- Scrape Section -->
                 <StackPanel>
                     <TextBlock Text="Scrape" Foreground="White" FontSize="16"/>
-                    <Button Width="60" Height="80" Content="+" Foreground="White" Background="Transparent" BorderBrush="White"/>
+                    <Button Click="ClickHandler" Tag="Settings" Width="60" Height="80" Content="+" Foreground="White" Background="Transparent" BorderBrush="White"/>
                 </StackPanel>
                 
                 <!-- My List #1 -->
