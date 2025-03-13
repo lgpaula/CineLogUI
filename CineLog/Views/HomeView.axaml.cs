@@ -1,11 +1,15 @@
 using System;
+using System.IO;
+using System.Net.Http;
 using System.Data.SQLite;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Layout;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media.Imaging;
 using Avalonia.Interactivity;
 using CineLog.ViewModels;
 
@@ -29,11 +33,11 @@ namespace CineLog.Views
             _moviesContainer = this.FindControl<StackPanel>("MoviesContainer");
         }
 
-        private void LoadMovies()
+        private async void LoadMovies()
         {
-            List<string> movies = GetMoviesFromDatabase();
+            List<(string Title, string PosterUrl)> movies = GetMoviesFromDatabase();
 
-            foreach (var movie in movies)
+            foreach (var (title, posterUrl) in movies)
             {
                 Border movieBox = new()
                 {
@@ -42,26 +46,64 @@ namespace CineLog.Views
                     CornerRadius = new CornerRadius(5),
                     Padding = new Thickness(10),
                     Margin = new Thickness(5),
-                    Width = 150, // Adjust size as needed
-                    Height = 200, // Adjust size as needed
-                    Child = new TextBlock
-                    {
-                        Text = movie,
-                        Foreground = Brushes.White,
-                        TextWrapping = TextWrapping.Wrap,
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Center,
-                        TextAlignment = TextAlignment.Center
-                    }
+                    Width = 150,
+                    Height = 250
                 };
 
+                StackPanel contentPanel = new()
+                {
+                    Orientation = Orientation.Vertical
+                };
+
+                Image movieImage = new()
+                {
+                    Stretch = Stretch.UniformToFill,
+                    Width = 150,
+                    Height = 200
+                };
+
+                // Asynchronously load image from URL
+                await LoadImageFromUrl(movieImage, posterUrl);
+
+                TextBlock movieTitle = new()
+                {
+                    Text = title,
+                    Foreground = Brushes.White,
+                    TextWrapping = TextWrapping.Wrap,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    TextAlignment = TextAlignment.Center,
+                    FontSize = 14,
+                    Margin = new Thickness(0, 5, 0, 0)
+                };
+
+                contentPanel.Children.Add(movieImage);
+                contentPanel.Children.Add(movieTitle);
+                movieBox.Child = contentPanel;
+                
                 _moviesContainer?.Children.Add(movieBox);
             }
         }
 
-        private List<string> GetMoviesFromDatabase()
+        // Load image from URL asynchronously
+        private async Task LoadImageFromUrl(Image imageControl, string imageUrl)
         {
-            List<string> movies = [];
+            try
+            {
+                using HttpClient client = new();
+                byte[] imageData = await client.GetByteArrayAsync(imageUrl);
+
+                using MemoryStream stream = new(imageData);
+                imageControl.Source = new Bitmap(stream);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to load image: {ex.Message}");
+            }
+        }
+
+        private List<(string Title, string PosterUrl)> GetMoviesFromDatabase()
+        {
+            List<(string, string)> movies = [];
 
             string dbPath = "example.db"; // Ensure the path is correct
             string connectionString = $"Data Source={dbPath};Version=3;";
@@ -69,12 +111,14 @@ namespace CineLog.Views
             using (SQLiteConnection conn = new(connectionString))
             {
                 conn.Open();
-                string sql = "SELECT title_name FROM titles"; // Adjust table and column name
+                string sql = "SELECT title_name, poster_url FROM titles"; // Adjust table and column name
                 using SQLiteCommand cmd = new(sql, conn);
                 using SQLiteDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    movies.Add(reader.GetString(0));
+                    string title = reader.GetString(0);
+                    string posterUrl = reader.GetString(1);
+                    movies.Add((title, posterUrl));
                 }
             }
 
