@@ -41,7 +41,7 @@ namespace CineLog.Views
             {
                 Border movieBox = new()
                 {
-                    BorderBrush = Brushes.White,
+                    BorderBrush = Brushes.Transparent,
                     BorderThickness = new Thickness(1),
                     CornerRadius = new CornerRadius(5),
                     Padding = new Thickness(10),
@@ -65,6 +65,13 @@ namespace CineLog.Views
                 // Asynchronously load image from URL
                 await LoadImageFromUrl(movieImage, posterUrl);
 
+                Border imageBorder = new()
+                {
+                    CornerRadius = new CornerRadius(10),
+                    ClipToBounds = true,
+                    Child = movieImage
+                };
+
                 TextBlock movieTitle = new()
                 {
                     Text = title,
@@ -76,7 +83,7 @@ namespace CineLog.Views
                     Margin = new Thickness(0, 5, 0, 0)
                 };
 
-                contentPanel.Children.Add(movieImage);
+                contentPanel.Children.Add(imageBorder);
                 contentPanel.Children.Add(movieTitle);
                 movieBox.Child = contentPanel;
                 

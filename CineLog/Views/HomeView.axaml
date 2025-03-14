@@ -19,11 +19,7 @@
                 </DockPanel>
                 <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Name="MyListContainer">
                     <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                        <StackPanel Orientation="Horizontal">
-                            <Button Width="60" Height="80" Content="O" Foreground="White" Background="Transparent" BorderBrush="White"/>
-                            <Button Width="60" Height="80" Content="O" Foreground="White" Background="Transparent" BorderBrush="White"/>
-                            <Button Width="60" Height="80" Content="O" Foreground="White" Background="Transparent" BorderBrush="White"/>
-                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Name="CustomList"/>
                     </ScrollViewer>
                 </Border>
 
@@ -32,11 +28,11 @@
                     <TextBlock Text="Entire Collection" Foreground="White" FontSize="16" DockPanel.Dock="Left"/>
                     <Button Content="- hide" DockPanel.Dock="Right" Name="HideCollectionButton" Foreground="White" Background="Transparent" BorderBrush="White"/>
                 </DockPanel>
-                <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Name="CollectionContainer">
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <!-- <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Name="CollectionContainer"> -->
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                         <StackPanel Orientation="Horizontal" Name="MoviesContainer"/>
                     </ScrollViewer>
-                </Border>
+                <!-- </Border> -->
             </StackPanel>
         </Grid>
     </Grid>
