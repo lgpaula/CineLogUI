@@ -132,11 +132,25 @@ namespace CineLog.Views
             return movies;
         }
 
-        private void ClickHandler(object sender, RoutedEventArgs e)
+        private void ViewChanger(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Tag is string viewName)
             {
                 ViewModel.HandleButtonClick(viewName);
+            }
+        }
+
+        private async void ClickExpander(object sender, RoutedEventArgs e)
+        {
+            var modalWindow = new ModalWindow();
+
+            if (VisualRoot is Window parentWindow)
+            {
+                modalWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                
+                await modalWindow.ShowDialog(parentWindow);
+                
+                // Code here will execute after the modal is closed
             }
         }
     }

@@ -19,7 +19,7 @@ namespace CineLog
             AvaloniaXamlLoader.Load(this);
         }
 
-        private void ClickHandler(object sender, RoutedEventArgs e)
+        private void ViewChanger(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Tag is string viewName)
             {
