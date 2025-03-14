@@ -1,6 +1,8 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Markup.Xaml;
+using Avalonia.Input;
+using Avalonia.Styling;
 
 namespace CineLog
 {
@@ -16,6 +18,14 @@ namespace CineLog
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.MainWindow = new MainWindow();
+
+                Styles.Add(new Style(x => x.OfType<Button>())
+                {
+                    Setters =
+                    {
+                        new Setter(Button.CursorProperty, new Cursor(StandardCursorType.Hand))
+                    }
+                });
             }
 
             base.OnFrameworkInitializationCompleted();
