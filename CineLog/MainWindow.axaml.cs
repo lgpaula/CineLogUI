@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using CineLog.ViewModels;
+using CineLog.Views;
 
 namespace CineLog
 {
@@ -24,6 +25,17 @@ namespace CineLog
             if (sender is Button button && button.Tag is string viewName)
             {
                 ViewModel.HandleButtonClick(viewName);
+            }
+        }
+
+        private async void ClickExpander(object sender, RoutedEventArgs e)
+        {
+            var modalWindow = new UserModalWindow();
+
+            if (VisualRoot is Window parentWindow)
+            {
+                await modalWindow.ShowDialog(parentWindow);
+                // Code here will execute after the modal is closed
             }
         }
 

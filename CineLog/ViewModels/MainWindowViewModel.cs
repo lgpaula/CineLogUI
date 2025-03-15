@@ -28,11 +28,11 @@ namespace CineLog.ViewModels
                 case "Home":
                     CurrentView = new HomeView();
                     break;
-                case "Settings":
-                    CurrentView = new SettingsView();
+                case "Scraper":
+                    CurrentView = new ScraperView();
                     break;
-                case "Profile":
-                    CurrentView = new ProfileView();
+                case "Collection":
+                    CurrentView = new CollectionView();
                     break;
                 default:
                     Console.WriteLine("Unknown view");

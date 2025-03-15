@@ -31,7 +31,7 @@
                         Width="300" Watermark="Search..."/>
 
                 <!-- Account Button (Right) -->
-                <Button Content="Profile" Click="ViewChanger" Tag="Profile"
+                <Button Content="Profile" Click="ClickExpander" Tag="Profile"
                         Width="100" Height="30" VerticalAlignment="Center"
                         HorizontalAlignment="Right" Margin="10" Grid.Column="2"/>
             </Grid>

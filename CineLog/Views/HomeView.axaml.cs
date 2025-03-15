@@ -140,18 +140,6 @@ namespace CineLog.Views
             }
         }
 
-        private async void ClickExpander(object sender, RoutedEventArgs e)
-        {
-            var modalWindow = new ModalWindow();
 
-            if (VisualRoot is Window parentWindow)
-            {
-                modalWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                
-                await modalWindow.ShowDialog(parentWindow);
-                
-                // Code here will execute after the modal is closed
-            }
-        }
     }
 }

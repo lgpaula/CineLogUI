@@ -1,4 +1,4 @@
-<UserControl x:Class="CineLog.Views.SettingsView"
+<UserControl x:Class="CineLog.Views.ScraperView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Border Background="Black" BorderBrush="White" BorderThickness="1" CornerRadius="20" Padding="20">

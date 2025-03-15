@@ -5,9 +5,9 @@ using Avalonia.Markup.Xaml;
 
 namespace CineLog.Views
 {
-    public partial class SettingsView : UserControl
+    public partial class ScraperView : UserControl
     {
-        public SettingsView()
+        public ScraperView()
         {
             InitializeComponent();
         }
