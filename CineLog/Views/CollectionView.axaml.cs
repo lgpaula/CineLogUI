@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Avalonia.Markup.Xaml;
-using Avalonia.Controls.Documents;
 using System.Data.SQLite;
 using Dapper;
 
@@ -20,7 +19,7 @@ namespace CineLog.Views
         private WrapPanel? _moviesContainer;
         private ScrollViewer? _scrollViewer;
         private int _currentPage = 0;
-        private const int PageSize = 50;
+        private const int PageSize = 100;
         private bool _isLoading = false;
 
         public CollectionView()
@@ -36,6 +35,13 @@ namespace CineLog.Views
             _moviesContainer = this.FindControl<WrapPanel>("CollectionContainer");
             _scrollViewer = this.FindControl<ScrollViewer>("MovieScrollViewer");
             
+            // Set up sizing for the container
+            if (_moviesContainer != null)
+            {
+                // Make sure the WrapPanel takes up available width
+                _moviesContainer.Width = Bounds.Width;
+            }
+            
             // Add scroll handler
             if (_scrollViewer != null)
             {
@@ -44,16 +50,26 @@ namespace CineLog.Views
             
             // Initial load
             LoadNextPage();
+            
+            // Subscribe to size changes
+            this.LayoutUpdated += (s, e) => {
+                if (_moviesContainer != null && Math.Abs(_moviesContainer.Width - Bounds.Width) > 1)
+                {
+                    _moviesContainer.Width = Bounds.Width;
+                }
+            };
         }
 
         private void ScrollViewer_ScrollChanged(object? sender, ScrollChangedEventArgs e)
         {
             if (_scrollViewer == null || _isLoading) return;
-
+            
             // Check if we've scrolled near the bottom
             double verticalOffset = _scrollViewer.Offset.Y;
             double viewportHeight = _scrollViewer.Viewport.Height;
             double extentHeight = _scrollViewer.Extent.Height;
+            
+            Console.WriteLine($"Scroll - Offset: {verticalOffset}, Viewport: {viewportHeight}, Extent: {extentHeight}");
             
             // If scrolled to within 200 pixels of the bottom, load more
             if (verticalOffset + viewportHeight + 200 >= extentHeight)
@@ -66,10 +82,13 @@ namespace CineLog.Views
         {
             if (_isLoading || _moviesContainer == null) return;
             
+            Console.WriteLine($"Loading page {_currentPage}");
             _isLoading = true;
+            
             try
             {
                 List<(string Title, string PosterUrl)> movies = GetMoviesFromDatabase(_currentPage, PageSize);
+                Console.WriteLine($"Loaded {movies.Count} movies");
                 
                 foreach (var (title, posterUrl) in movies)
                 {
@@ -92,20 +111,30 @@ namespace CineLog.Views
         {
             if (_moviesContainer == null) return;
 
+            // Create a Button to make the item clickable
+            Button movieButton = new()
+            {
+                Padding = new Thickness(0),
+                Margin = new Thickness(10),
+                Width = 150,
+                Height = 250,
+                HorizontalContentAlignment = HorizontalAlignment.Stretch,
+                VerticalContentAlignment = VerticalAlignment.Stretch
+            };
+
             Border movieBox = new()
             {
                 BorderBrush = Brushes.Transparent,
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(5),
-                Padding = new Thickness(10),
-                Margin = new Thickness(5),
-                Width = 150,
-                Height = 250
+                Padding = new Thickness(5),
+                Background = new SolidColorBrush(Color.Parse("#222222"))
             };
 
             StackPanel contentPanel = new()
             {
-                Orientation = Orientation.Vertical
+                Orientation = Orientation.Vertical,
+                Spacing = 5
             };
 
             Image movieImage = new()
@@ -119,7 +148,7 @@ namespace CineLog.Views
 
             Border imageBorder = new()
             {
-                CornerRadius = new CornerRadius(10),
+                CornerRadius = new CornerRadius(5),
                 ClipToBounds = true,
                 Child = movieImage
             };
@@ -132,14 +161,22 @@ namespace CineLog.Views
                 HorizontalAlignment = HorizontalAlignment.Center,
                 TextAlignment = TextAlignment.Center,
                 FontSize = 14,
+                MaxLines = 2,
                 Margin = new Thickness(0, 5, 0, 0)
             };
 
             contentPanel.Children.Add(imageBorder);
             contentPanel.Children.Add(movieTitle);
             movieBox.Child = contentPanel;
+            movieButton.Content = movieBox;
 
-            _moviesContainer.Children.Add(movieBox);
+            // Add click handler
+            movieButton.Click += (s, e) => {
+                Console.WriteLine($"Movie clicked: {title}");
+                // Here you would navigate to the movie details
+            };
+
+            _moviesContainer.Children.Add(movieButton);
         }
 
         private List<(string Title, string PosterUrl)> GetMoviesFromDatabase(int page, int pageSize)
@@ -167,7 +204,9 @@ namespace CineLog.Views
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to load image from {url}: {ex.Message}");
-                // Set a placeholder image if available
+                // Set a placeholder image 
+                image.Source = null;
+                // If you have a placeholder image, you would set it here
             }
         }
     }
