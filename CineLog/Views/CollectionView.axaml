@@ -1,0 +1,11 @@
+<UserControl x:Class="CineLog.Views.CollectionView"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid>
+        <ScrollViewer Name="MovieScrollViewer" Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <WrapPanel Name="CollectionContainer" Orientation="Horizontal"
+                     HorizontalAlignment="Center"/>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

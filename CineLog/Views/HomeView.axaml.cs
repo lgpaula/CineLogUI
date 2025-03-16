@@ -1,3 +1,4 @@
+using Dapper;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -110,26 +111,11 @@ namespace CineLog.Views
 
         private List<(string Title, string PosterUrl)> GetMoviesFromDatabase()
         {
-            List<(string, string)> movies = [];
-
-            string dbPath = "example.db"; // Ensure the path is correct
+            string dbPath = "example.db";
             string connectionString = $"Data Source={dbPath};Version=3;";
 
-            using (SQLiteConnection conn = new(connectionString))
-            {
-                conn.Open();
-                string sql = "SELECT title_name, poster_url FROM titles"; // Adjust table and column name
-                using SQLiteCommand cmd = new(sql, conn);
-                using SQLiteDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    string title = reader.GetString(0);
-                    string posterUrl = reader.GetString(1);
-                    movies.Add((title, posterUrl));
-                }
-            }
-
-            return movies;
+            using var connection = new SQLiteConnection(connectionString);
+            return connection.Query<(string, string)>("SELECT title_name, poster_url FROM titles").AsList();
         }
 
         private void ViewChanger(object sender, RoutedEventArgs e)
@@ -139,7 +125,5 @@ namespace CineLog.Views
                 ViewModel.HandleButtonClick(viewName);
             }
         }
-
-
     }
 }

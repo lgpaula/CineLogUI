@@ -22,6 +22,7 @@
       <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="ReactiveUI" Version="20.1.63" />
     <AvaloniaXaml Include="Views\**\*.axaml" />
     <AvaloniaResource Include="MainWindow.axaml" />
