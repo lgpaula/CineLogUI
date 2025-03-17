@@ -32,7 +32,10 @@ namespace CineLog.ViewModels
                     CurrentView = new ScraperView();
                     break;
                 case "Collection":
-                    CurrentView = new CollectionView();
+                    CurrentView = new CollectionView(viewName);
+                    break;
+                case "CustomList":
+                    CurrentView = new CollectionView(viewName);
                     break;
                 default:
                     Console.WriteLine("Unknown view");

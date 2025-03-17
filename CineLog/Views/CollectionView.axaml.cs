@@ -22,7 +22,7 @@ namespace CineLog.Views
         private const int PageSize = 100;
         private bool _isLoading = false;
 
-        public CollectionView()
+        public CollectionView(string viewName)
         {
             InitializeComponent();
         }

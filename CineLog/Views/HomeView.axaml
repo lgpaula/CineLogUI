@@ -10,17 +10,21 @@
                 <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Height="150" Width="100" HorizontalAlignment="Left" Name="ScrapeButtonBorder">
                     <Button Click="ViewChanger" Tag="Scraper" Foreground="White" Background="Transparent" BorderBrush="White"/>
                 </Border>
+
+                <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Height="30" Width="100" HorizontalAlignment="Left">
+                    <Button Click="AddListToTable" Content="Add List" Foreground="White" Background="Transparent" BorderBrush="White"/>
+                </Border>
                 
                 <!-- My List #1 -->
-                <DockPanel>
+                <!-- <DockPanel>
                     <TextBlock Text="My list #1" Foreground="White" FontSize="16"/>
-                    <Button Content="See all" DockPanel.Dock="Right" FontSize="16" Tag="ExpandListButton" Foreground="White" Background="Transparent" BorderBrush="White"/>
+                    <Button Click="ViewChanger" Content="See all" DockPanel.Dock="Right" FontSize="16" Tag="CustomList" Foreground="White" Background="Transparent" BorderBrush="White"/>
                 </DockPanel>
                 <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Name="MyListContainer">
                     <ScrollViewer HorizontalScrollBarVisibility="Auto">
                         <StackPanel Orientation="Horizontal" Name="CustomList"/>
                     </ScrollViewer>
-                </Border>
+                </Border> -->
 
                 <!-- Entire Collection -->
                 <DockPanel>
@@ -28,7 +32,7 @@
                     <Button Click="ViewChanger" Content="See all" DockPanel.Dock="Right" FontSize="16" Tag="Collection" Foreground="White" Background="Transparent" BorderBrush="White"/>
                 </DockPanel>
                     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                        <StackPanel Orientation="Horizontal" Name="MoviesContainer"/>
+                        <StackPanel Orientation="Horizontal" Name="CollectionContainer"/>
                     </ScrollViewer>
             </StackPanel>
         </Grid>
