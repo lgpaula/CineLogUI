@@ -186,7 +186,7 @@ namespace CineLog.Views
 
             using var connection = new SQLiteConnection(connectionString);
             return connection.Query<(string, string)>(
-                "SELECT title_name, poster_url FROM titles LIMIT @PageSize OFFSET @Offset", 
+                "SELECT title_name, poster_url FROM titles_table LIMIT @PageSize OFFSET @Offset", 
                 new { PageSize = pageSize, Offset = page * pageSize }
             ).AsList();
         }

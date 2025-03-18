@@ -1,7 +1,6 @@
 using Dapper;
 using System;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Data.SQLite;
 using System.Threading.Tasks;
@@ -23,13 +22,12 @@ namespace CineLog.Views
         private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext!;
         private static readonly string dbPath = "example.db";
         private static readonly string connectionString = $"Data Source={dbPath};Version=3;";
-        private static readonly string[] sourceArray = ["titles", "lists"];
 
         public HomeView()
         {
             InitializeComponent();
             CreateListsTable();
-            _ = LoadCollection();
+            _ = LoadCollection("CollectionContainer", GetMoviesFromCollection());
             _ = LoadLists();
         }
 
@@ -40,21 +38,21 @@ namespace CineLog.Views
 
         private async Task LoadLists()
         {
-            var lists = GetListsFromDatabase(); // Get all list names from the database.
+            var lists = GetListsFromDatabase();
 
             foreach (var listName in lists)
             {
-                // await LoadCollection(listName);
+                await LoadCollection(listName, GetMoviesFromList(listName));
             }
         }
 
-        private List<string> GetListsFromDatabase()
+        private static List<string> GetListsFromDatabase()
         {
-            List<string> lists = new();
+            List<string> lists = [];
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
-            using var command = new SQLiteCommand("SELECT name FROM lists;", connection);
+            using var command = new SQLiteCommand("SELECT name FROM lists_table;", connection);
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
@@ -65,10 +63,9 @@ namespace CineLog.Views
             return lists;
         }
 
-        private async Task LoadCollection(string listName = "titles")
+        private async Task LoadCollection(string panelName, List<(string Title, string PosterUrl)> titles)
         {
-            List<(string Title, string PosterUrl)> titles = GetMoviesFromList(listName);
-            StackPanel? panel = this.FindControl<StackPanel>(listName);
+            StackPanel? panel = this.FindControl<StackPanel>(panelName);
 
             foreach (var (title, posterUrl) in titles)
             {
@@ -139,25 +136,46 @@ namespace CineLog.Views
             }
         }
 
-        private List<(string Title, string PosterUrl)> GetMoviesFromList(string table_name = "titles")
+        private List<(string Title, string PosterUrl)> GetMoviesFromCollection()
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
-            Console.WriteLine("listname: " + table_name);
-
-            // Validate table name to prevent SQL injection (optional but recommended)
-            if (!sourceArray.Contains(table_name))
-            {
-                Console.WriteLine(" i thrwo");
-                throw new ArgumentException("Invalid table name", nameof(table_name));
-            }
-
-            Console.WriteLine("Table name validation passed");
-
-            string query = $"SELECT title_name, poster_url FROM {table_name}";
-            
+            string query = "SELECT title_name, poster_url FROM titles_table";
             return connection.Query<(string, string)>(query).AsList();
+        }
+
+        private static List<(string Title, string PosterUrl)> GetMoviesFromList(string listName)
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            string query = @"
+                SELECT t.title_name, t.poster_url
+                FROM titles_table t
+                JOIN list_movies_table lm ON t.id = lm.movie_id
+                JOIN lists_table l ON lm.list_id = l.id
+                WHERE l.name = @ListName";
+
+            return connection.Query<(string, string)>(query, new { ListName = listName }).AsList();
+        }
+
+        private void AddMovieToList(string listName, int movieId)
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            // Get list ID
+            int listId = connection.ExecuteScalar<int>(
+                "SELECT id FROM lists_table WHERE name = @ListName",
+                new { ListName = listName }
+            );
+
+            // Insert into list_movies_table
+            connection.Execute(
+                "INSERT INTO list_movies_table (list_id, movie_id) VALUES (@ListId, @MovieId)",
+                new { ListId = listId, MovieId = movieId }
+            );
         }
 
         private static void CreateListsTable() {
@@ -165,9 +183,19 @@ namespace CineLog.Views
             connection.Open();
 
             connection.Execute(@"
-                CREATE TABLE IF NOT EXISTS lists (
+                CREATE TABLE IF NOT EXISTS lists_table (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL UNIQUE
+                );
+            ");
+
+            connection.Execute(@"
+                CREATE TABLE IF NOT EXISTS list_movies_table (
+                    list_id INTEGER,
+                    movie_id INTEGER,
+                    FOREIGN KEY (list_id) REFERENCES lists_table(id),
+                    FOREIGN KEY (movie_id) REFERENCES titles_table(id),
+                    PRIMARY KEY (list_id, movie_id)
                 );
             ");
         }
@@ -178,7 +206,7 @@ namespace CineLog.Views
 
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
-            connection.Execute("INSERT INTO lists (name) VALUES (@name)", new { name = newListName });
+            connection.Execute("INSERT INTO lists_table (name) VALUES (@name)", new { name = newListName });
 
             LoadOrAddList(newListName);
         }
@@ -187,22 +215,18 @@ namespace CineLog.Views
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
-            return connection.ExecuteScalar<int>("SELECT COALESCE(MAX(id), 0) + 1 FROM lists");
+            return connection.ExecuteScalar<int>("SELECT COALESCE(MAX(id), 0) + 1 FROM lists_table");
         }
 
-        private async void LoadOrAddList(string listName)
+        private void LoadOrAddList(string listName)
         {
-            // Check if the list already exists in UI
             StackPanel? existingListPanel = this.FindControl<StackPanel>(listName);
             if (existingListPanel == null)
             {
-                // existingListPanel = CreateListUI(listName);
                 CreateListUI(listName);
             }
 
-            Console.WriteLine("listname: " + listName);
-
-            await LoadCollection(listName);
+            Console.WriteLine("listname: " + listName + " created");
         }
 
         private StackPanel CreateListUI(string listName)
