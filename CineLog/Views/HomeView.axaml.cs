@@ -39,12 +39,21 @@ namespace CineLog.Views
         private async Task LoadLists()
         {
             var lists = GetListsFromDatabase();
+            Console.WriteLine("Total lists: " + lists.Count);
 
             foreach (var listName in lists)
             {
-                CreateListUI(listName); // ✅ Ensure the list shows even if empty
-                var movies = GetMoviesFromList(listName);
-                await LoadCollection(listName, movies);
+                try
+                {
+                    Console.WriteLine("list: " + listName + " is loading");
+                    CreateListUI(listName);
+                    var movies = GetMoviesFromList(listName);
+                    await LoadCollection(listName, movies);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error loading {listName}: {ex.Message}");
+                }
             }
         }
 
@@ -56,10 +65,10 @@ namespace CineLog.Views
 
             using var command = new SQLiteCommand("SELECT name FROM lists_table;", connection);
             using var reader = command.ExecuteReader();
-            Console.WriteLine("Current lists: ");
+            // Console.WriteLine("Current lists: ");
             while (reader.Read())
             {
-                Console.WriteLine(reader.GetString(0));
+                // Console.WriteLine(reader.GetString(0));
                 lists.Add(reader.GetString(0));
             }
 
@@ -135,7 +144,7 @@ namespace CineLog.Views
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to load image: {ex.Message}");
+                // Console.WriteLine($"Failed to load image: {ex.Message}");
             }
         }
 
@@ -156,7 +165,7 @@ namespace CineLog.Views
             string query = @"
                 SELECT t.title_name, t.poster_url
                 FROM titles_table t
-                JOIN list_movies_table lm ON t.id = lm.movie_id
+                JOIN list_movies_table lm ON t.title_id = lm.movie_id
                 JOIN lists_table l ON lm.list_id = l.id
                 WHERE l.name = @ListName";
 
