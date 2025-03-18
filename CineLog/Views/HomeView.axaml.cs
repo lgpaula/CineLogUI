@@ -39,13 +39,11 @@ namespace CineLog.Views
         private async Task LoadLists()
         {
             var lists = GetListsFromDatabase();
-            Console.WriteLine("Total lists: " + lists.Count);
 
             foreach (var listName in lists)
             {
                 try
                 {
-                    Console.WriteLine("list: " + listName + " is loading");
                     CreateListUI(listName);
                     var movies = GetMoviesFromList(listName);
                     await LoadCollection(listName, movies);
@@ -65,10 +63,8 @@ namespace CineLog.Views
 
             using var command = new SQLiteCommand("SELECT name FROM lists_table;", connection);
             using var reader = command.ExecuteReader();
-            // Console.WriteLine("Current lists: ");
             while (reader.Read())
             {
-                // Console.WriteLine(reader.GetString(0));
                 lists.Add(reader.GetString(0));
             }
 
@@ -144,7 +140,7 @@ namespace CineLog.Views
             }
             catch (Exception ex)
             {
-                // Console.WriteLine($"Failed to load image: {ex.Message}");
+                Console.WriteLine($"Failed to load image: {ex.Message}");
             }
         }
 
@@ -224,7 +220,7 @@ namespace CineLog.Views
 
             Console.WriteLine("listname: " + listName + " created");
 
-            CreateListUI(listName); // ✅ Ensure UI updates immediately
+            CreateListUI(listName);
         }
 
         private static int GetNextListId()
@@ -292,7 +288,7 @@ namespace CineLog.Views
             wrapper.Children.Add(dockPanel);
             wrapper.Children.Add(listContainer);
 
-            listsContainer.Children.Add(wrapper); // ✅ ADD to ListsContainer
+            listsContainer.Children.Add(wrapper);
         }
 
         #region ViewModifier
