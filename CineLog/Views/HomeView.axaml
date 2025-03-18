@@ -5,7 +5,7 @@
         <!-- Top Bar -->
         <Grid RowDefinitions="Auto,*" Background="Black">
 
-            <StackPanel Orientation="Vertical" Margin="10" Spacing="10">
+            <StackPanel Name="ListsContainer" Orientation="Vertical" Margin="10" Spacing="10">
                 <!-- Scrape Section -->
                 <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Height="150" Width="100" HorizontalAlignment="Left" Name="ScrapeButtonBorder">
                     <Button Click="ViewChanger" Tag="Scraper" Foreground="White" Background="Transparent" BorderBrush="White"/>
@@ -27,13 +27,13 @@
                 </Border> -->
 
                 <!-- Entire Collection -->
-                <DockPanel>
+                <!-- <DockPanel>
                     <TextBlock Text="Entire Collection" Foreground="White" FontSize="16" DockPanel.Dock="Left"/>
                     <Button Click="ViewChanger" Content="See all" DockPanel.Dock="Right" FontSize="16" Tag="Collection" Foreground="White" Background="Transparent" BorderBrush="White"/>
                 </DockPanel>
                     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                         <StackPanel Orientation="Horizontal" Name="CollectionContainer"/>
-                    </ScrollViewer>
+                    </ScrollViewer> -->
             </StackPanel>
         </Grid>
     </Grid>

@@ -42,7 +42,9 @@ namespace CineLog.Views
 
             foreach (var listName in lists)
             {
-                await LoadCollection(listName, GetMoviesFromList(listName));
+                CreateListUI(listName); // ✅ Ensure the list shows even if empty
+                var movies = GetMoviesFromList(listName);
+                await LoadCollection(listName, movies);
             }
         }
 
@@ -54,6 +56,7 @@ namespace CineLog.Views
 
             using var command = new SQLiteCommand("SELECT name FROM lists_table;", connection);
             using var reader = command.ExecuteReader();
+            Console.WriteLine("Current lists: ");
             while (reader.Read())
             {
                 Console.WriteLine(reader.GetString(0));
@@ -176,6 +179,8 @@ namespace CineLog.Views
                 "INSERT INTO list_movies_table (list_id, movie_id) VALUES (@ListId, @MovieId)",
                 new { ListId = listId, MovieId = movieId }
             );
+
+            _ = LoadLists();
         }
 
         private static void CreateListsTable() {
@@ -202,13 +207,15 @@ namespace CineLog.Views
 
         private void AddListToTable(object sender, RoutedEventArgs e)
         {
-            string newListName = $"CustomList#{GetNextListId()}";
+            string listName = $"CustomList#{GetNextListId()}";
 
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
-            connection.Execute("INSERT INTO lists_table (name) VALUES (@name)", new { name = newListName });
+            connection.Execute("INSERT INTO lists_table (name) VALUES (@name)", new { name = listName });
 
-            LoadOrAddList(newListName);
+            Console.WriteLine("listname: " + listName + " created");
+
+            CreateListUI(listName); // ✅ Ensure UI updates immediately
         }
 
         private static int GetNextListId()
@@ -218,19 +225,11 @@ namespace CineLog.Views
             return connection.ExecuteScalar<int>("SELECT COALESCE(MAX(id), 0) + 1 FROM lists_table");
         }
 
-        private void LoadOrAddList(string listName)
+        private void CreateListUI(string listName)
         {
-            StackPanel? existingListPanel = this.FindControl<StackPanel>(listName);
-            if (existingListPanel == null)
-            {
-                CreateListUI(listName);
-            }
-
-            Console.WriteLine("listname: " + listName + " created");
-        }
-
-        private StackPanel CreateListUI(string listName)
-        {
+            var listsContainer = this.FindControl<StackPanel>("ListsContainer");
+            if (listsContainer is null) return;
+    
             DockPanel dockPanel = new()
             {
                 LastChildFill = true
@@ -275,8 +274,16 @@ namespace CineLog.Views
                     Content = listPanel
                 }
             };
+            StackPanel wrapper = new()
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 5
+            };
 
-            return listPanel;
+            wrapper.Children.Add(dockPanel);
+            wrapper.Children.Add(listContainer);
+
+            listsContainer.Children.Add(wrapper); // ✅ ADD to ListsContainer
         }
 
         #region ViewModifier
