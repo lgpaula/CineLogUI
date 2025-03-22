@@ -14,6 +14,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Interactivity;
 using Avalonia.Controls.Primitives;
 using CineLog.ViewModels;
+using Avalonia.Input;
 
 namespace CineLog.Views
 {
@@ -71,11 +72,11 @@ namespace CineLog.Views
             return lists;
         }
 
-        private async Task LoadCollection(string panelName, List<(string Title, string PosterUrl)> titles)
+        private async Task LoadCollection(string panelName, List<(string MovieId, string Title, string PosterUrl)> titles)
         {
             StackPanel? panel = this.FindControl<StackPanel>(panelName);
 
-            foreach (var (title, posterUrl) in titles)
+            foreach (var (movieId, title, posterUrl) in titles)
             {
                 Border movieBox = new()
                 {
@@ -96,8 +97,8 @@ namespace CineLog.Views
                 Image movieImage = new()
                 {
                     Stretch = Stretch.UniformToFill,
-                    Width = 150,
-                    Height = 200
+                    Width = 130,
+                    Height = 180
                 };
 
                 await LoadImageFromUrl(movieImage, posterUrl);
@@ -120,10 +121,85 @@ namespace CineLog.Views
                     Margin = new Thickness(0, 5, 0, 0)
                 };
 
+                // Create the Flyout for the ellipsis button
+                Flyout flyout = new();
+                StackPanel flyoutPanel = new()
+                {
+                    Background = Brushes.Black // Set background color of the flyout to black (or a dark color)
+                };
+
+                Button removeButton = new()
+                {
+                    Content = "Remove from this list",
+                    Background = Brushes.Transparent, // Keep transparent, but we can change if needed
+                    Foreground = Brushes.White,       // Ensure the text is white for contrast
+                    BorderBrush = Brushes.Transparent,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    Padding = new Thickness(5)
+                };
+                removeButton.Click += (s, e) => RemoveMovieFromList(panelName, movieId);
+
+                Button addToListButton = new()
+                {
+                    Content = "Add to list ▸",
+                    Background = Brushes.Transparent,
+                    Foreground = Brushes.White, // Text color for contrast
+                    BorderBrush = Brushes.Transparent,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    Padding = new Thickness(5)
+                };
+
+                Flyout nestedFlyout = new();
+                StackPanel nestedPanel = new()
+                {
+                    Background = Brushes.Black // Same background for consistency
+                };
+
+                foreach (var listName in GetListsFromDatabase())
+                {
+                    Button listButton = new()
+                    {
+                        Content = listName,
+                        Background = Brushes.Transparent,
+                        Foreground = Brushes.White, // Ensure text is visible
+                        BorderBrush = Brushes.Transparent,
+                        Padding = new Thickness(5),
+                        HorizontalAlignment = HorizontalAlignment.Stretch
+                    };
+                    listButton.Click += (s, e) => AddMovieToList(listName, movieId);
+                    nestedPanel.Children.Add(listButton);
+                }
+
+                nestedFlyout.Content = nestedPanel;
+                addToListButton.Flyout = nestedFlyout;
+
+                // Add buttons to the main flyout panel
+                flyoutPanel.Children.Add(removeButton);
+                flyoutPanel.Children.Add(addToListButton);
+                flyout.Content = flyoutPanel;
+
+                // Ellipsis button with the Flyout
+                Button ellipsisButton = new()
+                {
+                    Content = "⋮",
+                    FontSize = 16,
+                    Foreground = Brushes.White, // Ensure the ellipsis is visible
+                    Background = Brushes.Transparent,
+                    BorderBrush = Brushes.Transparent,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Cursor = new Cursor(StandardCursorType.Hand),
+                    Flyout = flyout // Attach flyout to button
+                };
+
+                DockPanel headerPanel = new();
+                DockPanel.SetDock(ellipsisButton, Dock.Right);
+                headerPanel.Children.Add(ellipsisButton);
+
+                contentPanel.Children.Add(headerPanel);
                 contentPanel.Children.Add(imageBorder);
                 contentPanel.Children.Add(movieTitle);
                 movieBox.Child = contentPanel;
-                
+
                 panel?.Children.Add(movieBox);
             }
         }
@@ -144,31 +220,31 @@ namespace CineLog.Views
             }
         }
 
-        private List<(string Title, string PosterUrl)> GetMoviesFromCollection()
+        private List<(string id, string Title, string PosterUrl)> GetMoviesFromCollection()
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
-            string query = "SELECT title_name, poster_url FROM titles_table";
-            return connection.Query<(string, string)>(query).AsList();
+            string query = "SELECT title_id, title_name, poster_url FROM titles_table";
+            return connection.Query<(string, string, string)>(query).AsList();
         }
 
-        private static List<(string Title, string PosterUrl)> GetMoviesFromList(string listName)
+        private static List<(string id, string Title, string PosterUrl)> GetMoviesFromList(string listName)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
             string query = @"
-                SELECT t.title_name, t.poster_url
+                SELECT t.title_id, t.title_name, t.poster_url
                 FROM titles_table t
                 JOIN list_movies_table lm ON t.title_id = lm.movie_id
                 JOIN lists_table l ON lm.list_id = l.id
                 WHERE l.name = @ListName";
 
-            return connection.Query<(string, string)>(query, new { ListName = listName }).AsList();
+            return connection.Query<(string, string, string)>(query, new { ListName = listName }).AsList();
         }
 
-        private void AddMovieToList(string listName, int movieId)
+        private void AddMovieToList(string listName, string movieId)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
@@ -187,6 +263,18 @@ namespace CineLog.Views
 
             _ = LoadLists();
         }
+
+        private void RemoveMovieFromList(string panelName, string movieId)
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+            connection.Execute(
+                "DELETE FROM list_movies_table WHERE movie_id = @MovieId",
+                new { MovieId = movieId }
+            );
+            _ = LoadLists();
+        }
+        
 
         private static void CreateListsTable() {
             using var connection = new SQLiteConnection(connectionString);

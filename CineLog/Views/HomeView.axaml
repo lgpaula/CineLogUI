@@ -15,25 +15,12 @@
                     <Button Click="AddListToTable" Content="Add List" Foreground="White" Background="Transparent" BorderBrush="White"/>
                 </Border>
                 
-                <!-- My List #1 -->
-                <!-- <DockPanel>
-                    <TextBlock Text="My list #1" Foreground="White" FontSize="16"/>
-                    <Button Click="ViewChanger" Content="See all" DockPanel.Dock="Right" FontSize="16" Tag="CustomList" Foreground="White" Background="Transparent" BorderBrush="White"/>
-                </DockPanel>
-                <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Name="MyListContainer">
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                        <StackPanel Orientation="Horizontal" Name="CustomList"/>
-                    </ScrollViewer>
-                </Border> -->
-
                 <!-- Entire Collection -->
                 <DockPanel>
                     <TextBlock Text="Entire Collection" Foreground="White" FontSize="16" DockPanel.Dock="Left"/>
                     <Button Click="ViewChanger" Content="See all" DockPanel.Dock="Right" FontSize="16" Tag="Collection" Foreground="White" Background="Transparent" BorderBrush="White"/>
                 </DockPanel>
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                        <StackPanel Orientation="Horizontal" Name="CollectionContainer"/>
-                    </ScrollViewer>
+                    <StackPanel Orientation="Horizontal" Name="CollectionContainer"/>
             </StackPanel>
         </Grid>
     </Grid>
