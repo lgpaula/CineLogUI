@@ -72,6 +72,21 @@ namespace CineLog.Views
             return lists;
         }
 
+        private static bool IsMovieInList(string listName, string movieId)
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            string query = @"
+                SELECT COUNT(*) 
+                FROM list_movies_table lm
+                JOIN lists_table l ON lm.list_id = l.id
+                WHERE l.name = @ListName AND lm.movie_id = @MovieId";
+
+            int count = connection.ExecuteScalar<int>(query, new { ListName = listName, MovieId = movieId });
+            return count > 0;
+        }
+
         private async Task LoadCollection(string panelName, List<(string MovieId, string Title, string PosterUrl)> titles)
         {
             StackPanel? panel = this.FindControl<StackPanel>(panelName);
@@ -121,74 +136,124 @@ namespace CineLog.Views
                     Margin = new Thickness(0, 5, 0, 0)
                 };
 
-                // Create the Flyout for the ellipsis button
+                // Flyout for the ellipsis button
                 Flyout flyout = new();
+                Border flyoutBorder = new()
+                {
+                    Background = Brushes.Black,
+                    BorderBrush = Brushes.White,
+                    BorderThickness = new Thickness(2),
+                    CornerRadius = new CornerRadius(10),
+                    Padding = new Thickness(5)
+                };
+
                 StackPanel flyoutPanel = new()
                 {
-                    Background = Brushes.Black // Set background color of the flyout to black (or a dark color)
+                    Spacing = 5,
+                    Width = 200
                 };
 
-                Button removeButton = new()
+                // Create the "Add to list" expander
+                var addToListExpander = new Expander
                 {
-                    Content = "Remove from this list",
-                    Background = Brushes.Transparent, // Keep transparent, but we can change if needed
-                    Foreground = Brushes.White,       // Ensure the text is white for contrast
-                    BorderBrush = Brushes.Transparent,
+                    Header = new TextBlock 
+                    {
+                        Text = "Add to List",
+                        Foreground = Brushes.White
+                    },
+                    IsExpanded = true,
                     HorizontalAlignment = HorizontalAlignment.Stretch,
-                    Padding = new Thickness(5)
+                    Foreground = Brushes.White,
+                    Background = Brushes.Transparent
                 };
-                removeButton.Click += (s, e) => RemoveMovieFromList(panelName, movieId);
 
-                Button addToListButton = new()
+                // Create a panel for checkboxes
+                var checkboxesPanel = new StackPanel
                 {
-                    Content = "Add to list ▸",
-                    Background = Brushes.Transparent,
-                    Foreground = Brushes.White, // Text color for contrast
-                    BorderBrush = Brushes.Transparent,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    Padding = new Thickness(5)
+                    Margin = new Thickness(5)
                 };
-
-                Flyout nestedFlyout = new();
-                StackPanel nestedPanel = new()
-                {
-                    Background = Brushes.Black // Same background for consistency
-                };
-
+                
+                // Add the checkboxes to the panel
                 foreach (var listName in GetListsFromDatabase())
                 {
-                    Button listButton = new()
+                    // Create a wrapper panel for checkbox and label
+                    var checkboxWrapper = new StackPanel
                     {
-                        Content = listName,
-                        Background = Brushes.Transparent,
-                        Foreground = Brushes.White, // Ensure text is visible
-                        BorderBrush = Brushes.Transparent,
-                        Padding = new Thickness(5),
-                        HorizontalAlignment = HorizontalAlignment.Stretch
+                        Orientation = Orientation.Horizontal,
+                        Margin = new Thickness(5, 2, 5, 2)
                     };
-                    listButton.Click += (s, e) => AddMovieToList(listName, movieId);
-                    nestedPanel.Children.Add(listButton);
+                    
+                    // Create a checkbox with explicit styling
+                    CheckBox listCheckBox = new()
+                    {
+                        Name = $"checkbox_{listName.Replace(" ", "X")}",  // Unique name for the checkbox
+                        Foreground = Brushes.White,
+                        Background = Brushes.Transparent,
+                        BorderBrush = Brushes.White,
+                        BorderThickness = new Thickness(1),
+                        Margin = new Thickness(0, 0, 5, 0),
+                        IsChecked = true,
+                        MinWidth = 16,
+                        MinHeight = 16,
+                        Classes = { "movie-list-checkbox" }
+                    };
+                    
+                    // Create a separate text label
+                    TextBlock checkBoxLabel = new()
+                    {
+                        Text = listName,
+                        Foreground = Brushes.White,
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    
+                    // Add both to the wrapper panel
+                    checkboxWrapper.Children.Add(listCheckBox);
+                    checkboxWrapper.Children.Add(checkBoxLabel);
+                    
+                    // Handle checkbox toggle logic
+                    listCheckBox.IsCheckedChanged += (s, e) =>
+                    {
+                        listCheckBox.InvalidateVisual();
+
+                        if (listCheckBox.IsChecked == true)
+                        {
+                            listCheckBox.Foreground = Brushes.LightGreen;
+                            // Uncomment and implement this method
+                            // AddMovieToList(listName, movieId);
+                            Console.WriteLine("Adding movie to list: " + listName);
+                        }
+                        else
+                        {
+                            listCheckBox.Foreground = Brushes.White;
+                            // Uncomment and implement this method
+                            // RemoveMovieFromList(listName, movieId);
+                            Console.WriteLine("Removing movie from list: " + listName);
+                        }
+                    };
+                    
+                    // Add the wrapper to the main panel
+                    checkboxesPanel.Children.Add(checkboxWrapper);
                 }
 
-                nestedFlyout.Content = nestedPanel;
-                addToListButton.Flyout = nestedFlyout;
+                // Set the checkboxes panel as the content of the expander
+                addToListExpander.Content = checkboxesPanel;
+                flyoutPanel.Children.Add(addToListExpander);
 
-                // Add buttons to the main flyout panel
-                flyoutPanel.Children.Add(removeButton);
-                flyoutPanel.Children.Add(addToListButton);
-                flyout.Content = flyoutPanel;
+                // Wrap the flyoutPanel inside the flyoutBorder
+                flyoutBorder.Child = flyoutPanel;
+                flyout.Content = flyoutBorder;
 
                 // Ellipsis button with the Flyout
                 Button ellipsisButton = new()
                 {
                     Content = "⋮",
                     FontSize = 16,
-                    Foreground = Brushes.White, // Ensure the ellipsis is visible
+                    Foreground = Brushes.White,
                     Background = Brushes.Transparent,
                     BorderBrush = Brushes.Transparent,
                     HorizontalAlignment = HorizontalAlignment.Right,
                     Cursor = new Cursor(StandardCursorType.Hand),
-                    Flyout = flyout // Attach flyout to button
+                    Flyout = flyout
                 };
 
                 DockPanel headerPanel = new();
@@ -248,31 +313,61 @@ namespace CineLog.Views
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
+            using var transaction = connection.BeginTransaction();
 
-            // Get list ID
-            int listId = connection.ExecuteScalar<int>(
-                "SELECT id FROM lists_table WHERE name = @ListName",
-                new { ListName = listName }
-            );
+            try
+            {
+                // Get list ID
+                int listId = connection.ExecuteScalar<int>(
+                    "SELECT id FROM lists_table WHERE name = @ListName",
+                    new { ListName = listName }
+                );
 
-            // Insert into list_movies_table
-            connection.Execute(
-                "INSERT INTO list_movies_table (list_id, movie_id) VALUES (@ListId, @MovieId)",
-                new { ListId = listId, MovieId = movieId }
-            );
+                // Check if movie is already in the list
+                int exists = connection.ExecuteScalar<int>(
+                    "SELECT COUNT(*) FROM list_movies_table WHERE list_id = @ListId AND movie_id = @MovieId",
+                    new { ListId = listId, MovieId = movieId }
+                );
 
-            _ = LoadLists();
+                if (exists == 0)
+                {
+                    // Insert into list_movies_table
+                    connection.Execute(
+                        "INSERT INTO list_movies_table (list_id, movie_id) VALUES (@ListId, @MovieId)",
+                        new { ListId = listId, MovieId = movieId }
+                    );
+                }
+
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                Console.WriteLine($"Error adding movie to list: {ex.Message}");
+            }
         }
 
-        private void RemoveMovieFromList(string panelName, string movieId)
+        private void RemoveMovieFromList(string listName, string movieId)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
-            connection.Execute(
-                "DELETE FROM list_movies_table WHERE movie_id = @MovieId",
-                new { MovieId = movieId }
-            );
-            _ = LoadLists();
+            using var transaction = connection.BeginTransaction();
+
+            try
+            {
+                string query = @"
+                    DELETE FROM list_movies_table 
+                    WHERE list_id IN (SELECT id FROM lists_table WHERE name = @ListName)
+                    AND movie_id = @MovieId";
+
+                connection.Execute(query, new { ListName = listName, MovieId = movieId });
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                Console.WriteLine($"Error removing movie from list: {ex.Message}");
+            }
         }
         
 
