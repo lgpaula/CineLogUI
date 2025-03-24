@@ -195,7 +195,6 @@ namespace CineLog.Views
                         IsChecked = true,
                         MinWidth = 16,
                         MinHeight = 16,
-                        Classes = { "movie-list-checkbox" }
                     };
                     
                     // Create a separate text label

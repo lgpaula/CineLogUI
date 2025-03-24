@@ -5,18 +5,6 @@
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.Styles>
-        <FluentTheme />
 
-        <Style Selector="CheckBox.movie-list-checkbox:checked /template/ Border#PART_Border">
-            <Setter Property="BorderBrush" Value="White"/>
-            <Setter Property="Background" Value="#4CAF50"/>
-        </Style>
-
-        <Style Selector="CheckBox.movie-list-checkbox:checked /template/ Path#PART_CheckGlyph">
-            <Setter Property="Fill" Value="White"/>
-            <Setter Property="Stroke" Value="White"/>
-            <Setter Property="StrokeThickness" Value="1"/>
-            <Setter Property="IsVisible" Value="True"/>
-        </Style>
     </Application.Styles>
 </Application>

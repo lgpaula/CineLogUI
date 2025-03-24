@@ -1,14 +1,9 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Layout;
-using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Avalonia.Markup.Xaml;
+using System;
+using System.Net.Http;
 using System.Data.SQLite;
+using System.Collections.Generic;
 using Dapper;
 
 namespace CineLog.Views
@@ -92,7 +87,9 @@ namespace CineLog.Views
                 
                 foreach (var (title, posterUrl) in movies)
                 {
-                    await AddMovieToContainer(title, posterUrl);
+                    var movieButtonInstance = new MovieButton(title, posterUrl);
+                    Button movieButton = await movieButtonInstance.CreateMovieButton(_httpClient);
+                    _moviesContainer.Children.Add(movieButton);
                 }
                 
                 _currentPage++;
@@ -107,78 +104,6 @@ namespace CineLog.Views
             }
         }
 
-        private async Task AddMovieToContainer(string title, string posterUrl)
-        {
-            if (_moviesContainer == null) return;
-
-            // Create a Button to make the item clickable
-            Button movieButton = new()
-            {
-                Padding = new Thickness(0),
-                Margin = new Thickness(10),
-                Width = 150,
-                Height = 250,
-                HorizontalContentAlignment = HorizontalAlignment.Stretch,
-                VerticalContentAlignment = VerticalAlignment.Stretch
-            };
-
-            Border movieBox = new()
-            {
-                BorderBrush = Brushes.Transparent,
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(5),
-                Padding = new Thickness(5),
-                Background = new SolidColorBrush(Color.Parse("#222222"))
-            };
-
-            StackPanel contentPanel = new()
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 5
-            };
-
-            Image movieImage = new()
-            {
-                Stretch = Stretch.UniformToFill,
-                Width = 130,
-                Height = 180
-            };
-
-            await LoadImageFromUrl(movieImage, posterUrl);
-
-            Border imageBorder = new()
-            {
-                CornerRadius = new CornerRadius(5),
-                ClipToBounds = true,
-                Child = movieImage
-            };
-
-            TextBlock movieTitle = new()
-            {
-                Text = title,
-                Foreground = Brushes.White,
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                TextAlignment = TextAlignment.Center,
-                FontSize = 14,
-                MaxLines = 2,
-                Margin = new Thickness(0, 5, 0, 0)
-            };
-
-            contentPanel.Children.Add(imageBorder);
-            contentPanel.Children.Add(movieTitle);
-            movieBox.Child = contentPanel;
-            movieButton.Content = movieBox;
-
-            // Add click handler
-            movieButton.Click += (s, e) => {
-                Console.WriteLine($"Movie clicked: {title}");
-                // Here you would navigate to the movie details
-            };
-
-            _moviesContainer.Children.Add(movieButton);
-        }
-
         private List<(string Title, string PosterUrl)> GetMoviesFromDatabase(int page, int pageSize)
         {
             string dbPath = "example.db";
@@ -189,25 +114,6 @@ namespace CineLog.Views
                 "SELECT title_name, poster_url FROM titles_table LIMIT @PageSize OFFSET @Offset", 
                 new { PageSize = pageSize, Offset = page * pageSize }
             ).AsList();
-        }
-
-        private async Task LoadImageFromUrl(Image image, string url)
-        {
-            try
-            {
-                using var response = await _httpClient.GetAsync(url);
-                response.EnsureSuccessStatusCode();
-
-                using var stream = await response.Content.ReadAsStreamAsync();
-                image.Source = new Bitmap(stream);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to load image from {url}: {ex.Message}");
-                // Set a placeholder image 
-                image.Source = null;
-                // If you have a placeholder image, you would set it here
-            }
         }
     }
 }
