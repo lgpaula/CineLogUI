@@ -10,11 +10,9 @@ using Avalonia.Media;
 using Avalonia.Layout;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.Media.Imaging;
 using Avalonia.Interactivity;
 using Avalonia.Controls.Primitives;
 using CineLog.ViewModels;
-using Avalonia.Input;
 
 namespace CineLog.Views
 {
@@ -23,12 +21,12 @@ namespace CineLog.Views
         private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext!;
         private static readonly string dbPath = "example.db";
         private static readonly string connectionString = $"Data Source={dbPath};Version=3;";
+        private readonly HttpClient _httpClient = new();
 
         public HomeView()
         {
             InitializeComponent();
             CreateListsTable();
-            _ = LoadCollection("CollectionContainer", GetMoviesFromCollection());
             _ = LoadLists();
         }
 
@@ -47,7 +45,17 @@ namespace CineLog.Views
                 {
                     CreateListUI(listName);
                     var movies = GetMoviesFromList(listName);
-                    await LoadCollection(listName, movies);
+                    Console.WriteLine($"Loaded {movies.Count} movies");
+
+                    StackPanel? panel = this.FindControl<StackPanel>(listName);
+
+                    foreach (var (id, Title, PosterUrl) in movies)
+                    {
+                        Movie movie = new() { Id = id, Title = Title, PosterUrl = PosterUrl };
+
+                        Button movieButton = await movie.CreateMovieButton(_httpClient);
+                        panel?.Children.Add(movieButton);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -87,204 +95,7 @@ namespace CineLog.Views
             return count > 0;
         }
 
-        private async Task LoadCollection(string panelName, List<(string MovieId, string Title, string PosterUrl)> titles)
-        {
-            StackPanel? panel = this.FindControl<StackPanel>(panelName);
-
-            foreach (var (movieId, title, posterUrl) in titles)
-            {
-                Border movieBox = new()
-                {
-                    BorderBrush = Brushes.Transparent,
-                    BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(5),
-                    Padding = new Thickness(10),
-                    Margin = new Thickness(5),
-                    Width = 150,
-                    Height = 250
-                };
-
-                StackPanel contentPanel = new()
-                {
-                    Orientation = Orientation.Vertical
-                };
-
-                Image movieImage = new()
-                {
-                    Stretch = Stretch.UniformToFill,
-                    Width = 130,
-                    Height = 180
-                };
-
-                await LoadImageFromUrl(movieImage, posterUrl);
-
-                Border imageBorder = new()
-                {
-                    CornerRadius = new CornerRadius(10),
-                    ClipToBounds = true,
-                    Child = movieImage
-                };
-
-                TextBlock movieTitle = new()
-                {
-                    Text = title,
-                    Foreground = Brushes.White,
-                    TextWrapping = TextWrapping.Wrap,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    TextAlignment = TextAlignment.Center,
-                    FontSize = 14,
-                    Margin = new Thickness(0, 5, 0, 0)
-                };
-
-                // Flyout for the ellipsis button
-                Flyout flyout = new();
-                Border flyoutBorder = new()
-                {
-                    Background = Brushes.Black,
-                    BorderBrush = Brushes.White,
-                    BorderThickness = new Thickness(2),
-                    CornerRadius = new CornerRadius(10),
-                    Padding = new Thickness(5)
-                };
-
-                StackPanel flyoutPanel = new()
-                {
-                    Spacing = 5,
-                    Width = 200
-                };
-
-                // Create the "Add to list" expander
-                var addToListExpander = new Expander
-                {
-                    Header = new TextBlock 
-                    {
-                        Text = "Add to List",
-                        Foreground = Brushes.White
-                    },
-                    IsExpanded = true,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    Foreground = Brushes.White,
-                    Background = Brushes.Transparent
-                };
-
-                // Create a panel for checkboxes
-                var checkboxesPanel = new StackPanel
-                {
-                    Margin = new Thickness(5)
-                };
-                
-                // Add the checkboxes to the panel
-                foreach (var listName in GetListsFromDatabase())
-                {
-                    // Create a wrapper panel for checkbox and label
-                    var checkboxWrapper = new StackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        Margin = new Thickness(5, 2, 5, 2)
-                    };
-                    
-                    // Create a checkbox with explicit styling
-                    CheckBox listCheckBox = new()
-                    {
-                        Name = $"checkbox_{listName.Replace(" ", "X")}",  // Unique name for the checkbox
-                        Foreground = Brushes.White,
-                        Background = Brushes.Transparent,
-                        BorderBrush = Brushes.White,
-                        BorderThickness = new Thickness(1),
-                        Margin = new Thickness(0, 0, 5, 0),
-                        IsChecked = true,
-                        MinWidth = 16,
-                        MinHeight = 16,
-                    };
-                    
-                    // Create a separate text label
-                    TextBlock checkBoxLabel = new()
-                    {
-                        Text = listName,
-                        Foreground = Brushes.White,
-                        VerticalAlignment = VerticalAlignment.Center
-                    };
-                    
-                    // Add both to the wrapper panel
-                    checkboxWrapper.Children.Add(listCheckBox);
-                    checkboxWrapper.Children.Add(checkBoxLabel);
-                    
-                    // Handle checkbox toggle logic
-                    listCheckBox.IsCheckedChanged += (s, e) =>
-                    {
-                        listCheckBox.InvalidateVisual();
-
-                        if (listCheckBox.IsChecked == true)
-                        {
-                            listCheckBox.Foreground = Brushes.LightGreen;
-                            // Uncomment and implement this method
-                            // AddMovieToList(listName, movieId);
-                            Console.WriteLine("Adding movie to list: " + listName);
-                        }
-                        else
-                        {
-                            listCheckBox.Foreground = Brushes.White;
-                            // Uncomment and implement this method
-                            // RemoveMovieFromList(listName, movieId);
-                            Console.WriteLine("Removing movie from list: " + listName);
-                        }
-                    };
-                    
-                    // Add the wrapper to the main panel
-                    checkboxesPanel.Children.Add(checkboxWrapper);
-                }
-
-                // Set the checkboxes panel as the content of the expander
-                addToListExpander.Content = checkboxesPanel;
-                flyoutPanel.Children.Add(addToListExpander);
-
-                // Wrap the flyoutPanel inside the flyoutBorder
-                flyoutBorder.Child = flyoutPanel;
-                flyout.Content = flyoutBorder;
-
-                // Ellipsis button with the Flyout
-                Button ellipsisButton = new()
-                {
-                    Content = "⋮",
-                    FontSize = 16,
-                    Foreground = Brushes.White,
-                    Background = Brushes.Transparent,
-                    BorderBrush = Brushes.Transparent,
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    Cursor = new Cursor(StandardCursorType.Hand),
-                    Flyout = flyout
-                };
-
-                DockPanel headerPanel = new();
-                DockPanel.SetDock(ellipsisButton, Dock.Right);
-                headerPanel.Children.Add(ellipsisButton);
-
-                contentPanel.Children.Add(headerPanel);
-                contentPanel.Children.Add(imageBorder);
-                contentPanel.Children.Add(movieTitle);
-                movieBox.Child = contentPanel;
-
-                panel?.Children.Add(movieBox);
-            }
-        }
-
-        private static async Task LoadImageFromUrl(Image imageControl, string imageUrl)
-        {
-            try
-            {
-                using HttpClient client = new();
-                byte[] imageData = await client.GetByteArrayAsync(imageUrl);
-
-                using MemoryStream stream = new(imageData);
-                imageControl.Source = new Bitmap(stream);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to load image: {ex.Message}");
-            }
-        }
-
-        private List<(string id, string Title, string PosterUrl)> GetMoviesFromCollection()
+        private List<(string, string, string)> GetMoviesFromCollection()
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
@@ -369,7 +180,6 @@ namespace CineLog.Views
             }
         }
         
-
         private static void CreateListsTable() {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();

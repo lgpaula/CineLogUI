@@ -47,7 +47,7 @@ namespace CineLog.Views
             LoadNextPage();
             
             // Subscribe to size changes
-            this.LayoutUpdated += (s, e) => {
+            LayoutUpdated += (s, e) => {
                 if (_moviesContainer != null && Math.Abs(_moviesContainer.Width - Bounds.Width) > 1)
                 {
                     _moviesContainer.Width = Bounds.Width;
@@ -82,13 +82,14 @@ namespace CineLog.Views
             
             try
             {
-                List<(string Title, string PosterUrl)> movies = GetMoviesFromDatabase(_currentPage, PageSize);
+                List<(string, string, string)> movies = GetMoviesFromDatabase(_currentPage, PageSize);
                 Console.WriteLine($"Loaded {movies.Count} movies");
                 
-                foreach (var (title, posterUrl) in movies)
+                foreach (var (id, Title, PosterUrl) in movies)
                 {
-                    var movieButtonInstance = new MovieButton(title, posterUrl);
-                    Button movieButton = await movieButtonInstance.CreateMovieButton(_httpClient);
+                    Movie movie = new() { Id = id, Title = Title, PosterUrl = PosterUrl };
+
+                    Button movieButton = await movie.CreateMovieButton(_httpClient);
                     _moviesContainer.Children.Add(movieButton);
                 }
                 
@@ -104,16 +105,15 @@ namespace CineLog.Views
             }
         }
 
-        private List<(string Title, string PosterUrl)> GetMoviesFromDatabase(int page, int pageSize)
+        private List<(string, string, string)> GetMoviesFromDatabase(int page, int pageSize)
         {
             string dbPath = "example.db";
             string connectionString = $"Data Source={dbPath};Version=3;";
-
             using var connection = new SQLiteConnection(connectionString);
-            return connection.Query<(string, string)>(
-                "SELECT title_name, poster_url FROM titles_table LIMIT @PageSize OFFSET @Offset", 
-                new { PageSize = pageSize, Offset = page * pageSize }
-            ).AsList();
+
+            string query = "SELECT title_id, title_name, poster_url FROM titles_table LIMIT @PageSize OFFSET @Offset";
+
+            return connection.Query<(string, string, string)>(query, new { PageSize = pageSize, Offset = page * pageSize }).AsList();
         }
     }
 }
