@@ -2,10 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using System;
 using System.Net.Http;
-using System.Data.SQLite;
 using System.Collections.Generic;
-using Dapper;
-using System.Linq;
 
 namespace CineLog.Views
 {
@@ -83,7 +80,8 @@ namespace CineLog.Views
             
             try
             {
-                List<Movie> movies = GetMoviesFromDatabase(_currentPage, PageSize);
+                // List<Movie> movies = GetMoviesFromDatabase(_currentPage, PageSize);
+                List<Movie> movies = DatabaseHandler.GetMoviesFromCollection();
                 Console.WriteLine($"Loaded {movies.Count} movies");
                 
                 foreach (var movie in movies)
@@ -104,19 +102,19 @@ namespace CineLog.Views
             }
         }
 
-        private static List<Movie> GetMoviesFromDatabase(int page, int pageSize)
-        {
-            string dbPath = "example.db";
-            string connectionString = $"Data Source={dbPath};Version=3;";
-            using var connection = new SQLiteConnection(connectionString);
+        // private static List<Movie> GetMoviesFromDatabase(int page, int pageSize)
+        // {
+        //     string dbPath = "example.db";
+        //     string connectionString = $"Data Source={dbPath};Version=3;";
+        //     using var connection = new SQLiteConnection(connectionString);
 
-            string query = "SELECT title_id, title_name, poster_url FROM titles_table LIMIT @PageSize OFFSET @Offset";
+        //     string query = "SELECT title_id, title_name, poster_url FROM titles_table LIMIT @PageSize OFFSET @Offset";
 
-            var result = connection.Query<(string, string, string)>(query, new { PageSize = pageSize, Offset = page * pageSize })
-                        .Select(t => new Movie(t.Item1, t.Item2, t.Item3))
-                        .ToList();
+        //     var result = connection.Query<(string, string, string)>(query, new { PageSize = pageSize, Offset = page * pageSize })
+        //                 .Select(t => new Movie(t.Item1, t.Item2, t.Item3))
+        //                 .ToList();
 
-            return result;
-        }
+        //     return result;
+        // }
     }
 }

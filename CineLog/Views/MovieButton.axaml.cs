@@ -1,11 +1,11 @@
 using System;
-using System.Threading.Tasks;
-using Avalonia.Controls;
-using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Media;
 using Avalonia.Layout;
+using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 
 namespace CineLog.Views 
 {
