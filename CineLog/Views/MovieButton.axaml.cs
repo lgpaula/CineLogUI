@@ -11,11 +11,10 @@ namespace CineLog.Views
 {
     public class Movie
     {
-        public required string Id { get; set; }
-        public required string Title { get; set; }
-        public required string PosterUrl { get; set; }
+        public string Id { get; set; }
+        public string Title { get; set; }
+        public string PosterUrl { get; set; }
 
-        // Optional: Constructor to match your current query
         public Movie(string id, string title, string posterUrl)
         {
             Id = id;
@@ -23,7 +22,6 @@ namespace CineLog.Views
             PosterUrl = posterUrl;
         }
 
-        // Parameterless constructor for ORM mapping
         public Movie() 
         {
             Id = string.Empty;
@@ -33,8 +31,6 @@ namespace CineLog.Views
 
         public async Task<Button> CreateMovieButton(HttpClient httpClient)
         {
-
-            Console.WriteLine("Creating movie button for: " + Title);
 
             // Create a Button to make the item clickable
             Button movieButton = new()

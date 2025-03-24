@@ -13,6 +13,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Interactivity;
 using Avalonia.Controls.Primitives;
 using CineLog.ViewModels;
+using System.Linq;
 
 namespace CineLog.Views
 {
@@ -27,12 +28,27 @@ namespace CineLog.Views
         {
             InitializeComponent();
             CreateListsTable();
+            _ = LoadCollection();
             _ = LoadLists();
         }
 
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+        }
+
+        private async Task LoadCollection()
+        {
+            var movies = GetMoviesFromCollection();
+            Console.WriteLine($"Loaded {movies.Count} movies");
+
+            StackPanel? panel = this.FindControl<StackPanel>("CollectionContainer");
+
+            foreach (var movie in movies)
+            {
+                Button movieButton = await movie.CreateMovieButton(_httpClient);
+                panel?.Children.Add(movieButton);
+            }
         }
 
         private async Task LoadLists()
@@ -49,10 +65,8 @@ namespace CineLog.Views
 
                     StackPanel? panel = this.FindControl<StackPanel>(listName);
 
-                    foreach (var (id, Title, PosterUrl) in movies)
+                    foreach (var movie in movies)
                     {
-                        Movie movie = new() { Id = id, Title = Title, PosterUrl = PosterUrl };
-
                         Button movieButton = await movie.CreateMovieButton(_httpClient);
                         panel?.Children.Add(movieButton);
                     }
@@ -95,16 +109,21 @@ namespace CineLog.Views
             return count > 0;
         }
 
-        private List<(string, string, string)> GetMoviesFromCollection()
+        private static List<Movie> GetMoviesFromCollection()
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
             string query = "SELECT title_id, title_name, poster_url FROM titles_table";
-            return connection.Query<(string, string, string)>(query).AsList();
+
+            var result = connection.Query<(string, string, string)>(query)
+                       .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
+                       .ToList();
+
+            return result;
         }
 
-        private static List<(string id, string Title, string PosterUrl)> GetMoviesFromList(string listName)
+        private static List<Movie> GetMoviesFromList(string listName)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
@@ -116,7 +135,11 @@ namespace CineLog.Views
                 JOIN lists_table l ON lm.list_id = l.id
                 WHERE l.name = @ListName";
 
-            return connection.Query<(string, string, string)>(query, new { ListName = listName }).AsList();
+            var result = connection.Query<(string, string, string)>(query, new { ListName = listName })
+                          .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
+                          .ToList();
+
+            return result;
         }
 
         private void AddMovieToList(string listName, string movieId)

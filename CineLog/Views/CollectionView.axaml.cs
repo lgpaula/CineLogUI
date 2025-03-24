@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Data.SQLite;
 using System.Collections.Generic;
 using Dapper;
+using System.Linq;
 
 namespace CineLog.Views
 {
@@ -82,13 +83,11 @@ namespace CineLog.Views
             
             try
             {
-                List<(string, string, string)> movies = GetMoviesFromDatabase(_currentPage, PageSize);
+                List<Movie> movies = GetMoviesFromDatabase(_currentPage, PageSize);
                 Console.WriteLine($"Loaded {movies.Count} movies");
                 
-                foreach (var (id, Title, PosterUrl) in movies)
+                foreach (var movie in movies)
                 {
-                    Movie movie = new() { Id = id, Title = Title, PosterUrl = PosterUrl };
-
                     Button movieButton = await movie.CreateMovieButton(_httpClient);
                     _moviesContainer.Children.Add(movieButton);
                 }
@@ -105,7 +104,7 @@ namespace CineLog.Views
             }
         }
 
-        private List<(string, string, string)> GetMoviesFromDatabase(int page, int pageSize)
+        private static List<Movie> GetMoviesFromDatabase(int page, int pageSize)
         {
             string dbPath = "example.db";
             string connectionString = $"Data Source={dbPath};Version=3;";
@@ -113,7 +112,11 @@ namespace CineLog.Views
 
             string query = "SELECT title_id, title_name, poster_url FROM titles_table LIMIT @PageSize OFFSET @Offset";
 
-            return connection.Query<(string, string, string)>(query, new { PageSize = pageSize, Offset = page * pageSize }).AsList();
+            var result = connection.Query<(string, string, string)>(query, new { PageSize = pageSize, Offset = page * pageSize })
+                        .Select(t => new Movie(t.Item1, t.Item2, t.Item3))
+                        .ToList();
+
+            return result;
         }
     }
 }
