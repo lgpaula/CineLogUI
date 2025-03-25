@@ -6,6 +6,8 @@ using Avalonia.Media;
 using Avalonia.Layout;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
+using System.Collections.Generic;
+using System.Windows.Input;
 
 namespace CineLog.Views 
 {
@@ -31,7 +33,6 @@ namespace CineLog.Views
 
         public Button CreateMovieButton(HttpClient httpClient)
         {
-
             // Create a Button to make the item clickable
             Button movieButton = new()
             {
@@ -91,41 +92,64 @@ namespace CineLog.Views
             movieBox.Child = contentPanel;
             movieButton.Content = movieBox;
 
-            ContextMenu contextMenu = new()
-            {
-                Items = 
-                {
-                    new MenuItem { Header = "View Details"},
-                    new MenuItem { Header = "Add to Favorites"}
-                }
-            };
-            movieButton.ContextMenu = contextMenu;
-
             // Add click handler
             movieButton.Click += (s, e) => {
                 Console.WriteLine($"Movie clicked: {Title}");
-                // Here you would navigate to the movie details
             };
 
             movieButton.PointerPressed += (s, e) =>
             {
-                var point = e.GetCurrentPoint(movieButton);
-                Console.WriteLine($"Right click: {point.Properties.IsRightButtonPressed}");
-
-                if (point.Properties.IsRightButtonPressed)
-                {
-                    Console.WriteLine("Right-click detected!");
-                    Console.WriteLine($"Context Menu: {contextMenu != null}");
-
-                    if (contextMenu != null)
-                    {
-                        // Explicitly open the context menu at the button's location
-                        contextMenu.Open(movieButton);
-                    }
-                }
+                Console.WriteLine("Right-click detected!");
+                var contextMenu = CreateContextMenu();
+                movieButton.ContextMenu = contextMenu;
+                contextMenu.Open(movieButton);
             };
 
             return movieButton;
+        }
+
+        private ContextMenu CreateContextMenu()
+        {
+            ContextMenu contextMenu = new();
+
+            var calendarMenuItem = new MenuItem { Header = "Add to Calendar" };
+
+            // Create "Add/Remove from Lists" submenu
+            var listSubMenu = new MenuItem { Header = "Add/Remove from Lists" };
+            List<string> listsInDb = DatabaseHandler.GetListsFromDatabase();
+
+            foreach (var listName in listsInDb)
+            {
+                Console.WriteLine($"Adding list: {listName}");
+                var menuItem = new MenuItem
+                {
+                    Header = new StackPanel
+                    {
+                        Orientation = Orientation.Horizontal,
+                        Children =
+                        {
+                            new CheckBox
+                            {
+                                IsChecked = false, // Set this dynamically later
+                                Margin = new Thickness(0, 0, 2, 0)
+                            },
+                            new TextBlock 
+                            { 
+                                Text = listName,
+                                VerticalAlignment = VerticalAlignment.Center
+                            }
+                        }
+                    },
+                };
+
+                listSubMenu.Items.Add(menuItem);
+            }
+
+            // Set the final context menu items
+            contextMenu.Items.Add(calendarMenuItem);
+            contextMenu.Items.Add(listSubMenu);
+
+            return contextMenu;
         }
 
         private async Task LoadImageFromUrl(Image image, HttpClient httpClient)

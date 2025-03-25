@@ -8,11 +8,12 @@
             <StackPanel Name="ListsContainer" Orientation="Vertical" Margin="10" Spacing="10">
                 <!-- Scrape Section -->
                 <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Height="150" Width="100" HorizontalAlignment="Left" Name="ScrapeButtonBorder">
-                    <Button Click="ViewChanger" Tag="Scraper" Foreground="White" Background="Transparent" BorderBrush="White"/>
+                    <Button Click="ViewChanger" Tag="Scraper" CornerRadius="10" Height="150" Width="100"/>
                 </Border>
 
-                <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Height="30" Width="100" HorizontalAlignment="Left">
-                    <Button Click="AddListToTable" Content="Add List" Foreground="White" Background="Transparent" BorderBrush="White"/>
+                <!-- Lists Section -->
+                <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Height="30" Width="80" HorizontalAlignment="Left">
+                    <Button Click="AddListToTable" Content="Add List" Background="Transparent" />
                 </Border>
                 
                 <!-- Entire Collection -->
