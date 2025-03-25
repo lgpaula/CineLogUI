@@ -79,7 +79,7 @@ namespace CineLog.Views
             }
         }
 
-        private async void LoadNextPage()
+        private void LoadNextPage()
         {
             if (_isLoading || _moviesContainer == null) return;
             
@@ -94,7 +94,7 @@ namespace CineLog.Views
                 
                 foreach (var movie in movies)
                 {
-                    Button movieButton = await movie.CreateMovieButton(_httpClient);
+                    Button movieButton = movie.CreateMovieButton(_httpClient);
                     _moviesContainer.Children.Add(movieButton);
                 }
                 

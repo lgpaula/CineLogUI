@@ -21,8 +21,7 @@ namespace CineLog.Views
         {
             InitializeComponent();
             DatabaseHandler.CreateListsTable();
-            _ = LoadCollection();
-            _ = LoadLists();
+            LoadMoviesAndLists();
         }
 
         private void InitializeComponent()
@@ -30,39 +29,18 @@ namespace CineLog.Views
             AvaloniaXamlLoader.Load(this);
         }
 
-        private async Task LoadCollection()
+        private void LoadMoviesAndLists()
         {
-            var movies = DatabaseHandler.GetMovies();
-            Console.WriteLine($"Loaded {movies.Count} movies from collection");
+            // Load the collection first (null listName loads the entire collection)
+            LoadListUI("CollectionContainer", null);
 
-            StackPanel? panel = this.FindControl<StackPanel>("CollectionContainer");
-
-            foreach (var movie in movies)
-            {
-                Button movieButton = await movie.CreateMovieButton(_httpClient);
-                panel?.Children.Add(movieButton);
-            }
-        }
-
-        private async Task LoadLists()
-        {
+            // Load each custom list and its movies
             var lists = DatabaseHandler.GetListsFromDatabase();
-
             foreach (var listName in lists)
             {
                 try
                 {
-                    CreateListUI(listName);
-                    var movies = DatabaseHandler.GetMovies(listName);
-                    Console.WriteLine($"Loaded {movies.Count} movies");
-
-                    StackPanel? panel = this.FindControl<StackPanel>(listName);
-
-                    foreach (var movie in movies)
-                    {
-                        Button movieButton = await movie.CreateMovieButton(_httpClient);
-                        panel?.Children.Add(movieButton);
-                    }
+                    LoadListUI(listName, listName);
                 }
                 catch (Exception ex)
                 {
@@ -71,13 +49,23 @@ namespace CineLog.Views
             }
         }
 
-        private void AddListToTable(object sender, RoutedEventArgs e)
+        private void LoadListUI(string containerName, string? listName)
         {
-            var listName = DatabaseHandler.CreateNewList();
-            CreateListUI(listName);
+            StackPanel? panel = this.FindControl<StackPanel>(containerName);
+            if (panel is null) CreateListPanel(containerName);
+
+            // Fetch movies, either the entire collection (if listName is null) or a specific list
+            var movies = DatabaseHandler.GetMovies(listName);
+            Console.WriteLine($"Loaded {movies.Count} movies {(listName == null ? "from collection" : $"from list '{listName}'")}");
+
+            foreach (var movie in movies)
+            {
+                Button movieButton = movie.CreateMovieButton(_httpClient);
+                panel?.Children.Add(movieButton);
+            }
         }
 
-        private void CreateListUI(string listName)
+        private void CreateListPanel(string listName)
         {
             var listsContainer = this.FindControl<StackPanel>("ListsContainer");
             if (listsContainer is null) return;
@@ -139,7 +127,7 @@ namespace CineLog.Views
             listsContainer.Children.Add(wrapper);
         }
 
-        #region ViewModifier
+        #region Buttons From AXAML
             private void ViewChanger(object? sender, RoutedEventArgs e)
             {
                 if (sender is Button button && button.Tag is string viewName)
@@ -147,6 +135,13 @@ namespace CineLog.Views
                     ViewModel?.HandleButtonClick(viewName);
                 }
             }
+
+            private void AddListToTable(object sender, RoutedEventArgs e)
+            {
+                var listName = DatabaseHandler.CreateNewList();
+                CreateListPanel(listName);
+            }
+
         #endregion
     }
 }

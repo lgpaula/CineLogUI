@@ -134,8 +134,6 @@ namespace CineLog.Views
             return count > 0;
         }
 
-
-        
         public static void CreateListsTable() {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();

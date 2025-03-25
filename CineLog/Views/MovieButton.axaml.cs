@@ -29,7 +29,7 @@ namespace CineLog.Views
             PosterUrl = string.Empty;
         }
 
-        public async Task<Button> CreateMovieButton(HttpClient httpClient)
+        public Button CreateMovieButton(HttpClient httpClient)
         {
 
             // Create a Button to make the item clickable
@@ -65,7 +65,7 @@ namespace CineLog.Views
                 Height = 180
             };
 
-            await LoadImageFromUrl(movieImage, httpClient);
+            _ = LoadImageFromUrl(movieImage, httpClient);
 
             Border imageBorder = new()
             {
