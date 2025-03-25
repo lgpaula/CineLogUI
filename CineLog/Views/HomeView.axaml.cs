@@ -32,7 +32,7 @@ namespace CineLog.Views
 
         private async Task LoadCollection()
         {
-            var movies = DatabaseHandler.GetMoviesFromCollection();
+            var movies = DatabaseHandler.GetMovies();
             Console.WriteLine($"Loaded {movies.Count} movies from collection");
 
             StackPanel? panel = this.FindControl<StackPanel>("CollectionContainer");
@@ -53,7 +53,7 @@ namespace CineLog.Views
                 try
                 {
                     CreateListUI(listName);
-                    var movies = DatabaseHandler.GetMoviesFromList(listName);
+                    var movies = DatabaseHandler.GetMovies(listName);
                     Console.WriteLine($"Loaded {movies.Count} movies");
 
                     StackPanel? panel = this.FindControl<StackPanel>(listName);
@@ -104,6 +104,7 @@ namespace CineLog.Views
                 BorderBrush = Brushes.White
             };
             seeAllButton.Click += ViewChanger;
+            seeAllButton.Tag = listName;
 
             DockPanel.SetDock(seeAllButton, Dock.Right);
             dockPanel.Children.Add(listTitle);

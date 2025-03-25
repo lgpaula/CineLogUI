@@ -11,35 +11,33 @@ namespace CineLog.Views
         private static readonly string dbPath = "example.db";
         private static readonly string connectionString = $"Data Source={dbPath};Version=3;";
 
-        public static List<Movie> GetMoviesFromList(string listName)
+        public static List<Movie> GetMovies(string? listName = null)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
-            string query = @"
-                SELECT t.title_id, t.title_name, t.poster_url
-                FROM titles_table t
-                JOIN list_movies_table lm ON t.title_id = lm.movie_id
-                JOIN lists_table l ON lm.list_id = l.id
-                WHERE l.name = @ListName";
+            string query;
+            object parameters;
 
-            var result = connection.Query<(string, string, string)>(query, new { ListName = listName })
-                          .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
-                          .ToList();
+            if (string.IsNullOrEmpty(listName))
+            {
+                query = "SELECT title_id, title_name, poster_url FROM titles_table";
+                parameters = new { };
+            }
+            else
+            {
+                query = @"
+                    SELECT t.title_id, t.title_name, t.poster_url
+                    FROM titles_table t
+                    JOIN list_movies_table lm ON t.title_id = lm.movie_id
+                    JOIN lists_table l ON lm.list_id = l.id
+                    WHERE l.name = @ListName";
+                parameters = new { ListName = listName };
+            }
 
-            return result;
-        }
-
-        public static List<Movie> GetMoviesFromCollection()
-        {
-            using var connection = new SQLiteConnection(connectionString);
-            connection.Open();
-
-            string query = "SELECT title_id, title_name, poster_url FROM titles_table";
-
-            var result = connection.Query<(string, string, string)>(query)
-                       .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
-                       .ToList();
+            var result = connection.Query<(string, string, string)>(query, parameters)
+                        .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
+                        .ToList();
 
             return result;
         }

@@ -1,10 +1,8 @@
 // handle logic, button clicks and binds data to the UI
 using System;
-using Avalonia.Controls;
-using System.Reactive;
 using ReactiveUI;
 using CineLog.Views;
-using Avalonia.Threading;
+using Avalonia.Controls;
 
 namespace CineLog.ViewModels
 {
@@ -23,24 +21,14 @@ namespace CineLog.ViewModels
 
         public void HandleButtonClick(string viewName)
         {
-            switch (viewName)
+            CurrentView = viewName switch
             {
-                case "Home":
-                    CurrentView = new HomeView();
-                    break;
-                case "Scraper":
-                    CurrentView = new ScraperView();
-                    break;
-                case "Collection":
-                    CurrentView = new CollectionView(viewName);
-                    break;
-                case "CustomList":
-                    CurrentView = new CollectionView(viewName);
-                    break;
-                default:
-                    Console.WriteLine("Unknown view");
-                    break;
-            }
+                "Home" => new HomeView(),
+                "Scraper" => new ScraperView(),
+                "Collection" => new CollectionView(),
+                _ when viewName.StartsWith("CustomList") => new CollectionView(viewName),
+                _ => throw new ArgumentException("Unknown view", nameof(viewName))
+            };
         }
     }
 }

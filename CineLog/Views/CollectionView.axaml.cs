@@ -14,8 +14,16 @@ namespace CineLog.Views
         private int _currentPage = 0;
         private const int PageSize = 100;
         private bool _isLoading = false;
+        private string? viewName;
 
         public CollectionView(string viewName)
+        {
+            Console.WriteLine($"Loading {viewName} view");
+            this.viewName = viewName;
+            InitializeComponent();
+        }
+
+        public CollectionView()
         {
             InitializeComponent();
         }
@@ -25,8 +33,8 @@ namespace CineLog.Views
             AvaloniaXamlLoader.Load(this);
             
             // Find controls after loading XAML
-            _moviesContainer = this.FindControl<WrapPanel>("CollectionContainer");
-            _scrollViewer = this.FindControl<ScrollViewer>("MovieScrollViewer");
+            _moviesContainer = this.FindControl<WrapPanel>("CollectionWrapPanel");
+            _scrollViewer = this.FindControl<ScrollViewer>("CollectionScrollViewer");
             
             // Set up sizing for the container
             if (_moviesContainer != null)
@@ -81,7 +89,7 @@ namespace CineLog.Views
             try
             {
                 // List<Movie> movies = GetMoviesFromDatabase(_currentPage, PageSize);
-                List<Movie> movies = DatabaseHandler.GetMoviesFromCollection();
+                List<Movie> movies = DatabaseHandler.GetMovies(viewName);
                 Console.WriteLine($"Loaded {movies.Count} movies");
                 
                 foreach (var movie in movies)

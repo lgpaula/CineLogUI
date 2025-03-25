@@ -3,10 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Grid>
-        <ScrollViewer Name="MovieScrollViewer" 
+        <ScrollViewer Name="CollectionScrollViewer" 
                      VerticalScrollBarVisibility="Visible"
                      HorizontalScrollBarVisibility="Disabled">
-            <WrapPanel Name="CollectionContainer" 
+            <WrapPanel Name="CollectionWrapPanel" 
                       Orientation="Horizontal"
                       HorizontalAlignment="Center"
                       Width="{Binding $parent[ScrollViewer].Viewport.Width}"/>
