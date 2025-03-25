@@ -86,141 +86,43 @@ namespace CineLog.Views
                 Margin = new Thickness(0, 5, 0, 0)
             };
 
-
-            // Flyout for the ellipsis button
-            // Flyout flyout = new();
-            // Border flyoutBorder = new()
-            // {
-            //     Background = Brushes.Black,
-            //     BorderBrush = Brushes.White,
-            //     BorderThickness = new Thickness(2),
-            //     CornerRadius = new CornerRadius(10),
-            //     Padding = new Thickness(5)
-            // };
-
-            // StackPanel flyoutPanel = new()
-            // {
-            //     Spacing = 5,
-            //     Width = 200
-            // };
-
-            // // Create the "Add to list" expander
-            // var addToListExpander = new Expander
-            // {
-            //     Header = new TextBlock 
-            //     {
-            //         Text = "Add to List",
-            //         Foreground = Brushes.White
-            //     },
-            //     IsExpanded = true,
-            //     HorizontalAlignment = HorizontalAlignment.Stretch,
-            //     Foreground = Brushes.White,
-            //     Background = Brushes.Transparent
-            // };
-
-            // // Create a panel for checkboxes
-            // var checkboxesPanel = new StackPanel
-            // {
-            //     Margin = new Thickness(5)
-            // };
-            
-            // // Add the checkboxes to the panel
-            // foreach (var listName in GetListsFromDatabase())
-            // {
-            //     // Create a wrapper panel for checkbox and label
-            //     var checkboxWrapper = new StackPanel
-            //     {
-            //         Orientation = Orientation.Horizontal,
-            //         Margin = new Thickness(5, 2, 5, 2)
-            //     };
-                
-            //     // Create a checkbox with explicit styling
-            //     CheckBox listCheckBox = new()
-            //     {
-            //         Name = $"checkbox_{listName.Replace(" ", "X")}",  // Unique name for the checkbox
-            //         Foreground = Brushes.White,
-            //         Background = Brushes.Transparent,
-            //         BorderBrush = Brushes.White,
-            //         BorderThickness = new Thickness(1),
-            //         Margin = new Thickness(0, 0, 5, 0),
-            //         IsChecked = true,
-            //         MinWidth = 16,
-            //         MinHeight = 16,
-            //     };
-                
-            //     // Create a separate text label
-            //     TextBlock checkBoxLabel = new()
-            //     {
-            //         Text = listName,
-            //         Foreground = Brushes.White,
-            //         VerticalAlignment = VerticalAlignment.Center
-            //     };
-                
-            //     // Add both to the wrapper panel
-            //     checkboxWrapper.Children.Add(listCheckBox);
-            //     checkboxWrapper.Children.Add(checkBoxLabel);
-                
-            //     // Handle checkbox toggle logic
-            //     listCheckBox.IsCheckedChanged += (s, e) =>
-            //     {
-            //         listCheckBox.InvalidateVisual();
-
-            //         if (listCheckBox.IsChecked == true)
-            //         {
-            //             listCheckBox.Foreground = Brushes.LightGreen;
-            //             // Uncomment and implement this method
-            //             // AddMovieToList(listName, movieId);
-            //             Console.WriteLine("Adding movie to list: " + listName);
-            //         }
-            //         else
-            //         {
-            //             listCheckBox.Foreground = Brushes.White;
-            //             // Uncomment and implement this method
-            //             // RemoveMovieFromList(listName, movieId);
-            //             Console.WriteLine("Removing movie from list: " + listName);
-            //         }
-            //     };
-                
-            //     // Add the wrapper to the main panel
-            //     checkboxesPanel.Children.Add(checkboxWrapper);
-            // }
-
-            // // Set the checkboxes panel as the content of the expander
-            // addToListExpander.Content = checkboxesPanel;
-            // flyoutPanel.Children.Add(addToListExpander);
-
-            // // Wrap the flyoutPanel inside the flyoutBorder
-            // flyoutBorder.Child = flyoutPanel;
-            // flyout.Content = flyoutBorder;
-
-            // // Ellipsis button with the Flyout
-            // Button ellipsisButton = new()
-            // {
-            //     Content = "⋮",
-            //     FontSize = 16,
-            //     Foreground = Brushes.White,
-            //     Background = Brushes.Transparent,
-            //     BorderBrush = Brushes.Transparent,
-            //     HorizontalAlignment = HorizontalAlignment.Right,
-            //     Cursor = new Cursor(StandardCursorType.Hand),
-            //     Flyout = flyout
-            // };
-
-            // DockPanel headerPanel = new();
-            // DockPanel.SetDock(ellipsisButton, Dock.Right);
-            // headerPanel.Children.Add(ellipsisButton);
-
-            // contentPanel.Children.Add(headerPanel);
-
             contentPanel.Children.Add(imageBorder);
             contentPanel.Children.Add(movieTitle);
             movieBox.Child = contentPanel;
             movieButton.Content = movieBox;
 
+            ContextMenu contextMenu = new()
+            {
+                Items = 
+                {
+                    new MenuItem { Header = "View Details"},
+                    new MenuItem { Header = "Add to Favorites"}
+                }
+            };
+            movieButton.ContextMenu = contextMenu;
+
             // Add click handler
             movieButton.Click += (s, e) => {
                 Console.WriteLine($"Movie clicked: {Title}");
                 // Here you would navigate to the movie details
+            };
+
+            movieButton.PointerPressed += (s, e) =>
+            {
+                var point = e.GetCurrentPoint(movieButton);
+                Console.WriteLine($"Right click: {point.Properties.IsRightButtonPressed}");
+
+                if (point.Properties.IsRightButtonPressed)
+                {
+                    Console.WriteLine("Right-click detected!");
+                    Console.WriteLine($"Context Menu: {contextMenu != null}");
+
+                    if (contextMenu != null)
+                    {
+                        // Explicitly open the context menu at the button's location
+                        contextMenu.Open(movieButton);
+                    }
+                }
             };
 
             return movieButton;
