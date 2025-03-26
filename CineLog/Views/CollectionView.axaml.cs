@@ -30,14 +30,11 @@ namespace CineLog.Views
             
             _moviesContainer = this.FindControl<WrapPanel>("CollectionWrapPanel");
             
-            // Set up sizing for the container
             if (_moviesContainer != null)
             {
-                // Make sure the WrapPanel takes up available width
                 _moviesContainer.Width = Bounds.Width;
             }
             
-            // Initial load
             LoadNextPage();
         }
 

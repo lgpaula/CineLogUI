@@ -1,4 +1,3 @@
-// handle logic, button clicks and binds data to the UI
 using System;
 using ReactiveUI;
 using CineLog.Views;

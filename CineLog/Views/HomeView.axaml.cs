@@ -1,14 +1,12 @@
 using System;
 using System.Net.Http;
-using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Media;
 using Avalonia.Layout;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Interactivity;
-using Avalonia.Controls.Primitives;
 using CineLog.ViewModels;
+using System.Collections.Generic;
 
 namespace CineLog.Views
 {
@@ -16,10 +14,12 @@ namespace CineLog.Views
     {
         private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext!;
         private readonly HttpClient _httpClient = new();
+        private readonly Dictionary<string, StackPanel> _listPanels = new();
 
         public HomeView()
         {
             InitializeComponent();
+            EventAggregator.Instance.Subscribe("ListUpdated", LoadListUI);
             DatabaseHandler.CreateListsTable();
             LoadMoviesAndLists();
         }
@@ -31,10 +31,8 @@ namespace CineLog.Views
 
         private void LoadMoviesAndLists()
         {
-            // Load the collection first (null listName loads the entire collection)
             LoadListUI("CollectionContainer", null);
 
-            // Load each custom list and its movies
             var lists = DatabaseHandler.GetListsFromDatabase();
             foreach (var listName in lists)
             {
@@ -51,12 +49,15 @@ namespace CineLog.Views
 
         private void LoadListUI(string containerName, string? listName)
         {
-            StackPanel? panel = this.FindControl<StackPanel>(containerName);
-            if (panel is null) CreateListPanel(containerName);
+            if (!_listPanels.TryGetValue(containerName, out StackPanel? panel))
+            {
+                panel = CreateListPanel(containerName);
+                _listPanels[containerName] = panel;
+            }
 
-            // Fetch movies, either the entire collection (if listName is null) or a specific list
+            panel.Children.Clear();
+
             var movies = DatabaseHandler.GetMovies(listName);
-            Console.WriteLine($"Loaded {movies.Count} movies {(listName == null ? "from collection" : $"from list '{listName}'")}");
 
             foreach (var movie in movies)
             {
@@ -65,11 +66,11 @@ namespace CineLog.Views
             }
         }
 
-        private void CreateListPanel(string listName)
+        private StackPanel CreateListPanel(string listName)
         {
             var listsContainer = this.FindControl<StackPanel>("ListsContainer");
-            if (listsContainer is null) return;
-    
+            if (listsContainer is null) return new StackPanel();
+
             DockPanel dockPanel = new()
             {
                 LastChildFill = true
@@ -104,27 +105,10 @@ namespace CineLog.Views
                 Name = listName
             };
 
-            Border listContainer = new()
-            {
-                BorderBrush = Brushes.White,
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(10),
-                Child = new ScrollViewer
-                {
-                    HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
-                    Content = listPanel
-                }
-            };
-            StackPanel wrapper = new()
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 5
-            };
+            listsContainer?.Children.Add(dockPanel);
+            listsContainer?.Children.Add(listPanel);
 
-            wrapper.Children.Add(dockPanel);
-            wrapper.Children.Add(listContainer);
-
-            listsContainer.Children.Add(wrapper);
+            return listPanel;
         }
 
         #region Buttons From AXAML

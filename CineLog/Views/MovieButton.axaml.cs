@@ -33,7 +33,6 @@ namespace CineLog.Views
 
         public Button CreateMovieButton(HttpClient httpClient)
         {
-            // Create a Button to make the item clickable
             Button movieButton = new()
             {
                 Padding = new Thickness(0),
@@ -92,14 +91,12 @@ namespace CineLog.Views
             movieBox.Child = contentPanel;
             movieButton.Content = movieBox;
 
-            // Add click handler
             movieButton.Click += (s, e) => {
                 Console.WriteLine($"Movie clicked: {Title}");
             };
 
             movieButton.PointerPressed += (s, e) =>
             {
-                Console.WriteLine("Right-click detected!");
                 var contextMenu = CreateContextMenu();
                 movieButton.ContextMenu = contextMenu;
                 contextMenu.Open(movieButton);
@@ -169,6 +166,8 @@ namespace CineLog.Views
                 Console.WriteLine($"Removed from list: {listName}");
                 DatabaseHandler.RemoveMovieFromList(listName, Id);
             }
+
+            EventAggregator.Instance.Publish("ListUpdated", listName, listName);
         }
 
         private async Task LoadImageFromUrl(Image image, HttpClient httpClient)
