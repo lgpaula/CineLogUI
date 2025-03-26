@@ -7,7 +7,6 @@ using Avalonia.Layout;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using System.Collections.Generic;
-using System.Windows.Input;
 
 namespace CineLog.Views 
 {

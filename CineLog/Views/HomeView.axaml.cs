@@ -7,6 +7,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Interactivity;
 using CineLog.ViewModels;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CineLog.Views
 {
@@ -14,11 +15,16 @@ namespace CineLog.Views
     {
         private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext!;
         private readonly HttpClient _httpClient = new();
-        private readonly Dictionary<string, StackPanel> _listPanels = new();
+        private readonly List<StackPanel> _listPanels = [];
 
         public HomeView()
         {
             InitializeComponent();
+            var preLoadedPanel = this.FindControl<StackPanel>("CollectionContainer");
+            if (preLoadedPanel != null)
+            {
+                _listPanels.Add(preLoadedPanel);
+            }
             EventAggregator.Instance.Subscribe("ListUpdated", LoadListUI);
             DatabaseHandler.CreateListsTable();
             LoadMoviesAndLists();
@@ -49,11 +55,8 @@ namespace CineLog.Views
 
         private void LoadListUI(string containerName, string? listName)
         {
-            if (!_listPanels.TryGetValue(containerName, out StackPanel? panel))
-            {
-                panel = CreateListPanel(containerName);
-                _listPanels[containerName] = panel;
-            }
+            StackPanel? panel = _listPanels.FirstOrDefault(p => p.Name == containerName);
+            panel ??= CreateListPanel(containerName);
 
             var moviesInDatabase = DatabaseHandler.GetMovies(listName);
 
@@ -130,6 +133,7 @@ namespace CineLog.Views
             listsContainer?.Children.Add(dockPanel);
             listsContainer?.Children.Add(listPanel);
 
+            _listPanels.Add(listPanel);
             return listPanel;
         }
 
