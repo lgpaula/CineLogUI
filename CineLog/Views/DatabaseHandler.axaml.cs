@@ -158,7 +158,7 @@ namespace CineLog.Views
 
         public static string CreateNewList() 
         {
-            string listName = $"CustomList#{DatabaseHandler.GetNextListId()}";
+            string listName = $"CustomList#{GetNextListId()}";
 
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
@@ -167,6 +167,13 @@ namespace CineLog.Views
             Console.WriteLine("listname: " + listName + " created");
 
             return listName;
+        }
+
+        public static void DeleteList(string listName)
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+            connection.Execute("DELETE FROM lists_table WHERE name = @name", new { name = listName });
         }
 
         private static int GetNextListId()

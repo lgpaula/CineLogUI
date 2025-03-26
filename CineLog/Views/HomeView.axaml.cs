@@ -87,8 +87,6 @@ namespace CineLog.Views
                     panel.Children.Remove(movieButtonsInUI[movieId]);
                 }
             }
-
-            Console.WriteLine($"Updated {containerName} with {moviesInDatabase.Count} movies");
         }
 
         private StackPanel CreateListPanel(string listName)
@@ -118,11 +116,23 @@ namespace CineLog.Views
                 BorderBrush = Brushes.White
             };
             seeAllButton.Click += ViewChanger;
-            seeAllButton.Tag = listName;
+
+            Button deleteListButton = new()
+            {
+                Content = "Delete",
+                FontSize = 16,
+                Tag = listName,
+                Foreground = Brushes.White,
+                Background = Brushes.Transparent,
+                BorderBrush = Brushes.White
+            };
+            deleteListButton.Click += DeleteList;
 
             DockPanel.SetDock(seeAllButton, Dock.Right);
+            DockPanel.SetDock(deleteListButton, Dock.Right);
             dockPanel.Children.Add(listTitle);
             dockPanel.Children.Add(seeAllButton);
+            dockPanel.Children.Add(deleteListButton);
 
             StackPanel listPanel = new()
             {
@@ -150,6 +160,27 @@ namespace CineLog.Views
             {
                 var listName = DatabaseHandler.CreateNewList();
                 CreateListPanel(listName);
+            }
+
+            private void DeleteList(object? sender, RoutedEventArgs e)
+            {
+                if (sender is Button button && button.Tag is string listName)
+                {
+                    DatabaseHandler.DeleteList(listName);
+                    var panel = _listPanels.FirstOrDefault(p => p.Name == listName);
+                    Console.WriteLine(panel == null);
+                    if (panel != null)
+                    {
+                        if (panel.Parent is DockPanel dockPanel)
+                        {
+                            dockPanel.Children.Remove(panel);
+                            dockPanel.Children.Remove(dockPanel.Children.First(c => c is TextBlock block && block.Text == listName));
+                        }
+                        _listPanels.Remove(panel);
+                    }
+                }
+
+                LoadMoviesAndLists();
             }
 
         #endregion
