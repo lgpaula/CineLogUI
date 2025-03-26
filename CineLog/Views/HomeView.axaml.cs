@@ -55,15 +55,37 @@ namespace CineLog.Views
                 _listPanels[containerName] = panel;
             }
 
-            panel.Children.Clear();
+            var moviesInDatabase = DatabaseHandler.GetMovies(listName);
 
-            var movies = DatabaseHandler.GetMovies(listName);
-
-            foreach (var movie in movies)
+            var movieButtonsInUI = new Dictionary<string, Button>();
+            foreach (var child in panel.Children)
             {
-                Button movieButton = movie.CreateMovieButton(_httpClient);
-                panel?.Children.Add(movieButton);
+                if (child is Button button && button.Tag is string movieId)
+                    movieButtonsInUI[movieId] = button;
             }
+
+            var movieIdsInDatabase = new HashSet<string>(moviesInDatabase.ConvertAll(m => m.Id));
+            var movieIdsInUI = new HashSet<string>(movieButtonsInUI.Keys);
+
+            foreach (var movie in moviesInDatabase)
+            {
+                if (!movieIdsInUI.Contains(movie.Id))
+                {
+                    Button movieButton = movie.CreateMovieButton(_httpClient);
+                    movieButton.Tag = movie.Id;
+                    panel.Children.Add(movieButton);
+                }
+            }
+
+            foreach (var movieId in movieIdsInUI)
+            {
+                if (!movieIdsInDatabase.Contains(movieId))
+                {
+                    panel.Children.Remove(movieButtonsInUI[movieId]);
+                }
+            }
+
+            Console.WriteLine($"Updated {containerName} with {moviesInDatabase.Count} movies");
         }
 
         private StackPanel CreateListPanel(string listName)
