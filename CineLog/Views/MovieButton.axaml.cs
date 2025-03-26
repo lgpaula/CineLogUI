@@ -114,13 +114,23 @@ namespace CineLog.Views
 
             var calendarMenuItem = new MenuItem { Header = "Add to Calendar" };
 
-            // Create "Add/Remove from Lists" submenu
             var listSubMenu = new MenuItem { Header = "Add/Remove from Lists" };
             List<string> listsInDb = DatabaseHandler.GetListsFromDatabase();
 
             foreach (var listName in listsInDb)
             {
-                Console.WriteLine($"Adding list: {listName}");
+                var checkBox = new CheckBox
+                {
+                    IsChecked = DatabaseHandler.IsMovieInList(listName, Id),
+                    Margin = new Thickness(0, 0, 2, 0)
+                };
+
+                checkBox.IsCheckedChanged += (sender, e) => 
+                {
+                    var isChecked = checkBox.IsChecked ?? false;
+                    OnListCheckChanged(listName, isChecked);
+                };
+
                 var menuItem = new MenuItem
                 {
                     Header = new StackPanel
@@ -128,11 +138,7 @@ namespace CineLog.Views
                         Orientation = Orientation.Horizontal,
                         Children =
                         {
-                            new CheckBox
-                            {
-                                IsChecked = false, // Set this dynamically later
-                                Margin = new Thickness(0, 0, 2, 0)
-                            },
+                            checkBox,
                             new TextBlock 
                             { 
                                 Text = listName,
@@ -145,11 +151,24 @@ namespace CineLog.Views
                 listSubMenu.Items.Add(menuItem);
             }
 
-            // Set the final context menu items
             contextMenu.Items.Add(calendarMenuItem);
             contextMenu.Items.Add(listSubMenu);
 
             return contextMenu;
+        }
+
+        private void OnListCheckChanged(string listName, bool isChecked)
+        {
+            if (isChecked)
+            {
+                Console.WriteLine($"Added to list: {listName}");
+                DatabaseHandler.AddMovieToList(listName, Id);
+            }
+            else
+            {
+                Console.WriteLine($"Removed from list: {listName}");
+                DatabaseHandler.RemoveMovieFromList(listName, Id);
+            }
         }
 
         private async Task LoadImageFromUrl(Image image, HttpClient httpClient)

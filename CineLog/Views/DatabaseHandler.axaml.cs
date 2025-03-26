@@ -58,32 +58,32 @@ namespace CineLog.Views
             return lists;
         }
 
-        private static void AddMovieToList(string listName, string movieId)
+        public static void AddMovieToList(string listName, string movieId)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
-            using var transaction = connection.BeginTransaction();
 
+            using var transaction = connection.BeginTransaction();
             try
             {
                 // Get list ID
                 int listId = connection.ExecuteScalar<int>(
                     "SELECT id FROM lists_table WHERE name = @ListName",
-                    new { ListName = listName }
+                    new { ListName = listName }, transaction // Pass transaction here
                 );
 
-                // Check if movie is already in the list
+                // Check if the movie is already in the list
                 int exists = connection.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM list_movies_table WHERE list_id = @ListId AND movie_id = @MovieId",
-                    new { ListId = listId, MovieId = movieId }
+                    new { ListId = listId, MovieId = movieId }, transaction // Pass transaction here
                 );
 
                 if (exists == 0)
                 {
-                    // Insert into list_movies_table
+                    // Insert movie into list_movies_table
                     connection.Execute(
                         "INSERT INTO list_movies_table (list_id, movie_id) VALUES (@ListId, @MovieId)",
-                        new { ListId = listId, MovieId = movieId }
+                        new { ListId = listId, MovieId = movieId }, transaction // Pass transaction here
                     );
                 }
 
@@ -92,11 +92,11 @@ namespace CineLog.Views
             catch (Exception ex)
             {
                 transaction.Rollback();
-                Console.WriteLine($"Error adding movie to list: {ex.Message}");
+                Console.WriteLine($"Error adding movie to list: {ex}");
             }
         }
 
-        private static void RemoveMovieFromList(string listName, string movieId)
+        public static void RemoveMovieFromList(string listName, string movieId)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
@@ -119,7 +119,7 @@ namespace CineLog.Views
             }
         }
 
-        private static bool IsMovieInList(string listName, string movieId)
+        public static bool IsMovieInList(string listName, string movieId)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
