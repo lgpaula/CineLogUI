@@ -14,7 +14,6 @@ namespace CineLog.Views
     public partial class HomeView : UserControl
     {
         private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext!;
-        private readonly HttpClient _httpClient = new();
         private readonly List<StackPanel> _listPanels = [];
 
         public HomeView()
@@ -74,7 +73,7 @@ namespace CineLog.Views
             {
                 if (!movieIdsInUI.Contains(movie.Id))
                 {
-                    Button movieButton = movie.CreateMovieButton(_httpClient);
+                    Button movieButton = movie.CreateMovieButton();
                     movieButton.Tag = movie.Id;
                     panel.Children.Add(movieButton);
                 }

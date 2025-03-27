@@ -1,20 +1,17 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using System;
-using System.Net.Http;
-using System.Collections.Generic;
 
 namespace CineLog.Views
 {
     public partial class CollectionView : UserControl
     {
-        private readonly HttpClient _httpClient = new();
-        private WrapPanel? _moviesContainer;
-        private string? viewName;
+        public string viewName = string.Empty;
+        private int _currentOffset = 0;
+        private const int count = 50;
 
         public CollectionView(string viewName)
         {
-            Console.WriteLine($"Loading {viewName} view");
             this.viewName = viewName;
             InitializeComponent();
         }
@@ -27,37 +24,41 @@ namespace CineLog.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-            
-            _moviesContainer = this.FindControl<WrapPanel>("CollectionWrapPanel");
-            
-            if (_moviesContainer != null)
-            {
-                _moviesContainer.Width = Bounds.Width;
-            }
-            
-            LoadNextPage();
+
+            var _moviesContainer = this.FindControl<WrapPanel>("CollectionWrapPanel")
+                        ?? throw new NullReferenceException("WrapPanel not found in XAML");
+            var _scrollViewer = this.FindControl<ScrollViewer>("CollectionScrollViewer") 
+                        ?? throw new NullReferenceException("ScrollViewer not found in XAML");
+
+            LoadNextPage(_moviesContainer);
+
+            _scrollViewer.ScrollChanged += (sender, e) => OnScrollChanged(_scrollViewer, _moviesContainer);
         }
 
-        private void LoadNextPage()
+        private void LoadNextPage(WrapPanel wrapPanel)
         {
-            if (_moviesContainer == null) return;
-                        
-            try
+            var movies = DatabaseHandler.GetMovies(viewName, count, _currentOffset);
+
+            foreach (var movie in movies)
             {
-                List<Movie> movies = DatabaseHandler.GetMovies(viewName);
-                Console.WriteLine($"Loaded {movies.Count} movies");
-                
-                foreach (var movie in movies)
-                {
-                    Button movieButton = movie.CreateMovieButton(_httpClient);
-                    _moviesContainer.Children.Add(movieButton);
-                }
-                
+                var movieButton = movie.CreateMovieButton();
+                wrapPanel.Children.Add(movieButton);
             }
-            catch (Exception ex)
+
+            Console.WriteLine($"Loaded {count} more movies (starting from offset {_currentOffset})");
+
+            _currentOffset += count;
+        }
+
+        private void OnScrollChanged(ScrollViewer scrollViewer, WrapPanel wrapPanel)
+        {
+            Console.WriteLine($"Offset.Y: {scrollViewer.Offset.Y}, window.Height: {scrollViewer.Viewport.Height}, window.Width: {scrollViewer.Extent.Height}");
+            if (scrollViewer.Offset.Y + scrollViewer.Viewport.Height >= scrollViewer.Extent.Height - 100)
             {
-                Console.WriteLine($"Error loading movies: {ex.Message}");
+                // Console.WriteLine("Loading more items...");
+                LoadNextPage(wrapPanel);
             }
         }
+
     }
 }

@@ -15,6 +15,7 @@ namespace CineLog.Views
         public string Id { get; set; }
         public string Title { get; set; }
         public string PosterUrl { get; set; }
+        private readonly HttpClient _httpClient = new();
 
         public Movie(string id, string title, string posterUrl)
         {
@@ -30,7 +31,7 @@ namespace CineLog.Views
             PosterUrl = string.Empty;
         }
 
-        public Button CreateMovieButton(HttpClient httpClient)
+        public Button CreateMovieButton()
         {
             Button movieButton = new()
             {
@@ -64,7 +65,7 @@ namespace CineLog.Views
                 Height = 180
             };
 
-            _ = LoadImageFromUrl(movieImage, httpClient);
+            _ = LoadImageFromUrl(movieImage);
 
             Border imageBorder = new()
             {
@@ -169,11 +170,11 @@ namespace CineLog.Views
             EventAggregator.Instance.Publish("ListUpdated", listName, listName);
         }
 
-        private async Task LoadImageFromUrl(Image image, HttpClient httpClient)
+        private async Task LoadImageFromUrl(Image image)
         {
             try
             {
-                using var response = await httpClient.GetAsync(PosterUrl);
+                using var response = await _httpClient.GetAsync(PosterUrl);
                 response.EnsureSuccessStatusCode();
 
                 using var stream = await response.Content.ReadAsStreamAsync();

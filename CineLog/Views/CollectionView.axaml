@@ -2,14 +2,7 @@
         xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Grid>
-        <ScrollViewer Name="CollectionScrollViewer" 
-                     VerticalScrollBarVisibility="Visible"
-                     HorizontalScrollBarVisibility="Disabled">
-            <WrapPanel Name="CollectionWrapPanel" 
-                      Orientation="Horizontal"
-                      HorizontalAlignment="Center"
-                      Width="{Binding $parent[ScrollViewer].Viewport.Width}"/>
+        <ScrollViewer x:Name="CollectionScrollViewer" VerticalScrollBarVisibility="Auto">
+                <WrapPanel Name="CollectionWrapPanel" Orientation="Horizontal"/>
         </ScrollViewer>
-    </Grid>
 </UserControl>

@@ -10,8 +10,9 @@ namespace CineLog.Views
     {
         private static readonly string dbPath = "example.db";
         private static readonly string connectionString = $"Data Source={dbPath};Version=3;";
+        private const int moviesPerPage = 80;
 
-        public static List<Movie> GetMovies(string? listName = null)
+        public static List<Movie> GetMovies(string? listName = null, int count = 20, int offset = 0)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
@@ -21,8 +22,11 @@ namespace CineLog.Views
 
             if (string.IsNullOrEmpty(listName))
             {
-                query = "SELECT title_id, title_name, poster_url FROM titles_table";
-                parameters = new { };
+                query = @"
+                    SELECT title_id, title_name, poster_url 
+                    FROM titles_table 
+                    LIMIT @Count OFFSET @Offset";
+                parameters = new { Count = count, Offset = offset };
             }
             else
             {
@@ -31,8 +35,9 @@ namespace CineLog.Views
                     FROM titles_table t
                     JOIN list_movies_table lm ON t.title_id = lm.movie_id
                     JOIN lists_table l ON lm.list_id = l.id
-                    WHERE l.name = @ListName";
-                parameters = new { ListName = listName };
+                    WHERE l.name = @ListName
+                    LIMIT @Count OFFSET @Offset";
+                parameters = new { Count = count, Offset = offset, ListName = listName };
             }
 
             var result = connection.Query<(string, string, string)>(query, parameters)
