@@ -1,9 +1,11 @@
 <Application xmlns="https://github.com/avaloniaui"
+             xmlns:themes="using:RangeSlider.Avalonia.Themes.Fluent"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="CineLog.App"
              RequestedThemeVariant="Default">
 
     <Application.Styles>
         <FluentTheme/>  <!-- Or "Light" depending on your preference -->
+        <themes:RangeSliderTheme />
     </Application.Styles>
 </Application>

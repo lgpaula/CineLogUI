@@ -39,6 +39,8 @@ namespace CineLog.Views
         {
             var movies = DatabaseHandler.GetMovies(viewName, count, _currentOffset);
 
+            if (movies.Count == 0) return;
+
             foreach (var movie in movies)
             {
                 var movieButton = movie.CreateMovieButton();
@@ -52,7 +54,7 @@ namespace CineLog.Views
 
         private void OnScrollChanged(ScrollViewer scrollViewer, WrapPanel wrapPanel)
         {
-            Console.WriteLine($"Offset.Y: {scrollViewer.Offset.Y}, window.Height: {scrollViewer.Viewport.Height}, window.Width: {scrollViewer.Extent.Height}");
+            // Console.WriteLine($"Offset.Y: {scrollViewer.Offset.Y}, window.Height: {scrollViewer.Viewport.Height}, window.Width: {scrollViewer.Extent.Height}");
             if (scrollViewer.Offset.Y + scrollViewer.Viewport.Height >= scrollViewer.Extent.Height - 100)
             {
                 Console.WriteLine("Loading more items...");
