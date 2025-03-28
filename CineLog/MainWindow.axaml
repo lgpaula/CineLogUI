@@ -38,9 +38,9 @@
         </Border>
 
         <!-- Scrollable Content -->
-        <ScrollViewer DockPanel.Dock="Right">
+        <Grid DockPanel.Dock="Bottom">
             <ContentControl Content="{Binding CurrentView}" />
-        </ScrollViewer>
+        </Grid>
     </DockPanel>
 
 

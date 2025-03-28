@@ -55,7 +55,7 @@ namespace CineLog.Views
             Console.WriteLine($"Offset.Y: {scrollViewer.Offset.Y}, window.Height: {scrollViewer.Viewport.Height}, window.Width: {scrollViewer.Extent.Height}");
             if (scrollViewer.Offset.Y + scrollViewer.Viewport.Height >= scrollViewer.Extent.Height - 100)
             {
-                // Console.WriteLine("Loading more items...");
+                Console.WriteLine("Loading more items...");
                 LoadNextPage(wrapPanel);
             }
         }

@@ -2,7 +2,7 @@
         xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-        <ScrollViewer x:Name="CollectionScrollViewer" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer x:Name="CollectionScrollViewer" VerticalAlignment="Stretch">
                 <WrapPanel Name="CollectionWrapPanel" Orientation="Horizontal"/>
         </ScrollViewer>
 </UserControl>
