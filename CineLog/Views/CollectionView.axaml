@@ -9,7 +9,7 @@
                                 <Expander.Header>
                                         <TextBlock Text="Filter" FontSize="20"/>
                                 </Expander.Header>
-                                <Grid RowDefinitions="*,*,*,*,*" ColumnDefinitions="150,*">
+                                <Grid RowDefinitions="*,*,*,*,*,*" ColumnDefinitions="150,*">
                                         <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Rating</TextBlock>
                                         <rs:RangeSlider Grid.Row="0" Grid.Column="1" Minimum="0.0" Maximum="10.0" LowerSelectedValue="0.0" UpperSelectedValue="10.0" IsThumbOverlap="False"/>
 
@@ -76,7 +76,9 @@
                                                 <CheckBox Content="Movie"/>
                                                 <CheckBox Content="Series"/>
                                         </WrapPanel>
+                                        <Button Grid.Row="5" Grid.Column="0" Content="Apply" HorizontalAlignment="Left" Margin="0,10,10,0"/>
                                 </Grid>
+
                         </Expander>
                         
                         <WrapPanel Name="CollectionWrapPanel" Orientation="Horizontal"/>
