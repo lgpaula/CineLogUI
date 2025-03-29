@@ -12,14 +12,12 @@ namespace CineLog.Views
         private static readonly string connectionString = $"Data Source={dbPath};Version=3;";
         private const int moviesPerPage = 80;
 
-        public static List<Movie> GetMovies(string? listName = null, int count = 20, int offset = 0)
+        public static List<Movie> GetMovies(string? listName = null, int count = 20, int offset = 0, FilterSettings? filterSettings = null)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
-            string query;
-            object parameters;
-
+            /* before filterSettings implementation
             if (string.IsNullOrEmpty(listName))
             {
                 query = @"
@@ -43,6 +41,52 @@ namespace CineLog.Views
             var result = connection.Query<(string, string, string)>(query, parameters)
                         .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
                         .ToList();
+            */
+
+            // If filterSettings is null, create a new one with default values
+            filterSettings ??= new FilterSettings();
+
+            // Base query
+            var query = @"
+                SELECT t.title_id, t.title_name, t.poster_url
+                FROM titles_table t
+                LEFT JOIN list_movies_table lm ON t.title_id = lm.movie_id
+                LEFT JOIN lists_table l ON lm.list_id = l.id
+                WHERE (@ListName IS NULL OR l.name = @ListName)";
+
+            // Apply filters dynamically based on non-null filterSettings
+            if (filterSettings.Rating != null)
+                query += " AND t.rating BETWEEN @MinRating AND @MaxRating";
+            if (filterSettings.Genre != null && filterSettings.Genre.Count > 0)
+                query += " AND t.genre IN @Genres";
+            if (filterSettings.Year != null)
+                query += " AND t.release_year BETWEEN @MinYear AND @MaxYear";
+            if (!string.IsNullOrEmpty(filterSettings.Company))
+                query += " AND t.production_company LIKE @Company";
+            if (!string.IsNullOrEmpty(filterSettings.Type))
+                query += " AND t.type IN (@Types)";
+
+            query += " LIMIT @Count OFFSET @Offset";
+
+            // Construct query parameters with null-safe default values
+            var parameters = new
+            {
+                MinRating = filterSettings.Rating?.Item1 ?? 0,
+                MaxRating = filterSettings.Rating?.Item2 ?? 10,
+                Genres = filterSettings.Genre ?? new List<string>(),
+                MinYear = filterSettings.Year?.Item1 ?? 1874,
+                MaxYear = filterSettings.Year?.Item2 ?? DateTime.Now.Year,
+                Company = "%" + (filterSettings.Company ?? "") + "%",
+                Types = filterSettings.Type?.Split(',') ?? new string[0],
+                Count = count,
+                Offset = offset,
+                ListName = listName,
+            };
+
+            // Execute query and map the results
+            var result = connection.Query<(string, string, string)>(query, parameters)
+                .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
+                .ToList();
 
             return result;
         }
@@ -186,6 +230,18 @@ namespace CineLog.Views
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
             return connection.ExecuteScalar<int>("SELECT COALESCE(MAX(id), 0) + 1 FROM lists_table");
+        }
+
+        public class FilterSettings
+        {
+            public Tuple<float, float>? Rating { get; set; }  // Nullable for optional filtering
+            public List<string>? Genre { get; set; } = new List<string>();
+            public Tuple<int, int>? Year { get; set; }
+            public string? Company { get; set; }
+            public string? Type { get; set; }
+
+            // Optional Constructor (empty initialization)
+            public FilterSettings() { }
         }
     }
 }

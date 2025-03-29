@@ -15,68 +15,28 @@
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Genre</TextBlock>
                                         <ScrollViewer Grid.Row="1" Grid.Column="1">
-                                                <WrapPanel Orientation="Horizontal">
-                                                        <CheckBox Content="Action"/>
-                                                        <CheckBox Content="Adventure"/>
-                                                        <CheckBox Content="Animation"/>
-                                                        <CheckBox Content="Biography"/>
-                                                        <CheckBox Content="Comedy"/>
-                                                        <CheckBox Content="Crime"/>
-                                                        <CheckBox Content="Documentary"/>
-                                                        <CheckBox Content="Drama"/>
-                                                        <CheckBox Content="Family"/>
-                                                        <CheckBox Content="Fantasy"/>
-                                                        <CheckBox Content="Film-Noir"/>
-                                                        <CheckBox Content="History"/>
-                                                        <CheckBox Content="Horror"/>
-                                                        <CheckBox Content="Music"/>
-                                                        <CheckBox Content="Musical"/>
-                                                        <CheckBox Content="Mystery"/>
-                                                        <CheckBox Content="Romance"/>
-                                                        <CheckBox Content="Sci-Fi"/>
-                                                        <CheckBox Content="Sport"/>
-                                                        <CheckBox Content="Thriller"/>
-                                                        <CheckBox Content="War"/>
-                                                        <CheckBox Content="Western"/>
+                                                <WrapPanel x:Name="GenreCheckBoxPanel" Orientation="Horizontal">
+                                                        <!-- add companies here as checkboxes dynamically -->
                                                 </WrapPanel>
                                         </ScrollViewer>
 
                                         <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Year release</TextBlock>
-                                        <rs:RangeSlider Grid.Row="2" Grid.Column="1" Minimum="1874" Maximum="2025" LowerSelectedValue="1874" UpperSelectedValue="2025" IsThumbOverlap="False"/>
+                                        <rs:RangeSlider x:Name="YearSlider" Grid.Row="2" Grid.Column="1" Minimum="1874" Maximum="2025" LowerSelectedValue="1874" UpperSelectedValue="2025" IsThumbOverlap="False"/>
+
                                         
                                         <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center">Company</TextBlock>
                                         <ScrollViewer Grid.Row="3" Grid.Column="1">
-                                                <WrapPanel Orientation="Horizontal">
-                                                        <RadioButton Content="Disney"/>
-                                                        <RadioButton Content="Pixar"/>
-                                                        <RadioButton Content="DreamWorks"/>
-                                                        <RadioButton Content="Warner Bros."/>
-                                                        <RadioButton Content="Universal"/>
-                                                        <RadioButton Content="Paramount"/>
-                                                        <RadioButton Content="Sony"/>
-                                                        <RadioButton Content="20th Century Fox"/>
-                                                        <RadioButton Content="Lionsgate"/>
-                                                        <RadioButton Content="MGM"/>
-                                                        <RadioButton Content="Miramax"/>
-                                                        <RadioButton Content="New Line Cinema"/>
-                                                        <RadioButton Content="Orion Pictures"/>
-                                                        <RadioButton Content="TriStar Pictures"/>
-                                                        <RadioButton Content="United Artists"/>
-                                                        <RadioButton Content="Columbia Pictures"/>
-                                                        <RadioButton Content="Touchstone Pictures"/>
-                                                        <RadioButton Content="Focus Features"/>
-                                                        <RadioButton Content="Studio Ghibli"/>
-                                                        <RadioButton Content="A24"/>
-                                                        <RadioButton Content="Other"/>
+                                                <WrapPanel x:Name="CompaniesPanel" Orientation="Horizontal">
+                                                        <!-- add companies here as radioButtons dynamically -->
                                                 </WrapPanel>
                                         </ScrollViewer>
 
                                         <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Type</TextBlock>
-                                        <WrapPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
-                                                <CheckBox Content="Movie"/>
-                                                <CheckBox Content="Series"/>
+                                        <WrapPanel Grid.Row="4" Grid.Column="1" x:Name="TitleTypePanel" Orientation="Horizontal">
+                                                <CheckBox Content="Movie" Tag="Movie"/>
+                                                <CheckBox Content="Series" Tag="Series"/>
                                         </WrapPanel>
-                                        <Button Grid.Row="5" Grid.Column="0" Content="Apply" HorizontalAlignment="Left" Margin="0,10,10,0"/>
+                                        <Button Grid.Row="5" Grid.Column="0" Click="ApplyFilter" Content="Apply" HorizontalAlignment="Left" Margin="0,10,10,0"/>
                                 </Grid>
 
                         </Expander>
