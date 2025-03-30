@@ -1,42 +1,107 @@
 <UserControl x:Class="CineLog.Views.ScraperView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Border Background="Black" BorderBrush="White" BorderThickness="1" CornerRadius="20" Padding="20">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="10">
-                <!-- Title -->
-                <TextBlock Text="SCRAPER" Foreground="White" FontSize="18" HorizontalAlignment="Center"/>
 
-                <!-- Genre Selection -->
-                <TextBlock Text="genres" Foreground="White"/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="10">
+            <Expander HorizontalAlignment="Stretch">
+                <Expander.Header>
+                    <TextBlock Text="Genre" Foreground="White" FontSize="20"/>
+                </Expander.Header>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <WrapPanel>
+                        <CheckBox Content="Action" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Adventure" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Animation" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Biography" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Comedy" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Crime" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Documentary" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Drama" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Family" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Fantasy" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Film-Noir" Foreground="White" Margin="5"/>
+                        <CheckBox Content="History" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Horror" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Music" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Musical" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Mystery" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Romance" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Sci-Fi" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Sport" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Thriller" Foreground="White" Margin="5"/>
+                        <CheckBox Content="War" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Western" Foreground="White" Margin="5"/>
+                    </WrapPanel>
+                </ScrollViewer>
+            </Expander>
+
+            <Expander HorizontalAlignment="Stretch">
+                <Expander.Header>
+                    <TextBlock Text="Release Year" Foreground="White" FontSize="20"/>
+                </Expander.Header>
                 <StackPanel Orientation="Horizontal" Spacing="5">
-                    <Button Content="X" Width="30" Height="30" Foreground="White" Background="Transparent" BorderBrush="White"/>
+                    <TextBlock Text="From" Foreground="White"/>
+                    <TextBox Width="50" Watermark="1874" Foreground="Black" Background="White"/>
+                    <TextBlock Text="To" Foreground="White"/>
+                    <TextBox Width="50" Watermark="2026" Foreground="Black" Background="White"/>
                 </StackPanel>
-                <WrapPanel>
-                    <TextBox Width="100" Height="30" Margin="5"/>
-                    <TextBox Width="150" Height="30" Margin="5"/>
-                    <CheckBox Content="Action" Foreground="White" Margin="5"/>
-                    <CheckBox Content="Comedy" Foreground="White" Margin="5"/>
-                    <CheckBox Content="Drama" Foreground="White" Margin="5"/>
-                    <TextBox Width="120" Height="30" Margin="5"/>
-                    <CheckBox Content="Horror" Foreground="White" Margin="5"/>
-                </WrapPanel>
+            </Expander>
 
-                <!-- Separator -->
-                <Line Stroke="White" StrokeThickness="1"/>
-
-                <!-- Release Year Selection -->
-                <TextBlock Text="release year" Foreground="White"/>
+            <Expander HorizontalAlignment="Stretch">
+                <Expander.Header>
+                    <TextBlock Text="Rating" Foreground="White" FontSize="20"/>
+                </Expander.Header>
                 <StackPanel Orientation="Horizontal" Spacing="5">
-                    <TextBox Width="50" Height="30"/>
-                    <Slider Minimum="1900" Maximum="2025" TickFrequency="5"/>
-                    <TextBlock Text="2005" Foreground="Red"/>
-                    <TextBlock Text="2010" Foreground="Red"/>
+                    <TextBlock Text="From" Foreground="White"/>
+                    <TextBox Width="50" Watermark="0.0" Foreground="Black" Background="White"/>
+                    <TextBlock Text="To" Foreground="White"/>
+                    <TextBox Width="50" Watermark="10.0" Foreground="Black" Background="White"/>
                 </StackPanel>
+            </Expander>
 
-                <!-- Scrape Button -->
-                <Button Content="scrape" Width="100" Height="40" Foreground="Black" Background="White"/>
-            </StackPanel>
-        </ScrollViewer>
-    </Border>
+            <Expander HorizontalAlignment="Stretch">
+                <Expander.Header>
+                    <TextBlock Text="Company" Foreground="White" FontSize="20"/>
+                </Expander.Header>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <WrapPanel>
+                        <CheckBox Content="Disney" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Pixar" Foreground="White" Margin="5"/>
+                        <CheckBox Content="DreamWorks" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Warner Bros." Foreground="White" Margin="5"/>
+                        <CheckBox Content="Universal" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Paramount" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Sony" Foreground="White" Margin="5"/>
+                        <CheckBox Content="20th Century Fox" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Lionsgate" Foreground="White" Margin="5"/>
+                        <CheckBox Content="MGM" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Miramax" Foreground="White" Margin="5"/>
+                        <CheckBox Content="New Line Cinema" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Orion Pictures" Foreground="White" Margin="5"/>
+                        <CheckBox Content="TriStar Pictures" Foreground="White" Margin="5"/>
+                        <CheckBox Content="United Artists" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Columbia Pictures" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Touchstone Pictures" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Focus Features" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Studio Ghibli" Foreground="White" Margin="5"/>
+                        <CheckBox Content="A24" Foreground="White" Margin="5"/>
+                    </WrapPanel>
+                </ScrollViewer>    
+            </Expander>
+
+            <Expander HorizontalAlignment="Stretch">
+                <Expander.Header>
+                    <TextBlock Text="Type" Foreground="White" FontSize="20"/>
+                </Expander.Header>
+                    <WrapPanel>
+                        <CheckBox Content="Movie" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Series" Foreground="White" Margin="5"/>
+                    </WrapPanel>
+            </Expander>
+
+            <!-- Scrape Button -->
+            <Button Content="scrape" Width="100" Height="40" Foreground="Black" Background="White"/>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>
