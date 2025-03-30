@@ -100,6 +100,17 @@
                     </WrapPanel>
             </Expander>
 
+            <Expander HorizontalAlignment="Stretch">
+                <Expander.Header>
+                    <TextBlock Text="Keywords" Foreground="White" FontSize="20"/>
+                </Expander.Header>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <WrapPanel x:Name="KeywordsPanel">
+                        <!-- <CheckBox Content="Action" Foreground="White" Margin="5"/> -->
+                    </WrapPanel>
+                </ScrollViewer>
+            </Expander>
+
             <!-- Scrape Button -->
             <Button x:Name="scrapeButton" Content="scrape" Width="100" Height="40" Foreground="Black" Background="White"/>
         </StackPanel>

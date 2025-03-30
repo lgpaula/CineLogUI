@@ -11,6 +11,7 @@ namespace CineLog.Views
         private readonly List<CheckBox> _genreCheckBoxes = null!;
         private readonly List<CheckBox> _companyCheckBoxes = null!;
         private readonly List<CheckBox> _typeCheckBoxes = null!;
+        private readonly List<CheckBox> _keywordCheckBoxes = null!;
         private readonly TextBox _yearFrom = null!;
         private readonly TextBox _yearTo = null!;
         private readonly TextBox _ratingFrom = null!;
@@ -26,9 +27,10 @@ namespace CineLog.Views
             _ratingFrom = this.FindControl<TextBox>("ratingFrom") ?? throw new InvalidOperationException("ratingFrom not found");
             _ratingTo = this.FindControl<TextBox>("ratingTo") ?? throw new InvalidOperationException("ratingTo not found");
 
-            _genreCheckBoxes = this.GetCheckBoxes("GenrePanel");
-            _companyCheckBoxes = this.GetCheckBoxes("CompanyPanel");
-            _typeCheckBoxes = this.GetCheckBoxes("TypePanel");
+            _genreCheckBoxes = GetCheckBoxes("GenrePanel");
+            _companyCheckBoxes = GetCheckBoxes("CompanyPanel");
+            _typeCheckBoxes = GetCheckBoxes("TypePanel");
+            _keywordCheckBoxes = GetCheckBoxes("KeywordPanel");
 
             _scrapeButton.Click += OnScrapeButtonClick;
         }
@@ -40,6 +42,7 @@ namespace CineLog.Views
                 Genres = GetSelectedCheckBoxes(_genreCheckBoxes),
                 Companies = GetSelectedCheckBoxes(_companyCheckBoxes),
                 Types = GetSelectedCheckBoxes(_typeCheckBoxes),
+                Keywords = GetSelectedCheckBoxes(_keywordCheckBoxes),
                 YearFrom = TryParseInt(_yearFrom.Text),
                 YearTo = TryParseInt(_yearTo.Text),
                 RatingFrom = TryParseFloat(_ratingFrom.Text),
@@ -83,6 +86,7 @@ namespace CineLog.Views
         public List<string> Genres { get; set; }
         public List<string> Companies { get; set; }
         public List<string> Types { get; set; }
+        public List<string> Keywords { get; set; }
         public int? YearFrom { get; set; }
         public int? YearTo { get; set; }
         public float? RatingFrom { get; set; }
