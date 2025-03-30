@@ -1,21 +1,91 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 
 namespace CineLog.Views
 {
     public partial class ScraperView : UserControl
     {
+        private readonly Button _scrapeButton = null!;
+        private readonly List<CheckBox> _genreCheckBoxes = null!;
+        private readonly List<CheckBox> _companyCheckBoxes = null!;
+        private readonly List<CheckBox> _typeCheckBoxes = null!;
+        private readonly TextBox _yearFrom = null!;
+        private readonly TextBox _yearTo = null!;
+        private readonly TextBox _ratingFrom = null!;
+        private readonly TextBox _ratingTo = null!;
+
         public ScraperView()
         {
             InitializeComponent();
+
+            _scrapeButton = this.FindControl<Button>("scrapeButton") ?? throw new InvalidOperationException("scrapeButton not found");
+            _yearFrom = this.FindControl<TextBox>("yearFrom") ?? throw new InvalidOperationException("yearFrom not found");
+            _yearTo = this.FindControl<TextBox>("yearTo") ?? throw new InvalidOperationException("yearTo not found");
+            _ratingFrom = this.FindControl<TextBox>("ratingFrom") ?? throw new InvalidOperationException("ratingFrom not found");
+            _ratingTo = this.FindControl<TextBox>("ratingTo") ?? throw new InvalidOperationException("ratingTo not found");
+
+            _genreCheckBoxes = this.GetCheckBoxes("GenrePanel");
+            _companyCheckBoxes = this.GetCheckBoxes("CompanyPanel");
+            _typeCheckBoxes = this.GetCheckBoxes("TypePanel");
+
+            _scrapeButton.Click += OnScrapeButtonClick;
         }
 
-        private void InitializeComponent()
+        private void OnScrapeButtonClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            AvaloniaXamlLoader.Load(this);
-            // You can do additional initialization here, directly on the UI thread
-            Console.WriteLine("settings");
+            var criteria = new ScraperCriteria
+            {
+                Genres = GetSelectedCheckBoxes(_genreCheckBoxes),
+                Companies = GetSelectedCheckBoxes(_companyCheckBoxes),
+                Types = GetSelectedCheckBoxes(_typeCheckBoxes),
+                YearFrom = TryParseInt(_yearFrom.Text),
+                YearTo = TryParseInt(_yearTo.Text),
+                RatingFrom = TryParseFloat(_ratingFrom.Text),
+                RatingTo = TryParseFloat(_ratingTo.Text)
+            };
+
+            StartScraping(criteria);
         }
+
+        private static void StartScraping(ScraperCriteria criteria)
+        {
+            // Implement scraping logic here
+            Console.WriteLine("Scraping with criteria: " + criteria);
+        }
+
+        private List<CheckBox> GetCheckBoxes(string parentName)
+        {
+            if (this.FindControl<WrapPanel>(parentName) is WrapPanel panel)
+                return [.. panel.Children.OfType<CheckBox>()];
+            return [];
+        }
+
+        private static List<string> GetSelectedCheckBoxes(List<CheckBox> checkBoxes)
+        {
+            return [.. checkBoxes.Where(cb => cb.IsChecked == true).Select(cb => cb.Content?.ToString() ?? "")];
+        }
+
+        private static int? TryParseInt(string? text)
+        {
+            return int.TryParse(text, out var result) ? result : (int?)null;
+        }
+
+        private static float? TryParseFloat(string? text)
+        {
+            return float.TryParse(text, out var result) ? result : (float?)null;
+        }
+    }
+
+    public struct ScraperCriteria
+    {
+        public List<string> Genres { get; set; }
+        public List<string> Companies { get; set; }
+        public List<string> Types { get; set; }
+        public int? YearFrom { get; set; }
+        public int? YearTo { get; set; }
+        public float? RatingFrom { get; set; }
+        public float? RatingTo { get; set; }
     }
 }

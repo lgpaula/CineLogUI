@@ -9,7 +9,7 @@
                     <TextBlock Text="Genre" Foreground="White" FontSize="20"/>
                 </Expander.Header>
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <WrapPanel>
+                    <WrapPanel x:Name="GenrePanel">
                         <CheckBox Content="Action" Foreground="White" Margin="5"/>
                         <CheckBox Content="Adventure" Foreground="White" Margin="5"/>
                         <CheckBox Content="Animation" Foreground="White" Margin="5"/>
@@ -42,9 +42,9 @@
                 </Expander.Header>
                 <StackPanel Orientation="Horizontal" Spacing="5">
                     <TextBlock Text="From" Foreground="White"/>
-                    <TextBox Width="50" Watermark="1874" Foreground="Black" Background="White"/>
+                    <TextBox x:Name="yearFrom" Width="50" Watermark="1874" Foreground="Black" Background="White"/>
                     <TextBlock Text="To" Foreground="White"/>
-                    <TextBox Width="50" Watermark="2026" Foreground="Black" Background="White"/>
+                    <TextBox x:Name="yearTo" Width="50" Watermark="2026" Foreground="Black" Background="White"/>
                 </StackPanel>
             </Expander>
 
@@ -54,9 +54,9 @@
                 </Expander.Header>
                 <StackPanel Orientation="Horizontal" Spacing="5">
                     <TextBlock Text="From" Foreground="White"/>
-                    <TextBox Width="50" Watermark="0.0" Foreground="Black" Background="White"/>
+                    <TextBox x:Name="ratingFrom" Width="50" Watermark="0.0" Foreground="Black" Background="White"/>
                     <TextBlock Text="To" Foreground="White"/>
-                    <TextBox Width="50" Watermark="10.0" Foreground="Black" Background="White"/>
+                    <TextBox x:Name="ratingTo" Width="50" Watermark="10.0" Foreground="Black" Background="White"/>
                 </StackPanel>
             </Expander>
 
@@ -65,7 +65,7 @@
                     <TextBlock Text="Company" Foreground="White" FontSize="20"/>
                 </Expander.Header>
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <WrapPanel>
+                    <WrapPanel x:Name="CompanyPanel">
                         <CheckBox Content="Disney" Foreground="White" Margin="5"/>
                         <CheckBox Content="Pixar" Foreground="White" Margin="5"/>
                         <CheckBox Content="DreamWorks" Foreground="White" Margin="5"/>
@@ -94,14 +94,14 @@
                 <Expander.Header>
                     <TextBlock Text="Type" Foreground="White" FontSize="20"/>
                 </Expander.Header>
-                    <WrapPanel>
+                    <WrapPanel x:Name="TypePanel">
                         <CheckBox Content="Movie" Foreground="White" Margin="5"/>
                         <CheckBox Content="Series" Foreground="White" Margin="5"/>
                     </WrapPanel>
             </Expander>
 
             <!-- Scrape Button -->
-            <Button Content="scrape" Width="100" Height="40" Foreground="Black" Background="White"/>
+            <Button x:Name="scrapeButton" Content="scrape" Width="100" Height="40" Foreground="Black" Background="White"/>
         </StackPanel>
     </ScrollViewer>
 </UserControl>
