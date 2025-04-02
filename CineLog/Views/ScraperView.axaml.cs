@@ -1,7 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using Avalonia.Controls;
+using Newtonsoft.Json;
 
 namespace CineLog.Views
 {
@@ -49,13 +52,14 @@ namespace CineLog.Views
                 RatingTo = TryParseFloat(_ratingTo.Text)
             };
 
-            StartScraping(criteria);
+            _ = StartScraping(criteria);
         }
 
-        private static void StartScraping(ScraperCriteria criteria)
+        private static async Task StartScraping(ScraperCriteria criteria)
         {
-            // Implement scraping logic here
-            Console.WriteLine("Scraping with criteria: " + criteria);
+            string stringCriteria = ConvertCriteria(criteria);
+            string response = await ScrapeAsync(stringCriteria);
+            Console.WriteLine("Response: " + response);
         }
 
         private List<CheckBox> GetCheckBoxes(string parentName)
@@ -72,12 +76,60 @@ namespace CineLog.Views
 
         private static int? TryParseInt(string? text)
         {
-            return int.TryParse(text, out var result) ? result : (int?)null;
+            return int.TryParse(text, out var result) ? result : null;
         }
 
         private static float? TryParseFloat(string? text)
         {
-            return float.TryParse(text, out var result) ? result : (float?)null;
+            return float.TryParse(text, out var result) ? result : null;
+        }
+
+        private static async Task<string> ScrapeAsync(string criteria)
+        {
+            using var client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(120);
+            try
+            {
+                var response = await client.GetAsync($"http://127.0.0.1:5000/scrape?criteria={Uri.EscapeDataString(criteria)}");
+                // Console.WriteLine($"HTTP Status Code: {response.StatusCode}");
+                
+                string result = await response.Content.ReadAsStringAsync();
+                // Console.WriteLine("Python result: " + result);
+                
+                if (!response.IsSuccessStatusCode) return "Flask API Error: " + result;
+
+                return result;
+            }
+            catch (TaskCanceledException ex) when (!ex.CancellationToken.IsCancellationRequested)
+            {
+                Console.WriteLine("Flask API timeout: " + ex.Message);
+                return "Error: Timeout";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error calling Flask API: " + ex.Message);
+                return "Error";
+            }
+        }
+
+        private static string ConvertCriteria(ScraperCriteria criteria)
+        {
+            var dict = new Dictionary<string, object?>
+            {
+                { "genres", criteria.Genres },
+                { "companies", criteria.Companies },
+                { "types", criteria.Types },
+                { "keywords", criteria.Keywords },
+                { "yearFrom", criteria.YearFrom },
+                { "yearTo", criteria.YearTo },
+                { "ratingFrom", criteria.RatingFrom },
+                { "ratingTo", criteria.RatingTo }
+            };
+
+            var stringCriteria = JsonConvert.SerializeObject(dict);
+            Console.WriteLine("stringCriteria: " + stringCriteria);
+
+            return stringCriteria;
         }
     }
 

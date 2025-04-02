@@ -21,14 +21,19 @@
                         <CheckBox Content="Family" Foreground="White" Margin="5"/>
                         <CheckBox Content="Fantasy" Foreground="White" Margin="5"/>
                         <CheckBox Content="Film-Noir" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Game-Show" Foreground="White" Margin="5"/>
                         <CheckBox Content="History" Foreground="White" Margin="5"/>
                         <CheckBox Content="Horror" Foreground="White" Margin="5"/>
                         <CheckBox Content="Music" Foreground="White" Margin="5"/>
                         <CheckBox Content="Musical" Foreground="White" Margin="5"/>
                         <CheckBox Content="Mystery" Foreground="White" Margin="5"/>
+                        <CheckBox Content="News" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Reality-TV" Foreground="White" Margin="5"/>
                         <CheckBox Content="Romance" Foreground="White" Margin="5"/>
                         <CheckBox Content="Sci-Fi" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Short" Foreground="White" Margin="5"/>
                         <CheckBox Content="Sport" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Talk-Show" Foreground="White" Margin="5"/>
                         <CheckBox Content="Thriller" Foreground="White" Margin="5"/>
                         <CheckBox Content="War" Foreground="White" Margin="5"/>
                         <CheckBox Content="Western" Foreground="White" Margin="5"/>
@@ -97,6 +102,10 @@
                     <WrapPanel x:Name="TypePanel">
                         <CheckBox Content="Movie" Foreground="White" Margin="5"/>
                         <CheckBox Content="Series" Foreground="White" Margin="5"/>
+                        <CheckBox Content="Short" Foreground="White" Margin="5"/>
+                        <CheckBox Content="TV Movie" Foreground="White" Margin="5"/>
+                        <CheckBox Content="TV Special" Foreground="White" Margin="5"/>
+                        <CheckBox Content="TV Mini-Series" Foreground="White" Margin="5"/>
                     </WrapPanel>
             </Expander>
 

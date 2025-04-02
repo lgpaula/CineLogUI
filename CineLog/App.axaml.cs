@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using System.Net.Http;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -9,9 +12,12 @@ namespace CineLog
 {
     public partial class App : Application
     {
+        private Process? _pythonServerProcess;
+
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
+            StartPythonServer();
         }
 
         public override void OnFrameworkInitializationCompleted()
@@ -24,12 +30,55 @@ namespace CineLog
                 {
                     Setters =
                     {
-                        new Setter(Button.CursorProperty, new Cursor(StandardCursorType.Hand))
+                        new Setter(InputElement.CursorProperty, new Cursor(StandardCursorType.Hand))
                     }
                 });
+
+                desktop.Exit += (sender, args) => OnExit(sender!, args);
             }
 
+
             base.OnFrameworkInitializationCompleted();
+        }
+
+        private void StartPythonServer()
+        {
+            if (IsServerRunning()) return;
+
+            _pythonServerProcess = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "python3", // Change to "python" if on Windows
+                    Arguments = "scraper_api.py",
+                    WorkingDirectory = "/home/legion/CLionProjects/pyScraper/scraper", //Directory.GetCurrentDirectory(),
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
+            _pythonServerProcess.Start();
+        }
+
+        private bool IsServerRunning()
+        {
+            try
+            {
+                using var client = new HttpClient();
+                var response = client.GetAsync("http://127.0.0.1:5000/health").Result;
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void OnExit(object sender, ControlledApplicationLifetimeExitEventArgs e)
+        {
+            _pythonServerProcess?.Kill();
+            _pythonServerProcess?.Dispose();
         }
     }
 }

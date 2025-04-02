@@ -1,14 +1,14 @@
 using System;
-using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Linq;
+using System.Data.SQLite;
+using System.Collections.Generic;
 using Dapper;
 
 namespace CineLog.Views
 {
     public static class DatabaseHandler
     {
-        private static readonly string dbPath = "example.db";
+        private static readonly string dbPath = "/home/legion/CLionProjects/pyScraper/scraper/cinelog.db";
         private static readonly string connectionString = $"Data Source={dbPath};Version=3;";
         private const int moviesPerPage = 80;
 
@@ -16,6 +16,16 @@ namespace CineLog.Views
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = "PRAGMA journal_mode=WAL;";
+            command.ExecuteNonQuery();
+
+            // Check if the titles_table exists
+            var tableExists = connection.ExecuteScalar<int>(
+                "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='titles_table';"
+            );
+
+            if (tableExists == 0) return [];
 
             string query;
             object parameters;
