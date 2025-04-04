@@ -1,6 +1,5 @@
 <UserControl x:Class="CineLog.Views.CollectionView"
         xmlns="https://github.com/avaloniaui"
-        xmlns:rs="using:RangeSlider.Avalonia.Controls"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
         <ScrollViewer x:Name="CollectionScrollViewer" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
@@ -11,7 +10,12 @@
                                 </Expander.Header>
                                 <Grid RowDefinitions="*,*,*,*,*,*" ColumnDefinitions="150,*">
                                         <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Rating</TextBlock>
-                                        <rs:RangeSlider Grid.Row="0" Grid.Column="1" Minimum="0.0" Maximum="10.0" LowerSelectedValue="0.0" UpperSelectedValue="10.0" IsThumbOverlap="False"/>
+                                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="5">
+                                                <TextBlock Text="From" Foreground="White"/>
+                                                <TextBox x:Name="MinRating" Width="50" Text="0.0" Foreground="Black" Background="White"/>
+                                                <TextBlock Text="To" Foreground="White"/>
+                                                <TextBox x:Name="MaxRating" Width="50" Text="10.0" Foreground="Black" Background="White"/>
+                                        </StackPanel>
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Genre</TextBlock>
                                         <ScrollViewer Grid.Row="1" Grid.Column="1">
@@ -21,8 +25,12 @@
                                         </ScrollViewer>
 
                                         <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Year release</TextBlock>
-                                        <rs:RangeSlider x:Name="YearSlider" Grid.Row="2" Grid.Column="1" Minimum="1874" Maximum="2025" LowerSelectedValue="1874" UpperSelectedValue="2025" IsThumbOverlap="False"/>
-
+                                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="5">
+                                                <TextBlock Text="From" Foreground="White"/>
+                                                <TextBox x:Name="yearStart" Width="50" Text="" Foreground="Black" Background="White"/>
+                                                <TextBlock Text="To" Foreground="White"/>
+                                                <TextBox x:Name="yearEnd" Width="50" Text="" Foreground="Black" Background="White"/>
+                                        </StackPanel>
                                         
                                         <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center">Company</TextBlock>
                                         <ScrollViewer Grid.Row="3" Grid.Column="1">
@@ -32,7 +40,7 @@
                                         </ScrollViewer>
 
                                         <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Type</TextBlock>
-                                        <WrapPanel Grid.Row="4" Grid.Column="1" x:Name="TitleTypePanel" Orientation="Horizontal">
+                                        <WrapPanel x:Name="TitleTypePanel" Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
                                                 <CheckBox Content="Movie" Tag="Movie"/>
                                                 <CheckBox Content="Series" Tag="Series"/>
                                         </WrapPanel>

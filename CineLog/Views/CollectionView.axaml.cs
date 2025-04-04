@@ -1,6 +1,6 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Interactivity;
 using System;
 using System.Collections.Generic;
 
@@ -59,7 +59,6 @@ namespace CineLog.Views
 
         private void OnScrollChanged()
         {
-            // Console.WriteLine($"Offset.Y: {scrollViewer.Offset.Y}, window.Height: {scrollViewer.Viewport.Height}, window.Width: {scrollViewer.Extent.Height}");
             if (_scrollViewer?.Offset.Y + _scrollViewer?.Viewport.Height >= _scrollViewer?.Extent.Height - 100)
             {
                 Console.WriteLine("Loading more items...");
@@ -72,15 +71,20 @@ namespace CineLog.Views
         private void ApplyFilter(object? sender, RoutedEventArgs e)
         {
             _moviesContainer?.Children.Clear();
-            _currentOffset = 0; // Reset offset when applying a new filter
+            _currentOffset = 0;
 
-            // Read the Rating RangeSlider values (e.g., minimum and maximum selected ratings)
-            var ratingSlider = this.FindControl<RangeSlider.Avalonia.Controls.RangeSlider>("RatingSlider");
-            var ratingRange = ratingSlider != null ? 
-                            new Tuple<float, float>((float)ratingSlider.LowerSelectedValue, (float)ratingSlider.UpperSelectedValue) : 
-                            null;
+            float minRating = 0.0f;
+            float maxRating = 10.0f;
 
-            // Read selected Genres (e.g., checked checkboxes in GenreCheckBoxPanel)
+            // Read Rating values
+            var minRatingBox = this.FindControl<TextBox>("MinRating");
+            var maxRatingBox = this.FindControl<TextBox>("MaxRating");
+            if (minRatingBox != null && float.TryParse(minRatingBox.Text, out float minRatingParsed)) minRating = minRatingParsed;
+            if (maxRatingBox != null && float.TryParse(maxRatingBox.Text, out float maxratingParsed)) maxRating = maxratingParsed;
+
+            Console.WriteLine($"Min Rating: {minRating}, Max Rating: {maxRating}");
+
+            // Read selected Genres
             var selectedGenres = new List<string>();
             var genrePanel = this.FindControl<WrapPanel>("GenreCheckBoxPanel");
             if (genrePanel != null)
@@ -89,16 +93,21 @@ namespace CineLog.Views
                 {
                     if (child is CheckBox checkBox && checkBox.IsChecked == true && checkBox.Content != null)
                     {
-                        selectedGenres.Add(checkBox.Content.ToString());
+                        var content = checkBox.Content.ToString();
+                        if (!string.IsNullOrEmpty(content))
+                            selectedGenres.Add(content);
                     }
                 }
             }
 
-            // Read the Year RangeSlider values (e.g., minimum and maximum selected years)
-            var yearSlider = this.FindControl<RangeSlider.Avalonia.Controls.RangeSlider>("YearSlider");
-            var yearRange = yearSlider != null ? 
-                            new Tuple<int, int>((int)yearSlider.LowerSelectedValue, (int)yearSlider.UpperSelectedValue) : 
-                            null;
+            // Read Year values
+            int yearStart = 1874;
+            int yearEnd = DateTime.Now.Year;
+
+            var minYearBox = this.FindControl<TextBox>("MinYear");
+            var maxYearBox = this.FindControl<TextBox>("MaxYear");
+            if (minYearBox != null && int.TryParse(minYearBox.Text, out int minYearParsed)) yearStart = minYearParsed;
+            if (maxYearBox != null && int.TryParse(maxYearBox.Text, out int maxYearParsed)) yearEnd = maxYearParsed;
 
             // Read Company TextBox
             string? company = this.FindControl<TextBox>("CompanyTextBox")?.Text;
@@ -118,17 +127,16 @@ namespace CineLog.Views
             // Update the filter settings
             filterSettings = new DatabaseHandler.FilterSettings
             {
-                Rating = ratingRange,
+                MinRating = minRating,
+                MaxRating = maxRating,
                 Genre = selectedGenres,
-                Year = yearRange,
+                YearStart = yearStart,
+                YearEnd = yearEnd,
                 Company = company,
                 Type = selectedTypes.Count > 0 ? string.Join(",", selectedTypes) : null
             };
 
-            // Reload the movies based on the new filter
             LoadNextPage();
-
-            Console.WriteLine("Filtering movies...");
         }
 
         #endregion

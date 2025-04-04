@@ -1,7 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Linq;
+using System.Text;
+using System.Data.SQLite;
+using System.Collections.Generic;
 using Dapper;
 
 namespace CineLog.Views
@@ -16,75 +17,68 @@ namespace CineLog.Views
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
-
-            /* before filterSettings implementation
-            if (string.IsNullOrEmpty(listName))
-            {
-                query = @"
-                    SELECT title_id, title_name, poster_url 
-                    FROM titles_table 
-                    LIMIT @Count OFFSET @Offset";
-                parameters = new { Count = count, Offset = offset };
-            }
-            else
-            {
-                query = @"
-                    SELECT t.title_id, t.title_name, t.poster_url
-                    FROM titles_table t
-                    JOIN list_movies_table lm ON t.title_id = lm.movie_id
-                    JOIN lists_table l ON lm.list_id = l.id
-                    WHERE l.name = @ListName
-                    LIMIT @Count OFFSET @Offset";
-                parameters = new { Count = count, Offset = offset, ListName = listName };
-            }
-
-            var result = connection.Query<(string, string, string)>(query, parameters)
-                        .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
-                        .ToList();
-            */
-
-            // If filterSettings is null, create a new one with default values
+            
             filterSettings ??= new FilterSettings();
 
-            // Base query
-            var query = @"
-                SELECT t.title_id, t.title_name, t.poster_url
-                FROM titles_table t
-                LEFT JOIN list_movies_table lm ON t.title_id = lm.movie_id
-                LEFT JOIN lists_table l ON lm.list_id = l.id
-                WHERE (@ListName IS NULL OR l.name = @ListName)";
+            var query = new StringBuilder();
+            var parameters = new DynamicParameters();
 
-            // Apply filters dynamically based on non-null filterSettings
-            if (filterSettings.Rating != null)
-                query += " AND t.rating BETWEEN @MinRating AND @MaxRating";
-            if (filterSettings.Genre != null && filterSettings.Genre.Count > 0)
-                query += " AND t.genre IN @Genres";
-            if (filterSettings.Year != null)
-                query += " AND t.release_year BETWEEN @MinYear AND @MaxYear";
-            if (!string.IsNullOrEmpty(filterSettings.Company))
-                query += " AND t.production_company LIKE @Company";
-            if (!string.IsNullOrEmpty(filterSettings.Type))
-                query += " AND t.type IN (@Types)";
+            // Base SELECT
+            query.Append(@"
+                SELECT t.title_id, t.title_name, t.poster_url 
+                FROM titles_table t");
 
-            query += " LIMIT @Count OFFSET @Offset";
+            var whereClauses = new List<string>();
 
-            // Construct query parameters with null-safe default values
-            var parameters = new
+            // if list
+            if (!string.IsNullOrEmpty(listName))
             {
-                MinRating = filterSettings.Rating?.Item1 ?? 0,
-                MaxRating = filterSettings.Rating?.Item2 ?? 10,
-                Genres = filterSettings.Genre ?? new List<string>(),
-                MinYear = filterSettings.Year?.Item1 ?? 1874,
-                MaxYear = filterSettings.Year?.Item2 ?? DateTime.Now.Year,
-                Company = "%" + (filterSettings.Company ?? "") + "%",
-                Types = filterSettings.Type?.Split(',') ?? new string[0],
-                Count = count,
-                Offset = offset,
-                ListName = listName,
-            };
+                query.Append(@"
+                    JOIN list_movies_table lm ON t.title_id = lm.movie_id
+                    JOIN lists_table l ON lm.list_id = l.id");
+                whereClauses.Add("l.name = @ListName");
+                parameters.Add("ListName", listName);
+            }
+                
+            if (string.IsNullOrEmpty(listName)) whereClauses.Add("1 = 1"); // Dummy condition to start WHERE block
+
+            whereClauses.Add("t.rating >= @MinRating");
+            whereClauses.Add("t.rating <= @MaxRating");
+            parameters.Add("MinRating", filterSettings.MinRating ?? 0);
+            parameters.Add("MaxRating", filterSettings.MaxRating ?? 10);
+
+            whereClauses.Add("t.year_start >= @MinYear");
+            whereClauses.Add("(t.year_end <= @MaxYear OR t.year_end IS NULL)");
+            parameters.Add("MinYear", filterSettings.YearStart);
+            parameters.Add("MaxYear", filterSettings.YearEnd);
+
+            if (filterSettings.Genre is { Count: > 0 })
+            {
+                whereClauses.Add("t.genre IN @Genres");
+                parameters.Add("Genres", filterSettings.Genre);
+            }
+
+            if (!string.IsNullOrEmpty(filterSettings.Company))
+            {
+                whereClauses.Add("t.companies LIKE @Company");
+                parameters.Add("Company", "%" + filterSettings.Company + "%");
+            }
+
+            if (!string.IsNullOrEmpty(filterSettings.Type))
+            {
+                whereClauses.Add("t.title_type IN @Types");
+                parameters.Add("Types", filterSettings.Type.Split(','));
+            }
+
+            if (whereClauses.Count > 0)
+                query.Append(" WHERE " + string.Join(" AND ", whereClauses));
+
+            query.Append(" LIMIT @Count OFFSET @Offset");
+            parameters.Add("Count", count);
+            parameters.Add("Offset", offset);
 
             // Execute query and map the results
-            var result = connection.Query<(string, string, string)>(query, parameters)
+            var result = connection.Query<(string, string, string)>(query.ToString(), parameters)
                 .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
                 .ToList();
 
@@ -234,9 +228,11 @@ namespace CineLog.Views
 
         public class FilterSettings
         {
-            public Tuple<float, float>? Rating { get; set; }  // Nullable for optional filtering
-            public List<string>? Genre { get; set; } = new List<string>();
-            public Tuple<int, int>? Year { get; set; }
+            public float? MinRating { get; set; } = 0;
+            public float? MaxRating { get; set; } = 10;
+            public List<string>? Genre { get; set; } = [];
+            public int YearStart { get; set; } = 1874;
+            public int YearEnd { get; set; } = DateTime.Now.Year + 1;
             public string? Company { get; set; }
             public string? Type { get; set; }
 
