@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text;
 using System.Data.SQLite;
 using System.Collections.Generic;
 using Dapper;
@@ -12,10 +13,11 @@ namespace CineLog.Views
         private static readonly string connectionString = $"Data Source={dbPath};Version=3;";
         private const int moviesPerPage = 80;
 
-        public static List<Movie> GetMovies(string? listName = null, int count = 20, int offset = 0)
+        public static List<Movie> GetMovies(string? listName = null, int count = 20, int offset = 0, FilterSettings? filterSettings = null)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
+
             using var command = connection.CreateCommand();
             command.CommandText = "PRAGMA journal_mode=WAL;";
             command.ExecuteNonQuery();
@@ -26,33 +28,70 @@ namespace CineLog.Views
             );
 
             if (tableExists == 0) return [];
+            
+            filterSettings ??= new FilterSettings();
 
-            string query;
-            object parameters;
+            var query = new StringBuilder();
+            var parameters = new DynamicParameters();
 
-            if (string.IsNullOrEmpty(listName))
+            // Base SELECT
+            query.Append(@"
+                SELECT t.title_id, t.title_name, t.poster_url 
+                FROM titles_table t");
+
+            var whereClauses = new List<string>();
+
+            // if list
+            if (!string.IsNullOrEmpty(listName))
             {
-                query = @"
-                    SELECT title_id, title_name, poster_url 
-                    FROM titles_table 
-                    LIMIT @Count OFFSET @Offset";
-                parameters = new { Count = count, Offset = offset };
-            }
-            else
-            {
-                query = @"
-                    SELECT t.title_id, t.title_name, t.poster_url
-                    FROM titles_table t
+                query.Append(@"
                     JOIN list_movies_table lm ON t.title_id = lm.movie_id
-                    JOIN lists_table l ON lm.list_id = l.id
-                    WHERE l.name = @ListName
-                    LIMIT @Count OFFSET @Offset";
-                parameters = new { Count = count, Offset = offset, ListName = listName };
+                    JOIN lists_table l ON lm.list_id = l.id");
+                whereClauses.Add("l.name = @ListName");
+                parameters.Add("ListName", listName);
+            }
+                
+            if (string.IsNullOrEmpty(listName)) whereClauses.Add("1 = 1"); // Dummy condition to start WHERE block
+
+            whereClauses.Add("t.rating >= @MinRating");
+            whereClauses.Add("t.rating <= @MaxRating");
+            parameters.Add("MinRating", filterSettings.MinRating ?? 0);
+            parameters.Add("MaxRating", filterSettings.MaxRating ?? 10);
+
+            whereClauses.Add("t.year_start >= @MinYear");
+            whereClauses.Add("(t.year_end <= @MaxYear OR t.year_end IS NULL)");
+            parameters.Add("MinYear", filterSettings.YearStart);
+            parameters.Add("MaxYear", filterSettings.YearEnd);
+
+            if (filterSettings.Genre is { Count: > 0 })
+            {
+                whereClauses.Add("t.genre IN @Genres");
+                parameters.Add("Genres", filterSettings.Genre);
             }
 
-            var result = connection.Query<(string, string, string)>(query, parameters)
-                        .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
-                        .ToList();
+            if (!string.IsNullOrEmpty(filterSettings.Company))
+            {
+                whereClauses.Add("t.companies LIKE @Company");
+                parameters.Add("Company", "%" + filterSettings.Company + "%");
+            }
+
+            if (!string.IsNullOrEmpty(filterSettings.Type))
+            {
+                whereClauses.Add("t.title_type IN @Types");
+                parameters.Add("Types", filterSettings.Type.Split(','));
+            }
+
+            if (whereClauses.Count > 0)
+                query.Append(" WHERE " + string.Join(" AND ", whereClauses));
+
+            query.Append(" LIMIT @Count OFFSET @Offset");
+            parameters.Add("Count", count);
+            parameters.Add("Offset", offset);
+
+            // Execute query and map the results
+            var result = connection.Query<(string, string, string)>(query.ToString(), parameters)
+                .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
+                .ToList();
 
             return result;
         }
@@ -196,6 +235,20 @@ namespace CineLog.Views
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
             return connection.ExecuteScalar<int>("SELECT COALESCE(MAX(id), 0) + 1 FROM lists_table");
+        }
+
+        public class FilterSettings
+        {
+            public float? MinRating { get; set; } = 0;
+            public float? MaxRating { get; set; } = 10;
+            public List<string>? Genre { get; set; } = [];
+            public int YearStart { get; set; } = 1874;
+            public int YearEnd { get; set; } = DateTime.Now.Year + 1;
+            public string? Company { get; set; }
+            public string? Type { get; set; }
+
+            // Optional Constructor (empty initialization)
+            public FilterSettings() { }
         }
     }
 }

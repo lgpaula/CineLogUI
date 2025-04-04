@@ -6,6 +6,5 @@
 
     <Application.Styles>
         <FluentTheme/>  <!-- Or "Light" depending on your preference -->
-        <themes:RangeSliderTheme />
     </Application.Styles>
 </Application>
