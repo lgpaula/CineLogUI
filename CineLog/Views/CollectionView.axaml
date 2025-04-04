@@ -36,6 +36,26 @@
                                         <ScrollViewer Grid.Row="3" Grid.Column="1">
                                                 <WrapPanel x:Name="CompaniesPanel" Orientation="Horizontal">
                                                         <!-- add companies here as radioButtons dynamically -->
+                                                        <CheckBox Content="Disney"/>
+                                                        <CheckBox Content="Pixar"/>
+                                                        <CheckBox Content="DreamWorks"/>
+                                                        <CheckBox Content="Warner Bros."/>
+                                                        <CheckBox Content="Universal"/>
+                                                        <CheckBox Content="Paramount"/>
+                                                        <CheckBox Content="Sony"/>
+                                                        <CheckBox Content="20th Century Fox"/>
+                                                        <CheckBox Content="Lionsgate"/>
+                                                        <CheckBox Content="MGM"/>
+                                                        <CheckBox Content="Miramax"/>
+                                                        <CheckBox Content="New Line Cinema"/>
+                                                        <CheckBox Content="Orion Pictures"/>
+                                                        <CheckBox Content="TriStar Pictures"/>
+                                                        <CheckBox Content="United Artists"/>
+                                                        <CheckBox Content="Columbia Pictures"/>
+                                                        <CheckBox Content="Touchstone Pictures"/>
+                                                        <CheckBox Content="Focus Features"/>
+                                                        <CheckBox Content="Studio Ghibli"/>
+                                                        <CheckBox Content="A24"/>
                                                 </WrapPanel>
                                         </ScrollViewer>
 
