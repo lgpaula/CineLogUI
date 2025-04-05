@@ -5,7 +5,7 @@ using System.Data.SQLite;
 using System.Collections.Generic;
 using Dapper;
 
-namespace CineLog.Views
+namespace CineLog.Views.Helper
 {
     public static class DatabaseHandler
     {

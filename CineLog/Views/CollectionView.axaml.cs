@@ -3,6 +3,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Interactivity;
 using System;
 using System.Collections.Generic;
+using CineLog.Views.Helper;
 
 namespace CineLog.Views
 {

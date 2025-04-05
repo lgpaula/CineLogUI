@@ -8,7 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using System.Collections.Generic;
 
-namespace CineLog.Views 
+namespace CineLog.Views.Helper 
 {
     public class Movie
     {

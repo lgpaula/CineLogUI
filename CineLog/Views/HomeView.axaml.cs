@@ -1,13 +1,13 @@
 using System;
-using System.Net.Http;
+using System.Linq;
+using System.Collections.Generic;
 using Avalonia.Media;
 using Avalonia.Layout;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Interactivity;
 using CineLog.ViewModels;
-using System.Collections.Generic;
-using System.Linq;
+using CineLog.Views.Helper;
 
 namespace CineLog.Views
 {
