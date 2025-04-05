@@ -138,3 +138,6 @@ obj/
 
 # Databases
 *.db
+
+# temporary files
+*.txt
