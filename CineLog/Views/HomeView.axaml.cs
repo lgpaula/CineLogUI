@@ -75,6 +75,7 @@ namespace CineLog.Views
                 {
                     Button movieButton = movie.CreateMovieButton();
                     movieButton.Tag = movie.Id;
+                    movieButton.Click += ViewChanger;
                     panel.Children.Add(movieButton);
                 }
             }

@@ -1,0 +1,52 @@
+<UserControl x:Class="CineLog.Views.TitleView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Title" FontSize="20" HorizontalAlignment="Left" x:Name="TitleTextBox"/> <!-- add Schedule button -->
+                <TextBlock Grid.Row="1" Grid.Column="0" Text='&#x2B50;' x:Name="InfoTextBlock"/> <!-- Placeholder for year/runtime -->
+                <TextBlock Grid.Row="2" Grid.Column="0" FontSize="16" TextWrapping="Wrap" HorizontalAlignment="Stretch" x:Name="DescriptionBox"/>
+
+                <Expander Grid.Row="3" Grid.Column="0" HorizontalAlignment="Stretch" x:Name="GenreExpander">
+                    <Expander.Header>
+                        <TextBlock Text="Genre" Foreground="White" FontSize="20"/>
+                    </Expander.Header>
+                </Expander>
+
+                <Expander Grid.Row="4" Grid.Column="0" HorizontalAlignment="Stretch" x:Name="StarsExpander">
+                    <Expander.Header>
+                        <TextBlock Text="Stars" Foreground="White" FontSize="20"/>
+                    </Expander.Header>
+                </Expander>
+
+                <Expander Grid.Row="5" Grid.Column="0" HorizontalAlignment="Stretch" x:Name="WritersExpander">
+                    <Expander.Header>
+                        <TextBlock Text="Writers" Foreground="White" FontSize="20"/>
+                    </Expander.Header>
+                </Expander>
+
+                <Expander Grid.Row="6" Grid.Column="0" HorizontalAlignment="Stretch" x:Name="DirectorsExpander">
+                    <Expander.Header>
+                        <TextBlock Text="Directors" Foreground="White" FontSize="20"/>
+                    </Expander.Header>
+                </Expander>
+
+                <Expander Grid.Row="7" Grid.Column="0" HorizontalAlignment="Stretch" x:Name="CreatorsExpander">
+                    <Expander.Header>
+                        <TextBlock Text="Creators" Foreground="White" FontSize="20"/>
+                    </Expander.Header>
+                </Expander>
+
+                <Expander Grid.Row="8" Grid.Column="0" HorizontalAlignment="Stretch" x:Name="CompaniesExpander">
+                    <Expander.Header>
+                        <TextBlock Text="Companies" Foreground="White" FontSize="20"/>
+                    </Expander.Header>
+                </Expander>
+
+                <StackPanel Grid.Row="0" Grid.RowSpan="9" Grid.Column="1" x:Name="TitlePoster"/>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -50,6 +50,8 @@ namespace CineLog.Views
             foreach (var movie in movies)
             {
                 var movieButton = movie.CreateMovieButton();
+                movieButton.Tag = movie.Id;
+                // movieButton 
                 _moviesContainer?.Children.Add(movieButton);
             }
 
