@@ -83,10 +83,6 @@ namespace CineLog.Views.Helper
             movieBox.Child = contentPanel;
             movieButton.Content = movieBox;
 
-            movieButton.Click += (s, e) => {
-                Console.WriteLine($"Movie clicked: {Title}");
-            };
-
             movieButton.PointerPressed += (s, e) =>
             {
                 var contextMenu = CreateContextMenu();
@@ -150,12 +146,10 @@ namespace CineLog.Views.Helper
         {
             if (isChecked)
             {
-                Console.WriteLine($"Added to list: {listName}");
                 DatabaseHandler.AddMovieToList(listName, Id);
             }
             else
             {
-                Console.WriteLine($"Removed from list: {listName}");
                 DatabaseHandler.RemoveMovieFromList(listName, Id);
             }
 

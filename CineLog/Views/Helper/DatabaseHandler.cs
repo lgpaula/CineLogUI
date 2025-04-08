@@ -12,7 +12,6 @@ namespace CineLog.Views.Helper
     {
         private static readonly string dbPath = "/home/legion/CLionProjects/pyScraper/scraper/cinelog.db";
         private static readonly string connectionString = $"Data Source={dbPath};Version=3;";
-        private const int moviesPerPage = 80;
 
         public static List<Movie> GetMovies(string? listName = null, int count = 20, int offset = 0, FilterSettings? filterSettings = null)
         {
@@ -29,8 +28,6 @@ namespace CineLog.Views.Helper
             );
 
             if (tableExists == 0) return [];
-            
-            // filterSettings ??= new FilterSettings();
 
             var query = new StringBuilder();
             var parameters = new DynamicParameters();
@@ -66,7 +63,6 @@ namespace CineLog.Views.Helper
             parameters.Add("Count", count);
             parameters.Add("Offset", offset);
 
-            // Execute query and map the results
             var result = connection.Query<(string, string, string)>(query.ToString(), parameters)
                 .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
                 .ToList();
@@ -129,24 +125,21 @@ namespace CineLog.Views.Helper
             using var transaction = connection.BeginTransaction();
             try
             {
-                // Get list ID
                 int listId = connection.ExecuteScalar<int>(
                     "SELECT id FROM lists_table WHERE name = @ListName",
-                    new { ListName = listName }, transaction // Pass transaction here
+                    new { ListName = listName }, transaction
                 );
 
-                // Check if the movie is already in the list
                 int exists = connection.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM list_movies_table WHERE list_id = @ListId AND movie_id = @MovieId",
-                    new { ListId = listId, MovieId = movieId }, transaction // Pass transaction here
+                    new { ListId = listId, MovieId = movieId }, transaction
                 );
 
                 if (exists == 0)
                 {
-                    // Insert movie into list_movies_table
                     connection.Execute(
                         "INSERT INTO list_movies_table (list_id, movie_id) VALUES (@ListId, @MovieId)",
-                        new { ListId = listId, MovieId = movieId }, transaction // Pass transaction here
+                        new { ListId = listId, MovieId = movieId }, transaction
                     );
                 }
 
@@ -227,8 +220,6 @@ namespace CineLog.Views.Helper
             connection.Open();
             connection.Execute("INSERT INTO lists_table (name) VALUES (@name)", new { name = listName });
 
-            Console.WriteLine("listname: " + listName + " created");
-
             return listName;
         }
 
@@ -248,14 +239,11 @@ namespace CineLog.Views.Helper
 
         public static async Task<TitleInfo> GetTitleInfo(string id)
         {
-            Console.WriteLine($"GetTitleInfo for id: {id}");
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
             string checkQuery = "SELECT updated FROM titles_table WHERE title_id = @id";
             bool isUpdated = connection.ExecuteScalar<bool>(checkQuery, new { id });
-
-            Console.WriteLine($"Is updated: {isUpdated}");
 
             if (!isUpdated)
             {
@@ -278,7 +266,6 @@ namespace CineLog.Views.Helper
             public string? Company { get; set; }
             public string? Type { get; set; }
 
-            // Optional Constructor (empty initialization)
             public FilterSettings() { }
         }
 

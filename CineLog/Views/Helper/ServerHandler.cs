@@ -13,10 +13,7 @@ namespace CineLog.Views.Helper
             try
             {
                 var response = await client.GetAsync($"http://127.0.0.1:5000/scrape?criteria={Uri.EscapeDataString(criteria)}");
-                // Console.WriteLine($"HTTP Status Code: {response.StatusCode}");
-                
                 string result = await response.Content.ReadAsStringAsync();
-                // Console.WriteLine("Python result: " + result);
                 
                 if (!response.IsSuccessStatusCode) return "Flask API Error: " + result;
 

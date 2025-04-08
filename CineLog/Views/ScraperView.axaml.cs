@@ -58,7 +58,6 @@ namespace CineLog.Views
         {
             string stringCriteria = ConvertCriteria(criteria);
             string response = await Helper.ServerHandler.ScrapeMultipleTitles(stringCriteria);
-            Console.WriteLine("Response: " + response);
         }
 
         private List<CheckBox> GetCheckBoxes(string parentName)
@@ -98,7 +97,6 @@ namespace CineLog.Views
             };
 
             var stringCriteria = JsonConvert.SerializeObject(dict);
-            Console.WriteLine("stringCriteria: " + stringCriteria);
 
             return stringCriteria;
         }

@@ -15,8 +15,6 @@ namespace CineLog.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-            // You can do additional initialization here, directly on the UI thread
-            Console.WriteLine("profile");
         }
     }
 }

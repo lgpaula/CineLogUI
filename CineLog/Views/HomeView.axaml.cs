@@ -168,7 +168,6 @@ namespace CineLog.Views
                 {
                     DatabaseHandler.DeleteList(listName);
                     var panel = _listPanels.FirstOrDefault(p => p.Name == listName);
-                    Console.WriteLine(panel == null);
                     if (panel != null)
                     {
                         if (panel.Parent is DockPanel dockPanel)

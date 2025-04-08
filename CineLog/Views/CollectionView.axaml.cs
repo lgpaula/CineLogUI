@@ -66,7 +66,6 @@ namespace CineLog.Views
         {
             if (_scrollViewer?.Offset.Y + _scrollViewer?.Viewport.Height >= _scrollViewer?.Extent.Height - 100)
             {
-                Console.WriteLine("Loading more items...");
                 LoadNextPage();
             }
         }
@@ -86,8 +85,6 @@ namespace CineLog.Views
             var maxRatingBox = this.FindControl<TextBox>("MaxRating");
             if (minRatingBox != null && float.TryParse(minRatingBox.Text, out float minRatingParsed)) minRating = minRatingParsed;
             if (maxRatingBox != null && float.TryParse(maxRatingBox.Text, out float maxratingParsed)) maxRating = maxratingParsed;
-
-            Console.WriteLine($"Min Rating: {minRating}, Max Rating: {maxRating}");
 
             // Read selected Genres
             var selectedGenres = new List<string>();
