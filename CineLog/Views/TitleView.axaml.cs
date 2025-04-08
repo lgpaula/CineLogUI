@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
@@ -94,7 +95,12 @@ namespace CineLog.Views
 
             foreach (var item in itemList)
             {
-                panel.Children.Add(new TextBlock { Text = item.Trim(), FontSize = 12 });
+                panel.Children.Add(new Button 
+                {
+                    Content = item.Trim(),
+                    FontSize = 12,
+                    Margin = new Thickness(0, 0, 5, 0),
+                });
             }
 
             wrap.Content = panel;
