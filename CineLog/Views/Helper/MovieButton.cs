@@ -31,6 +31,13 @@ namespace CineLog.Views.Helper
             PosterUrl = string.Empty;
         }
 
+        public Movie(string posterUrl)
+        {
+            Id = string.Empty;
+            Title = string.Empty;
+            PosterUrl = posterUrl;
+        }
+
         public Button CreateMovieButton()
         {
             Button movieButton = new()
@@ -58,21 +65,6 @@ namespace CineLog.Views.Helper
                 Spacing = 5
             };
 
-            Image movieImage = new()
-            {
-                Stretch = Stretch.UniformToFill,
-                Width = 130,
-                Height = 180
-            };
-
-            _ = LoadImageFromUrl(movieImage);
-
-            Border imageBorder = new()
-            {
-                CornerRadius = new CornerRadius(5),
-                ClipToBounds = true,
-                Child = movieImage
-            };
 
             TextBlock movieTitle = new()
             {
@@ -86,7 +78,7 @@ namespace CineLog.Views.Helper
                 Margin = new Thickness(0, 5, 0, 0)
             };
 
-            contentPanel.Children.Add(imageBorder);
+            contentPanel.Children.Add(GetImageBorder());
             contentPanel.Children.Add(movieTitle);
             movieBox.Child = contentPanel;
             movieButton.Content = movieBox;
@@ -168,6 +160,27 @@ namespace CineLog.Views.Helper
             }
 
             EventAggregator.Instance.Publish("ListUpdated", listName, listName);
+        }
+
+        public Border GetImageBorder()
+        {
+            Image movieImage = new()
+            {
+                Stretch = Stretch.UniformToFill,
+                // Width = 130,
+                // Height = 180
+            };
+
+            _ = LoadImageFromUrl(movieImage);
+
+            Border imageBorder = new()
+            {
+                CornerRadius = new CornerRadius(5),
+                ClipToBounds = true,
+                Child = movieImage
+            };
+
+            return imageBorder;
         }
 
         private async Task LoadImageFromUrl(Image image)

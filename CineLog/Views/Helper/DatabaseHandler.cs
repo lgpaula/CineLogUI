@@ -29,7 +29,7 @@ namespace CineLog.Views.Helper
 
             if (tableExists == 0) return [];
             
-            filterSettings ??= new FilterSettings();
+            // filterSettings ??= new FilterSettings();
 
             var query = new StringBuilder();
             var parameters = new DynamicParameters();
@@ -53,12 +53,34 @@ namespace CineLog.Views.Helper
                 
             if (string.IsNullOrEmpty(listName)) whereClauses.Add("1 = 1"); // Dummy condition to start WHERE block
 
-            whereClauses.Add("t.rating >= @MinRating");
-            whereClauses.Add("t.rating <= @MaxRating");
+            if (filterSettings != null)
+            {
+                appendFilterClauses(filterSettings, whereClauses, parameters);
+            }
+
+            if (whereClauses.Count > 0)
+                query.Append(" WHERE " + string.Join(" AND ", whereClauses));
+
+            query.Append(" LIMIT @Count OFFSET @Offset");
+            parameters.Add("Count", count);
+            parameters.Add("Offset", offset);
+
+            // Execute query and map the results
+            var result = connection.Query<(string, string, string)>(query.ToString(), parameters)
+                .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
+                .ToList();
+
+            return result;
+        }
+
+        private static void appendFilterClauses(FilterSettings filterSettings, List<string> whereClauses, DynamicParameters parameters)
+        {
+            whereClauses.Add("(t.rating >= @MinRating OR t.rating IS NULL)");
+            whereClauses.Add("(t.rating <= @MaxRating OR t.rating IS NULL)");
             parameters.Add("MinRating", filterSettings.MinRating ?? 0);
             parameters.Add("MaxRating", filterSettings.MaxRating ?? 10);
 
-            whereClauses.Add("t.year_start >= @MinYear");
+            whereClauses.Add("(t.year_start >= @MinYear OR t.year_start IS NULL)");
             whereClauses.Add("(t.year_end <= @MaxYear OR t.year_end IS NULL)");
             parameters.Add("MinYear", filterSettings.YearStart);
             parameters.Add("MaxYear", filterSettings.YearEnd);
@@ -80,20 +102,6 @@ namespace CineLog.Views.Helper
                 whereClauses.Add("t.title_type IN @Types");
                 parameters.Add("Types", filterSettings.Type.Split(','));
             }
-
-            if (whereClauses.Count > 0)
-                query.Append(" WHERE " + string.Join(" AND ", whereClauses));
-
-            query.Append(" LIMIT @Count OFFSET @Offset");
-            parameters.Add("Count", count);
-            parameters.Add("Offset", offset);
-
-            // Execute query and map the results
-            var result = connection.Query<(string, string, string)>(query.ToString(), parameters)
-                .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
-                .ToList();
-
-            return result;
         }
 
         public static List<string> GetListsFromDatabase()
@@ -237,6 +245,25 @@ namespace CineLog.Views.Helper
             return connection.ExecuteScalar<int>("SELECT COALESCE(MAX(id), 0) + 1 FROM lists_table");
         }
 
+        public static TitleInfo GetTitleInfo(string id)
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            string checkQuery = "SELECT updated FROM titles_table WHERE title_id = @id";
+            bool isUpdated = connection.ExecuteScalar<bool>(checkQuery, new { id });
+
+            if (!isUpdated)
+            {
+                ServerHandler.ScrapeSingleTitle(id).Wait();
+            }
+
+            string query = @"SELECT * FROM titles_table WHERE title_id = @id";
+            var result = connection.QuerySingleOrDefault<TitleInfo>(query, new { id });
+
+            return result;
+        }
+
         public class FilterSettings
         {
             public float? MinRating { get; set; } = 0;
@@ -249,6 +276,24 @@ namespace CineLog.Views.Helper
 
             // Optional Constructor (empty initialization)
             public FilterSettings() { }
+        }
+
+        public readonly struct TitleInfo
+        {
+            public string Id { get; }
+            public string? Title { get; }
+            public string? PosterUrl { get; }
+            public int? YearStart { get; }
+            public int? YearEnd { get; }
+            public string? Plot { get; }
+            public string? Runtime { get; }
+            public string? Rating { get; }
+            public string? Genres { get; }
+            public string? Stars { get; }
+            public string? Writers { get; }
+            public string? Directors { get; }
+            public string? Creators { get; }
+            public string? Companies { get; }
         }
     }
 }
