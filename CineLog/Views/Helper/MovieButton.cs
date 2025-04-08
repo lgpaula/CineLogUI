@@ -161,8 +161,6 @@ namespace CineLog.Views.Helper
             Image movieImage = new()
             {
                 Stretch = Stretch.UniformToFill,
-                // Width = 130,
-                // Height = 180
             };
 
             _ = LoadImageFromUrl(movieImage);

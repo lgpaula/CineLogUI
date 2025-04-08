@@ -54,11 +54,11 @@ namespace CineLog.Views
         {
             var titleInfo = await DatabaseHandler.GetTitleInfo(id);
 
-            _titleTextBox!.Text = titleInfo.Title;
+            _titleTextBox!.Text = titleInfo.Title_name;
 
-            _infoTextBlock!.Text = $"⭐ {titleInfo.Rating} • {titleInfo.YearStart}";
-            if (titleInfo.YearEnd != null)
-                _infoTextBlock.Text += $" - {titleInfo.YearEnd}";
+            _infoTextBlock!.Text = $"⭐ {titleInfo.Rating} • {titleInfo.Year_start}";
+            if (titleInfo.Year_end != null)
+                _infoTextBlock.Text += $" - {titleInfo.Year_end}";
             _infoTextBlock.Text += $" • {titleInfo.Runtime}";
 
             _descriptionBox!.Text = titleInfo.Plot;
@@ -70,9 +70,9 @@ namespace CineLog.Views
             TryFill(_creatorsExpander, titleInfo.Creators);
             TryFill(_companiesExpander, titleInfo.Companies);
 
-            if (_titlePoster is not null && !string.IsNullOrWhiteSpace(titleInfo.PosterUrl))
+            if (_titlePoster is not null && !string.IsNullOrWhiteSpace(titleInfo.Poster_url))
             {
-                Movie movie = new(titleInfo.PosterUrl);
+                Movie movie = new(titleInfo.Poster_url);
                 _titlePoster.Children.Add(movie.GetImageBorder());
             }
         }

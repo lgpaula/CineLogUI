@@ -9,37 +9,37 @@
                 <TextBlock Grid.Row="1" Grid.Column="0" Text='&#x2B50;' x:Name="InfoTextBlock"/> <!-- Placeholder for year/runtime -->
                 <TextBlock Grid.Row="2" Grid.Column="0" FontSize="16" TextWrapping="Wrap" HorizontalAlignment="Stretch" x:Name="DescriptionBox"/>
 
-                <Expander Grid.Row="3" Grid.Column="0" HorizontalAlignment="Stretch" x:Name="GenreExpander">
+                <Expander Grid.Row="3" Grid.Column="0" x:Name="GenreExpander">
                     <Expander.Header>
                         <TextBlock Text="Genre" Foreground="White" FontSize="20"/>
                     </Expander.Header>
                 </Expander>
 
-                <Expander Grid.Row="4" Grid.Column="0" HorizontalAlignment="Stretch" x:Name="StarsExpander">
+                <Expander Grid.Row="4" Grid.Column="0" x:Name="StarsExpander">
                     <Expander.Header>
                         <TextBlock Text="Stars" Foreground="White" FontSize="20"/>
                     </Expander.Header>
                 </Expander>
 
-                <Expander Grid.Row="5" Grid.Column="0" HorizontalAlignment="Stretch" x:Name="WritersExpander">
+                <Expander Grid.Row="5" Grid.Column="0" x:Name="WritersExpander">
                     <Expander.Header>
                         <TextBlock Text="Writers" Foreground="White" FontSize="20"/>
                     </Expander.Header>
                 </Expander>
 
-                <Expander Grid.Row="6" Grid.Column="0" HorizontalAlignment="Stretch" x:Name="DirectorsExpander">
+                <Expander Grid.Row="6" Grid.Column="0" x:Name="DirectorsExpander">
                     <Expander.Header>
                         <TextBlock Text="Directors" Foreground="White" FontSize="20"/>
                     </Expander.Header>
                 </Expander>
 
-                <Expander Grid.Row="7" Grid.Column="0" HorizontalAlignment="Stretch" x:Name="CreatorsExpander">
+                <Expander Grid.Row="7" Grid.Column="0" x:Name="CreatorsExpander">
                     <Expander.Header>
                         <TextBlock Text="Creators" Foreground="White" FontSize="20"/>
                     </Expander.Header>
                 </Expander>
 
-                <Expander Grid.Row="8" Grid.Column="0" HorizontalAlignment="Stretch" x:Name="CompaniesExpander">
+                <Expander Grid.Row="8" Grid.Column="0" x:Name="CompaniesExpander">
                     <Expander.Header>
                         <TextBlock Text="Companies" Foreground="White" FontSize="20"/>
                     </Expander.Header>

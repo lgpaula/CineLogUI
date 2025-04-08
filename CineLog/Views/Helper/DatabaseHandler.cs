@@ -269,22 +269,22 @@ namespace CineLog.Views.Helper
             public FilterSettings() { }
         }
 
-        public readonly struct TitleInfo
+        public struct TitleInfo
         {
-            public string Id { get; }
-            public string? Title { get; }
-            public string? PosterUrl { get; }
-            public int? YearStart { get; }
-            public int? YearEnd { get; }
-            public string? Plot { get; }
-            public string? Runtime { get; }
-            public string? Rating { get; }
-            public string? Genres { get; }
-            public string? Stars { get; }
-            public string? Writers { get; }
-            public string? Directors { get; }
-            public string? Creators { get; }
-            public string? Companies { get; }
+            public string Title_Id { get; set; }
+            public string? Title_name { get; set; }
+            public string? Poster_url { get; set; }
+            public int? Year_start { get; set; }
+            public int? Year_end { get; set; }
+            public string? Plot { get; set; }
+            public string? Runtime { get; set; }
+            public string? Rating { get; set; }
+            public string? Genres { get; set; }
+            public string? Stars { get; set; }
+            public string? Writers { get; set; }
+            public string? Directors { get; set; }
+            public string? Creators { get; set; }
+            public string? Companies { get; set; }
         }
     }
 }
