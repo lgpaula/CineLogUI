@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using CineLog.Views.Helper;
 using System;
-using System.Collections.Generic;
 
 namespace CineLog.Views
 {
@@ -16,6 +16,7 @@ namespace CineLog.Views
         private Expander ?_directorsExpander;
         private Expander ?_creatorsExpander;
         private Expander ?_companiesExpander;
+        private StackPanel ?_titlePoster;
 
         public TitleView(string id)
         {
@@ -45,52 +46,51 @@ namespace CineLog.Views
                 ?? throw new NullReferenceException("CreatorsExpander not found in XAML");
             _companiesExpander = this.FindControl<Expander>("CompaniesExpander")
                 ?? throw new NullReferenceException("CompaniesExpander not found in XAML");
+            _titlePoster = this.FindControl<StackPanel>("TitlePoster")
+                ?? throw new NullReferenceException("TitlePoster not found in XAML");
         }
 
         private void LoadTitleInfo(string id)
         {
-            // Simulated loading - replace with actual logic
-            var titleInfo = new
-            {
-                Title = "The Matrix",
-                Year = 1999,
-                Runtime = "2h 16m",
-                Description = "A computer hacker learns about the true nature of reality.",
-                Genres = new List<string> { "Action", "Sci-Fi" },
-                Stars = new List<string> { "Keanu Reeves", "Laurence Fishburne" },
-                Writers = new List<string> { "Lana Wachowski", "Lilly Wachowski" },
-                Directors = new List<string> { "The Wachowskis" },
-                Creators = new List<string> { },
-                Companies = new List<string> { "Warner Bros." }
-            };
+            var titleInfo = DatabaseHandler.GetTitleInfo(id);
 
-            if (_titleTextBox != null)
-            {
-                _titleTextBox.Text = titleInfo.Title;
-            }
-            if (_infoTextBlock != null)
-            {
-                _infoTextBlock.Text = $"⭐ {titleInfo.Year} • {titleInfo.Runtime}";
-            }
-            if (_descriptionBox != null)
-            {
-                _descriptionBox.Text = titleInfo.Description;
-            }
+            _titleTextBox!.Text = titleInfo.Title;
 
-            FillExpander(_genreExpander, titleInfo.Genres);
-            FillExpander(_starsExpander, titleInfo.Stars);
-            FillExpander(_writersExpander, titleInfo.Writers);
-            FillExpander(_directorsExpander, titleInfo.Directors);
-            FillExpander(_creatorsExpander, titleInfo.Creators);
-            FillExpander(_companiesExpander, titleInfo.Companies);
+            _infoTextBlock!.Text = $"⭐ {titleInfo.Rating} • {titleInfo.YearStart}";
+            if (titleInfo.YearEnd != null)
+                _infoTextBlock.Text += $" - {titleInfo.YearEnd}";
+            _infoTextBlock.Text += $" • {titleInfo.Runtime}";
+
+            _descriptionBox!.Text = titleInfo.Plot;
+
+            TryFill(_genreExpander, titleInfo.Genres);
+            TryFill(_starsExpander, titleInfo.Stars);
+            TryFill(_writersExpander, titleInfo.Writers);
+            TryFill(_directorsExpander, titleInfo.Directors);
+            TryFill(_creatorsExpander, titleInfo.Creators);
+            TryFill(_companiesExpander, titleInfo.Companies);
+
+            if (_titlePoster is not null && !string.IsNullOrWhiteSpace(titleInfo.PosterUrl))
+            {
+                Movie movie = new(titleInfo.PosterUrl);
+                _titlePoster.Children.Add(movie.GetImageBorder());
+            }
         }
 
-        private static void FillExpander(Expander expander, List<string> items)
+        private static void TryFill(Expander? expander, string? data)
+        {
+            if (expander is not null && !string.IsNullOrWhiteSpace(data))
+                FillExpander(expander, data);
+        }
+
+        private static void FillExpander(Expander expander, string items)
         {
             var panel = new StackPanel();
-            foreach (var item in items)
+            var itemList = items.Split(',');
+
+            foreach (var item in itemList)
             {
-                panel.Children.Add(new TextBlock { Text = item, FontSize = 16 });
+                panel.Children.Add(new TextBlock { Text = item.Trim(), FontSize = 12 });
             }
 
             expander.Content = panel;

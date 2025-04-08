@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Avalonia.Controls;
@@ -58,7 +57,7 @@ namespace CineLog.Views
         private static async Task StartScraping(ScraperCriteria criteria)
         {
             string stringCriteria = ConvertCriteria(criteria);
-            string response = await ScrapeAsync(stringCriteria);
+            string response = await Helper.ServerHandler.ScrapeMultipleTitles(stringCriteria);
             Console.WriteLine("Response: " + response);
         }
 
@@ -82,34 +81,6 @@ namespace CineLog.Views
         private static float? TryParseFloat(string? text)
         {
             return float.TryParse(text, out var result) ? result : null;
-        }
-
-        private static async Task<string> ScrapeAsync(string criteria)
-        {
-            using var client = new HttpClient();
-            client.Timeout = TimeSpan.FromSeconds(120);
-            try
-            {
-                var response = await client.GetAsync($"http://127.0.0.1:5000/scrape?criteria={Uri.EscapeDataString(criteria)}");
-                // Console.WriteLine($"HTTP Status Code: {response.StatusCode}");
-                
-                string result = await response.Content.ReadAsStringAsync();
-                // Console.WriteLine("Python result: " + result);
-                
-                if (!response.IsSuccessStatusCode) return "Flask API Error: " + result;
-
-                return result;
-            }
-            catch (TaskCanceledException ex) when (!ex.CancellationToken.IsCancellationRequested)
-            {
-                Console.WriteLine("Flask API timeout: " + ex.Message);
-                return "Error: Timeout";
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error calling Flask API: " + ex.Message);
-                return "Error";
-            }
         }
 
         private static string ConvertCriteria(ScraperCriteria criteria)

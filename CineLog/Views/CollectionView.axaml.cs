@@ -4,11 +4,13 @@ using Avalonia.Interactivity;
 using System;
 using System.Collections.Generic;
 using CineLog.Views.Helper;
+using CineLog.ViewModels;
 
 namespace CineLog.Views
 {
     public partial class CollectionView : UserControl
     {
+        private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext!;
         public string viewName = string.Empty;
         private int _currentOffset = 0;
         private const int count = 50;
@@ -51,7 +53,7 @@ namespace CineLog.Views
             {
                 var movieButton = movie.CreateMovieButton();
                 movieButton.Tag = movie.Id;
-                // movieButton 
+                movieButton.Click += ViewChanger;
                 _moviesContainer?.Children.Add(movieButton);
             }
 
@@ -143,6 +145,14 @@ namespace CineLog.Views
         }
 
         #endregion
+
+        private void ViewChanger(object? sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is string viewName)
+            {
+                ViewModel?.HandleButtonClick(viewName);
+            }
+        }
 
     }
 }
