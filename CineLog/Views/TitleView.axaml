@@ -13,36 +13,42 @@
                     <Expander.Header>
                         <TextBlock Text="Genre" Foreground="White" FontSize="20"/>
                     </Expander.Header>
+                    <ScrollViewer x:Name="GenreScrollViewer"/>
                 </Expander>
 
                 <Expander Grid.Row="4" Grid.Column="0" x:Name="StarsExpander">
                     <Expander.Header>
                         <TextBlock Text="Stars" Foreground="White" FontSize="20"/>
                     </Expander.Header>
+                    <ScrollViewer x:Name="StarsScrollViewer"/>
                 </Expander>
 
                 <Expander Grid.Row="5" Grid.Column="0" x:Name="WritersExpander">
                     <Expander.Header>
                         <TextBlock Text="Writers" Foreground="White" FontSize="20"/>
                     </Expander.Header>
+                    <ScrollViewer x:Name="WritersScrollViewer"/>
                 </Expander>
 
                 <Expander Grid.Row="6" Grid.Column="0" x:Name="DirectorsExpander">
                     <Expander.Header>
                         <TextBlock Text="Directors" Foreground="White" FontSize="20"/>
                     </Expander.Header>
+                    <ScrollViewer x:Name="DirectorsScrollViewer"/>
                 </Expander>
 
                 <Expander Grid.Row="7" Grid.Column="0" x:Name="CreatorsExpander">
                     <Expander.Header>
                         <TextBlock Text="Creators" Foreground="White" FontSize="20"/>
                     </Expander.Header>
+                    <ScrollViewer x:Name="CreatorsScrollViewer"/>
                 </Expander>
 
                 <Expander Grid.Row="8" Grid.Column="0" x:Name="CompaniesExpander">
                     <Expander.Header>
                         <TextBlock Text="Companies" Foreground="White" FontSize="20"/>
                     </Expander.Header>
+                    <ScrollViewer x:Name="CompaniesScrollViewer"/>
                 </Expander>
 
                 <StackPanel Grid.Row="0" Grid.RowSpan="9" Grid.Column="1" x:Name="TitlePoster"/>

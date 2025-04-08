@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using CineLog.Views.Helper;
 using System;
@@ -10,12 +11,12 @@ namespace CineLog.Views
         private TextBlock ?_titleTextBox;
         private TextBlock ?_infoTextBlock;
         private TextBlock ?_descriptionBox;
-        private Expander ?_genreExpander;
-        private Expander ?_starsExpander;
-        private Expander ?_writersExpander;
-        private Expander ?_directorsExpander;
-        private Expander ?_creatorsExpander;
-        private Expander ?_companiesExpander;
+        private ScrollViewer ?_genreViewer;
+        private ScrollViewer ?_starsViewer;
+        private ScrollViewer ?_writersViewer;
+        private ScrollViewer ?_directorsViewer;
+        private ScrollViewer ?_creatorsViewer;
+        private ScrollViewer ?_companiesViewer;
         private StackPanel ?_titlePoster;
 
         public TitleView(string id)
@@ -34,17 +35,17 @@ namespace CineLog.Views
                 ?? throw new NullReferenceException("InfoTextBlock not found in XAML");
             _descriptionBox = this.FindControl<TextBlock>("DescriptionBox")
                 ?? throw new NullReferenceException("DescriptionBox not found in XAML");
-            _genreExpander = this.FindControl<Expander>("GenreExpander")
+            _genreViewer = this.FindControl<ScrollViewer>("GenreScrollViewer")
                 ?? throw new NullReferenceException("GenreExpander not found in XAML");
-            _starsExpander = this.FindControl<Expander>("StarsExpander")
+            _starsViewer = this.FindControl<ScrollViewer>("StarsScrollViewer")
                 ?? throw new NullReferenceException("StarsExpander not found in XAML");
-            _writersExpander = this.FindControl<Expander>("WritersExpander")
+            _writersViewer = this.FindControl<ScrollViewer>("WritersScrollViewer")
                 ?? throw new NullReferenceException("WritersExpander not found in XAML");
-            _directorsExpander = this.FindControl<Expander>("DirectorsExpander")
+            _directorsViewer = this.FindControl<ScrollViewer>("DirectorsScrollViewer")
                 ?? throw new NullReferenceException("DirectorsExpander not found in XAML");
-            _creatorsExpander = this.FindControl<Expander>("CreatorsExpander")
+            _creatorsViewer = this.FindControl<ScrollViewer>("CreatorsScrollViewer")
                 ?? throw new NullReferenceException("CreatorsExpander not found in XAML");
-            _companiesExpander = this.FindControl<Expander>("CompaniesExpander")
+            _companiesViewer = this.FindControl<ScrollViewer>("CompaniesScrollViewer")
                 ?? throw new NullReferenceException("CompaniesExpander not found in XAML");
             _titlePoster = this.FindControl<StackPanel>("TitlePoster")
                 ?? throw new NullReferenceException("TitlePoster not found in XAML");
@@ -63,12 +64,12 @@ namespace CineLog.Views
 
             _descriptionBox!.Text = titleInfo.Plot;
 
-            TryFill(_genreExpander, titleInfo.Genres);
-            TryFill(_starsExpander, titleInfo.Stars);
-            TryFill(_writersExpander, titleInfo.Writers);
-            TryFill(_directorsExpander, titleInfo.Directors);
-            TryFill(_creatorsExpander, titleInfo.Creators);
-            TryFill(_companiesExpander, titleInfo.Companies);
+            TryFill(_genreViewer, titleInfo.Genres);
+            TryFill(_starsViewer, titleInfo.Stars);
+            TryFill(_writersViewer, titleInfo.Writers);
+            TryFill(_directorsViewer, titleInfo.Directors);
+            TryFill(_creatorsViewer, titleInfo.Creators);
+            TryFill(_companiesViewer, titleInfo.Companies);
 
             if (_titlePoster is not null && !string.IsNullOrWhiteSpace(titleInfo.Poster_url))
             {
@@ -77,15 +78,18 @@ namespace CineLog.Views
             }
         }
 
-        private static void TryFill(Expander? expander, string? data)
+        private static void TryFill(ScrollViewer? wrap, string? data)
         {
-            if (expander is not null && !string.IsNullOrWhiteSpace(data))
-                FillExpander(expander, data);
+            if (wrap is not null && !string.IsNullOrWhiteSpace(data))
+                FillExpander(wrap, data);
         }
 
-        private static void FillExpander(Expander expander, string items)
+        private static void FillExpander(ScrollViewer wrap, string items)
         {
-            var panel = new StackPanel();
+            var panel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal
+            };
             var itemList = items.Split(',');
 
             foreach (var item in itemList)
@@ -93,7 +97,7 @@ namespace CineLog.Views
                 panel.Children.Add(new TextBlock { Text = item.Trim(), FontSize = 12 });
             }
 
-            expander.Content = panel;
+            wrap.Content = panel;
         }
     }
 }
