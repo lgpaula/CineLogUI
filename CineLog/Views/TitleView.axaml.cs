@@ -20,6 +20,7 @@ namespace CineLog.Views
 
         public TitleView(string id)
         {
+            Console.WriteLine($"TitleView constructor called with id: {id}");
             InitializeComponent();
             LoadTitleInfo(id);
         }
@@ -50,9 +51,11 @@ namespace CineLog.Views
                 ?? throw new NullReferenceException("TitlePoster not found in XAML");
         }
 
-        private void LoadTitleInfo(string id)
+        private async void LoadTitleInfo(string id)
         {
-            var titleInfo = DatabaseHandler.GetTitleInfo(id);
+            Console.WriteLine($"LoadTitleInfo for id: {id}");
+            var titleInfo = await DatabaseHandler.GetTitleInfo(id);
+            Console.WriteLine($"LoadedTitleInfo");
 
             _titleTextBox!.Text = titleInfo.Title;
 

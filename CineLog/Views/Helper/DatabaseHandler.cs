@@ -4,6 +4,7 @@ using System.Text;
 using System.Data.SQLite;
 using System.Collections.Generic;
 using Dapper;
+using System.Threading.Tasks;
 
 namespace CineLog.Views.Helper
 {
@@ -245,17 +246,20 @@ namespace CineLog.Views.Helper
             return connection.ExecuteScalar<int>("SELECT COALESCE(MAX(id), 0) + 1 FROM lists_table");
         }
 
-        public static TitleInfo GetTitleInfo(string id)
+        public static async Task<TitleInfo> GetTitleInfo(string id)
         {
+            Console.WriteLine($"GetTitleInfo for id: {id}");
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
             string checkQuery = "SELECT updated FROM titles_table WHERE title_id = @id";
             bool isUpdated = connection.ExecuteScalar<bool>(checkQuery, new { id });
 
+            Console.WriteLine($"Is updated: {isUpdated}");
+
             if (!isUpdated)
             {
-                ServerHandler.ScrapeSingleTitle(id).Wait();
+                await ServerHandler.ScrapeSingleTitle(id);
             }
 
             string query = @"SELECT * FROM titles_table WHERE title_id = @id";
