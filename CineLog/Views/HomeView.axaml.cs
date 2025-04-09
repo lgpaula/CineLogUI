@@ -99,11 +99,13 @@ namespace CineLog.Views
                 LastChildFill = true
             };
 
-            TextBlock listTitle = new()
+            TextBox listTitle = new()
             {
                 Text = listName,
                 Foreground = Brushes.White,
-                FontSize = 16
+                FontSize = 16,
+                Background = Brushes.Transparent,
+                BorderBrush = Brushes.Transparent
             };
 
             Button seeAllButton = new()
