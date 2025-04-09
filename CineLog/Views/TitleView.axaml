@@ -3,55 +3,62 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel>
-            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Title" FontSize="20" HorizontalAlignment="Left" x:Name="TitleTextBox"/> <!-- add Schedule button -->
-                <TextBlock Grid.Row="1" Grid.Column="0" Text='&#x2B50;' x:Name="InfoTextBlock"/> <!-- Placeholder for year/runtime -->
+        <StackPanel Margin="10 20" >
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="2*,*">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Title" FontSize="36" HorizontalAlignment="Center" x:Name="TitleTextBox"/>
+                <WrapPanel Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right">
+                    <Button x:Name="AddToWatchlistButton" Content="WL"/>
+                    <Button x:Name="AddToFavlistButton" Content="FAV"/>
+                    <Button x:Name="AddToScheduleButton" Content="SCH"/>
+                </WrapPanel>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" x:Name="InfoTextBlock"/>
                 <TextBlock Grid.Row="2" Grid.Column="0" FontSize="16" TextWrapping="Wrap" HorizontalAlignment="Stretch" x:Name="DescriptionBox"/>
 
-                <Expander Grid.Row="3" Grid.Column="0" x:Name="GenreExpander">
+                <Expander Grid.Row="3" Grid.Column="0" x:Name="GenreExpander" CornerRadius="10">
                     <Expander.Header>
                         <TextBlock Text="Genre" Foreground="White" FontSize="20"/>
                     </Expander.Header>
                     <ScrollViewer x:Name="GenreScrollViewer"/>
                 </Expander>
 
-                <Expander Grid.Row="4" Grid.Column="0" x:Name="StarsExpander">
+                <Expander Grid.Row="4" Grid.Column="0" x:Name="StarsExpander" CornerRadius="10">
                     <Expander.Header>
                         <TextBlock Text="Stars" Foreground="White" FontSize="20"/>
                     </Expander.Header>
                     <ScrollViewer x:Name="StarsScrollViewer"/>
                 </Expander>
 
-                <Expander Grid.Row="5" Grid.Column="0" x:Name="WritersExpander">
+                <Expander Grid.Row="5" Grid.Column="0" x:Name="WritersExpander" CornerRadius="10">
                     <Expander.Header>
                         <TextBlock Text="Writers" Foreground="White" FontSize="20"/>
                     </Expander.Header>
                     <ScrollViewer x:Name="WritersScrollViewer"/>
                 </Expander>
 
-                <Expander Grid.Row="6" Grid.Column="0" x:Name="DirectorsExpander">
+                <Expander Grid.Row="6" Grid.Column="0" x:Name="DirectorsExpander" CornerRadius="10">
                     <Expander.Header>
                         <TextBlock Text="Directors" Foreground="White" FontSize="20"/>
                     </Expander.Header>
                     <ScrollViewer x:Name="DirectorsScrollViewer"/>
                 </Expander>
 
-                <Expander Grid.Row="7" Grid.Column="0" x:Name="CreatorsExpander">
+                <Expander Grid.Row="7" Grid.Column="0" x:Name="CreatorsExpander" CornerRadius="10">
                     <Expander.Header>
                         <TextBlock Text="Creators" Foreground="White" FontSize="20"/>
                     </Expander.Header>
                     <ScrollViewer x:Name="CreatorsScrollViewer"/>
                 </Expander>
 
-                <Expander Grid.Row="8" Grid.Column="0" x:Name="CompaniesExpander">
+                <Expander Grid.Row="8" Grid.Column="0" x:Name="CompaniesExpander" CornerRadius="10">
                     <Expander.Header>
                         <TextBlock Text="Companies" Foreground="White" FontSize="20"/>
                     </Expander.Header>
                     <ScrollViewer x:Name="CompaniesScrollViewer"/>
                 </Expander>
 
-                <StackPanel Grid.Row="0" Grid.RowSpan="9" Grid.Column="1" x:Name="TitlePoster"/>
+                <StackPanel Grid.Row="0" Grid.RowSpan="9" Grid.Column="1" Margin="20 20" x:Name="TitlePoster"/>
+
             </Grid>
         </StackPanel>
     </ScrollViewer>

@@ -58,7 +58,7 @@ namespace CineLog.Views
 
             _titleTextBox!.Text = titleInfo.Title_name;
 
-            _infoTextBlock!.Text = $"⭐ {titleInfo.Rating} • {titleInfo.Year_start}";
+            _infoTextBlock!.Text = $" {titleInfo.Rating} • {titleInfo.Year_start}";
             if (titleInfo.Year_end != null)
                 _infoTextBlock.Text += $" - {titleInfo.Year_end}";
             _infoTextBlock.Text += $" • {titleInfo.Runtime}";
