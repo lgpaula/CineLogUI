@@ -14,17 +14,14 @@ namespace CineLog.Views
     public partial class HomeView : UserControl
     {
         private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext!;
-        private readonly List<StackPanel> _listPanels = [];
+        private readonly List<StackPanel> _panelsList = [];
 
         public HomeView()
         {
             InitializeComponent();
-            var preLoadedPanel = this.FindControl<StackPanel>("CollectionContainer");
-            if (preLoadedPanel != null)
-            {
-                _listPanels.Add(preLoadedPanel);
-            }
             EventAggregator.Instance.Subscribe("ListUpdated", LoadListUI);
+
+            _panelsList.Add(this.FindControl<StackPanel>("CollectionContainer")!);
             DatabaseHandler.CreateListsTable();
             LoadMoviesAndLists();
         }
@@ -54,7 +51,7 @@ namespace CineLog.Views
 
         private void LoadListUI(string containerName, string? listName)
         {
-            StackPanel? panel = _listPanels.FirstOrDefault(p => p.Name == containerName);
+            StackPanel? panel = _panelsList.FirstOrDefault(p => p.Name == containerName);
             panel ??= CreateListPanel(containerName);
 
             var moviesInDatabase = DatabaseHandler.GetMovies(listName);
@@ -145,7 +142,7 @@ namespace CineLog.Views
             listsContainer?.Children.Add(dockPanel);
             listsContainer?.Children.Add(listPanel);
 
-            _listPanels.Add(listPanel);
+            _panelsList.Add(listPanel);
             return listPanel;
         }
 
@@ -169,19 +166,13 @@ namespace CineLog.Views
                 if (sender is Button button && button.Tag is string listName)
                 {
                     DatabaseHandler.DeleteList(listName);
-                    var panel = _listPanels.FirstOrDefault(p => p.Name == listName);
-                    if (panel != null)
-                    {
-                        if (panel.Parent is DockPanel dockPanel)
-                        {
-                            dockPanel.Children.Remove(panel);
-                            dockPanel.Children.Remove(dockPanel.Children.First(c => c is TextBlock block && block.Text == listName));
-                        }
-                        _listPanels.Remove(panel);
-                    }
-                }
 
-                LoadMoviesAndLists();
+                    var container = this.FindControl<StackPanel>("ListsContainer");
+                    container?.Children.Clear();
+                    _panelsList.Clear();
+
+                    LoadMoviesAndLists();
+                }
             }
 
         #endregion
