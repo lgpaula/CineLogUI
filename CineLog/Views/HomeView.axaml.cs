@@ -38,14 +38,7 @@ namespace CineLog.Views
             var lists = DatabaseHandler.GetListsFromDatabase();
             foreach (var listName in lists)
             {
-                try
-                {
-                    LoadListUI(listName, listName);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error loading {listName}: {ex.Message}");
-                }
+                LoadListUI(listName, listName);
             }
         }
 
