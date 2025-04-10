@@ -196,7 +196,7 @@ namespace CineLog.Views.Helper
 
             connection.Execute(@"
                 CREATE TABLE IF NOT EXISTS lists_table (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id INTEGER PRIMARY KEY,
                     name TEXT NOT NULL UNIQUE
                 );
             ");
