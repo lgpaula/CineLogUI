@@ -27,9 +27,14 @@ namespace CineLog.ViewModels
                 "Scraper" => new ScraperView(),
                 "Collection" => new CollectionView(),
                 _ when viewName.StartsWith("tt") => new TitleView(viewName),
-                _ when viewName.StartsWith("CustomList") => new CollectionView(viewName),
+                _ when IsValidUuid(viewName) => new CollectionView(viewName),
                 _ => throw new ArgumentException("Unknown view", nameof(viewName))
             };
+        }
+
+        private static bool IsValidUuid(string input)
+        {
+            return Guid.TryParse(input, out _);
         }
     }
 }

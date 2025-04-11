@@ -6,7 +6,6 @@ using Avalonia.Media;
 using Avalonia.Layout;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
-using System.Collections.Generic;
 
 namespace CineLog.Views.Helper 
 {
@@ -100,20 +99,20 @@ namespace CineLog.Views.Helper
             var calendarMenuItem = new MenuItem { Header = "Add to Calendar" };
 
             var listSubMenu = new MenuItem { Header = "Add/Remove from Lists" };
-            List<string> listsInDb = DatabaseHandler.GetListsFromDatabase();
+            var listsInDb = DatabaseHandler.GetListsFromDatabase();
 
-            foreach (var listName in listsInDb)
+            foreach (var (_, list_id) in listsInDb)
             {
                 var checkBox = new CheckBox
                 {
-                    IsChecked = DatabaseHandler.IsMovieInList(listName, Id),
+                    IsChecked = DatabaseHandler.IsMovieInList(list_id, Id),
                     Margin = new Thickness(0, 0, 2, 0)
                 };
 
                 checkBox.IsCheckedChanged += (sender, e) => 
                 {
                     var isChecked = checkBox.IsChecked ?? false;
-                    OnListCheckChanged(listName, isChecked);
+                    OnListCheckChanged(list_id, isChecked);
                 };
 
                 var menuItem = new MenuItem
@@ -126,7 +125,7 @@ namespace CineLog.Views.Helper
                             checkBox,
                             new TextBlock 
                             { 
-                                Text = listName,
+                                Text = DatabaseHandler.GetListName(list_id),
                                 VerticalAlignment = VerticalAlignment.Center
                             }
                         }
@@ -142,18 +141,19 @@ namespace CineLog.Views.Helper
             return contextMenu;
         }
 
-        private void OnListCheckChanged(string listName, bool isChecked)
+        private void OnListCheckChanged(string list_id, bool isChecked)
         {
             if (isChecked)
             {
-                DatabaseHandler.AddMovieToList(listName, Id);
+                DatabaseHandler.AddMovieToList(list_id, Id);
             }
             else
             {
-                DatabaseHandler.RemoveMovieFromList(listName, Id);
+                DatabaseHandler.RemoveMovieFromList(list_id, Id);
             }
 
-            EventAggregator.Instance.Publish("ListUpdated", listName, listName);
+            Console.WriteLine($"Movie {Id} {(isChecked ? "added to" : "removed from")} list {list_id}");
+            EventAggregator.Instance.Publish("ListUpdated", DatabaseHandler.GetListName(list_id), list_id);
         }
 
         public Border GetImageBorder()

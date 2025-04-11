@@ -21,7 +21,6 @@ namespace CineLog.Views
             InitializeComponent();
             EventAggregator.Instance.Subscribe("ListUpdated", LoadListUI);
 
-            _panelsList.Add(this.FindControl<StackPanel>("CollectionContainer")!);
             DatabaseHandler.CreateListsTable();
             LoadMoviesAndLists();
         }
@@ -33,21 +32,23 @@ namespace CineLog.Views
 
         private void LoadMoviesAndLists()
         {
+            _panelsList.Add(this.FindControl<StackPanel>("CollectionContainer")!);
+
             LoadListUI("CollectionContainer", null);
 
             var lists = DatabaseHandler.GetListsFromDatabase();
-            foreach (var listName in lists)
+            foreach (var (list_name, list_uuid) in lists)
             {
-                LoadListUI(listName, listName);
+                LoadListUI(list_name, list_uuid);
             }
         }
 
-        private void LoadListUI(string containerName, string? listName)
+        private void LoadListUI(string listName, string? listId)
         {
-            StackPanel? panel = _panelsList.FirstOrDefault(p => p.Name == containerName);
-            panel ??= CreateListPanel(containerName);
+            StackPanel? panel = _panelsList.FirstOrDefault(p => p.Name == (listId ?? listName));
+            panel ??= CreateListPanel(listName, listId ?? listName);
 
-            var moviesInDatabase = DatabaseHandler.GetMovies(listName);
+            var moviesInDatabase = DatabaseHandler.GetMovies(listId);
 
             var movieButtonsInUI = new Dictionary<string, Button>();
             foreach (var child in panel.Children)
@@ -79,8 +80,9 @@ namespace CineLog.Views
             }
         }
 
-        private StackPanel CreateListPanel(string listName)
+        private StackPanel CreateListPanel(string listName, string listId)
         {
+            Console.WriteLine($"Creating list panel for {listName} with ID {listId}");
             var listsContainer = this.FindControl<StackPanel>("ListsContainer");
             if (listsContainer is null) return new StackPanel();
 
@@ -111,7 +113,7 @@ namespace CineLog.Views
             {
                 Content = "See all",
                 FontSize = 16,
-                Tag = listName,
+                Tag = listId,
                 Foreground = Brushes.White,
                 Background = Brushes.Transparent,
                 BorderBrush = Brushes.White
@@ -122,7 +124,7 @@ namespace CineLog.Views
             {
                 Content = "Delete",
                 FontSize = 16,
-                Tag = listName,
+                Tag = listId,
                 Foreground = Brushes.White,
                 Background = Brushes.Transparent,
                 BorderBrush = Brushes.White
@@ -138,7 +140,7 @@ namespace CineLog.Views
             StackPanel listPanel = new()
             {
                 Orientation = Orientation.Horizontal,
-                Name = listName
+                Name = listId,
             };
 
             listsContainer?.Children.Add(dockPanel);
@@ -159,8 +161,8 @@ namespace CineLog.Views
 
             private void AddListToTable(object sender, RoutedEventArgs e)
             {
-                var listName = DatabaseHandler.CreateNewList();
-                CreateListPanel(listName);
+                var list = DatabaseHandler.CreateNewList();
+                CreateListPanel(list[0], list[1]);
             }
 
             private void DeleteList(object? sender, RoutedEventArgs e)

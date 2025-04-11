@@ -13,7 +13,7 @@ namespace CineLog.Views.Helper
         private static readonly string dbPath = "/home/legion/CLionProjects/pyScraper/scraper/cinelog.db";
         private static readonly string connectionString = $"Data Source={dbPath};Version=3;";
 
-        public static List<Movie> GetMovies(string? listName = null, int count = 20, int offset = 0, FilterSettings? filterSettings = null)
+        public static List<Movie> GetMovies(string? list_uuid = null, int count = 20, int offset = 0, FilterSettings? filterSettings = null)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
@@ -40,16 +40,16 @@ namespace CineLog.Views.Helper
             var whereClauses = new List<string>();
 
             // if list
-            if (!string.IsNullOrEmpty(listName))
+            if (!string.IsNullOrEmpty(list_uuid))
             {
                 query.Append(@"
                     JOIN list_movies_table lm ON t.title_id = lm.movie_id
-                    JOIN lists_table l ON lm.list_id = l.id");
-                whereClauses.Add("l.name = @ListName");
-                parameters.Add("ListName", listName);
+                    JOIN lists_table l ON lm.list_id = l.uuid");
+                whereClauses.Add("l.uuid = @ListId");
+                parameters.Add("ListId", list_uuid);
             }
                 
-            if (string.IsNullOrEmpty(listName)) whereClauses.Add("1 = 1"); // Dummy condition to start WHERE block
+            if (string.IsNullOrEmpty(list_uuid)) whereClauses.Add("1 = 1");
 
             if (filterSettings != null)
             {
@@ -101,35 +101,30 @@ namespace CineLog.Views.Helper
             }
         }
 
-        public static List<string> GetListsFromDatabase()
+        public static List<(string uuid, string name)> GetListsFromDatabase()
         {
-            List<string> lists = [];
+            var lists = new List<(string, string)>();
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
-            using var command = new SQLiteCommand("SELECT name FROM lists_table;", connection);
+            using var command = new SQLiteCommand("SELECT name, uuid FROM lists_table;", connection);
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
-                lists.Add(reader.GetString(0));
+                lists.Add((reader.GetString(0), reader.GetString(1)));
             }
 
             return lists;
         }
 
-        public static void AddMovieToList(string listName, string movieId)
+        public static void AddMovieToList(string listId, string movieId)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
-
             using var transaction = connection.BeginTransaction();
+
             try
             {
-                int listId = connection.ExecuteScalar<int>(
-                    "SELECT id FROM lists_table WHERE name = @ListName",
-                    new { ListName = listName }, transaction
-                );
-
                 int exists = connection.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM list_movies_table WHERE list_id = @ListId AND movie_id = @MovieId",
                     new { ListId = listId, MovieId = movieId }, transaction
@@ -162,7 +157,7 @@ namespace CineLog.Views.Helper
             {
                 string query = @"
                     DELETE FROM list_movies_table 
-                    WHERE list_id IN (SELECT id FROM lists_table WHERE name = @ListName)
+                    WHERE list_id IN (SELECT uuid FROM lists_table WHERE name = @ListName)
                     AND movie_id = @MovieId";
 
                 connection.Execute(query, new { ListName = listName, MovieId = movieId });
@@ -175,7 +170,7 @@ namespace CineLog.Views.Helper
             }
         }
 
-        public static bool IsMovieInList(string listName, string movieId)
+        public static bool IsMovieInList(string list_id, string movieId)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
@@ -183,10 +178,10 @@ namespace CineLog.Views.Helper
             string query = @"
                 SELECT COUNT(*) 
                 FROM list_movies_table lm
-                JOIN lists_table l ON lm.list_id = l.id
-                WHERE l.name = @ListName AND lm.movie_id = @MovieId";
+                JOIN lists_table l ON lm.list_id = l.uuid
+                WHERE l.uuid = @ListId AND lm.movie_id = @MovieId";
 
-            int count = connection.ExecuteScalar<int>(query, new { ListName = listName, MovieId = movieId });
+            int count = connection.ExecuteScalar<int>(query, new { ListId = list_id, MovieId = movieId });
             return count > 0;
         }
 
@@ -196,8 +191,8 @@ namespace CineLog.Views.Helper
 
             connection.Execute(@"
                 CREATE TABLE IF NOT EXISTS lists_table (
-                    id INTEGER PRIMARY KEY,
-                    name TEXT NOT NULL UNIQUE
+                    uuid TEXT NOT NULL UNIQUE PRIMARY KEY,
+                    name TEXT NOT NULL
                 );
             ");
 
@@ -212,30 +207,30 @@ namespace CineLog.Views.Helper
             ");
         }
 
-        public static string CreateNewList() 
+        public static List<string> CreateNewList() 
         {
-            string listName = $"CustomList#{GetNextListId()}";
+            string listName = "My List";
+            string uuid = GetNewListUuid();
 
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
-            connection.Execute("INSERT INTO lists_table (name) VALUES (@name)", new { name = listName });
+            connection.Execute("INSERT INTO lists_table (uuid, name) VALUES (@id, @name)", new {id = uuid, name = listName });
 
-            return listName;
+            return [listName, uuid];
         }
 
-        public static void DeleteList(string listName)
+        private static string GetNewListUuid()
         {
-            using var connection = new SQLiteConnection(connectionString);
-            connection.Open();
-            connection.Execute("DELETE FROM list_movies_table WHERE list_id = (SELECT id FROM lists_table WHERE name = @name)", new { name = listName });
-            connection.Execute("DELETE FROM lists_table WHERE name = @name", new { name = listName });
+            return Guid.NewGuid().ToString();
         }
 
-        private static int GetNextListId()
+        public static void DeleteList(string listId)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
-            return connection.ExecuteScalar<int>("SELECT COALESCE(MAX(id), 0) + 1 FROM lists_table");
+
+            connection.Execute("DELETE FROM list_movies_table WHERE list_id = @ListId", new { ListId = listId });
+            connection.Execute("DELETE FROM lists_table WHERE uuid = @ListId", new { ListId = listId });
         }
 
         public static async Task<TitleInfo> GetTitleInfo(string id)
@@ -264,6 +259,26 @@ namespace CineLog.Views.Helper
 
             string query = "UPDATE lists_table SET name = @newName WHERE name = @oldName";
             connection.Execute(query, new { newName, oldName });
+        }
+
+        internal static object GetListUuid(string listName)
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            string query = "SELECT uuid FROM lists_table WHERE name = @listName";
+            var result = connection.ExecuteScalar<string>(query, new { listName });
+            return result!;
+        }
+
+        internal static string GetListName(string list_id)
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            string query = "SELECT name FROM lists_table WHERE uuid = @list_id";
+            var result = connection.ExecuteScalar<string>(query, new { list_id });
+            return result!;
         }
 
         public class FilterSettings

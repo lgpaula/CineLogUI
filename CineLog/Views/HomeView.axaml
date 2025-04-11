@@ -21,7 +21,7 @@
                     <TextBlock Text="Entire Collection" Foreground="White" FontSize="16" DockPanel.Dock="Left"/>
                     <Button Click="ViewChanger" Content="See all" DockPanel.Dock="Right" FontSize="16" Tag="Collection" Foreground="White" Background="Transparent" BorderBrush="White"/>
                 </DockPanel>
-                    <StackPanel Orientation="Horizontal" Name="CollectionContainer"/>
+                <StackPanel Orientation="Horizontal" Name="CollectionContainer"/>
             </StackPanel>
         </Grid>
     </ScrollViewer>
