@@ -227,6 +227,7 @@ namespace CineLog.Views.Helper
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
+            connection.Execute("DELETE FROM list_movies_table WHERE list_id = (SELECT id FROM lists_table WHERE name = @name)", new { name = listName });
             connection.Execute("DELETE FROM lists_table WHERE name = @name", new { name = listName });
         }
 
