@@ -256,6 +256,15 @@ namespace CineLog.Views.Helper
             return result;
         }
 
+        public static void UpdateListName(string oldName, string newName)
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            string query = "UPDATE lists_table SET name = @newName WHERE name = @oldName";
+            connection.Execute(query, new { newName, oldName });
+        }
+
         public class FilterSettings
         {
             public float? MinRating { get; set; } = 0;

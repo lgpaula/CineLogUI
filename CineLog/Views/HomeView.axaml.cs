@@ -98,6 +98,15 @@ namespace CineLog.Views
                 BorderBrush = Brushes.Transparent
             };
 
+            listTitle.LostFocus += (s, e) =>
+            {
+                if (listTitle.Text != listName)
+                {
+                    DatabaseHandler.UpdateListName(listName, listTitle.Text);
+                    listName = listTitle.Text;
+                }
+            };
+
             Button seeAllButton = new()
             {
                 Content = "See all",
