@@ -8,6 +8,8 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Interactivity;
 using CineLog.ViewModels;
 using CineLog.Views.Helper;
+using Avalonia.Controls.Primitives;
+using Avalonia;
 
 namespace CineLog.Views
 {
@@ -82,8 +84,7 @@ namespace CineLog.Views
 
         private StackPanel CreateListPanel(string listName, string listId)
         {
-            var listsContainer = this.FindControl<StackPanel>("CustomListsContainer");
-            if (listsContainer is null) return new StackPanel();
+            var listsContainer = this.FindControl<StackPanel>("CustomListsContainer")!;
 
             DockPanel dockPanel = new()
             {
@@ -130,8 +131,10 @@ namespace CineLog.Views
             };
             deleteListButton.Click += DeleteList;
 
-            DockPanel.SetDock(seeAllButton, Dock.Right);
+            DockPanel.SetDock(listTitle, Dock.Left);
             DockPanel.SetDock(deleteListButton, Dock.Right);
+            DockPanel.SetDock(seeAllButton, Dock.Right);
+
             dockPanel.Children.Add(listTitle);
             dockPanel.Children.Add(seeAllButton);
             dockPanel.Children.Add(deleteListButton);
@@ -139,11 +142,29 @@ namespace CineLog.Views
             StackPanel listPanel = new()
             {
                 Orientation = Orientation.Horizontal,
-                Name = listId,
+                Name = listId
+            };
+
+            ScrollViewer scrollViewer = new()
+            {
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+                Content = listPanel
+            };
+
+            Border listBorder = new()
+            {
+                BorderBrush = Brushes.White,
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(20),
+                Background = Brushes.Black,
+                Margin = new Thickness(0, 5, 0, 0),
+                Padding = new Thickness(10),
+                Child = scrollViewer
             };
 
             listsContainer?.Children.Add(dockPanel);
-            listsContainer?.Children.Add(listPanel);
+            listsContainer?.Children.Add(listBorder);
 
             _panelsList.Add(listPanel);
             return listPanel;
