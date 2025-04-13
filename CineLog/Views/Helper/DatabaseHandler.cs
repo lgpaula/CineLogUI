@@ -309,6 +309,7 @@ namespace CineLog.Views.Helper
             public string? Directors { get; set; }
             public string? Creators { get; set; }
             public string? Companies { get; set; }
+            public string? Schedule { get; set; }
         }
     }
 }

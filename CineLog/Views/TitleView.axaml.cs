@@ -62,6 +62,8 @@ namespace CineLog.Views
             if (titleInfo.Year_end != null)
                 _infoTextBlock.Text += $" - {titleInfo.Year_end}";
             _infoTextBlock.Text += $" • {titleInfo.Runtime}";
+            _infoTextBlock.Text += $" • {titleInfo.Schedule}";
+
 
             _descriptionBox!.Text = titleInfo.Plot;
 
