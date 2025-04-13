@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ScrollViewer>
         <!-- Top Bar -->
-        <Grid RowDefinitions="Auto,Auto,Auto" Background="Black">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto" Background="Black">
             <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
                 <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Height="150" Width="100" HorizontalAlignment="Left" Name="ScrapeButtonBorder">
                     <Button Click="ViewChanger" Tag="Scraper" CornerRadius="10" Height="150" Width="100"/>
@@ -16,13 +16,15 @@
                 </Border>
             </StackPanel>
                 
-            <StackPanel Grid.Row="2" Name="ListsContainer" Orientation="Vertical" Margin="10" Spacing="10">
+            <StackPanel Grid.Row="2" Name="PreMadeListsContainer" Orientation="Vertical" Margin="10" Spacing="10">
                 <DockPanel>
                     <TextBlock Text="Entire Collection" Foreground="White" FontSize="16" DockPanel.Dock="Left"/>
                     <Button Click="ViewChanger" Content="See all" DockPanel.Dock="Right" FontSize="16" Tag="Collection" Foreground="White" Background="Transparent" BorderBrush="White"/>
                 </DockPanel>
                 <StackPanel Orientation="Horizontal" Name="CollectionContainer"/>
             </StackPanel>
+
+            <StackPanel Grid.Row="3" Name="CustomListsContainer" Orientation="Vertical" Margin="10" Spacing="10"/>
         </Grid>
     </ScrollViewer>
 </UserControl>

@@ -15,6 +15,7 @@ namespace CineLog.Views.Helper
 
         public static List<Movie> GetMovies(string? list_uuid = null, int count = 20, int offset = 0, FilterSettings? filterSettings = null)
         {
+            Console.WriteLine($"Getting movies from database with list_uuid: {list_uuid}");
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
@@ -53,7 +54,7 @@ namespace CineLog.Views.Helper
 
             if (filterSettings != null)
             {
-                appendFilterClauses(filterSettings, whereClauses, parameters);
+                AppendFilterClauses(filterSettings, whereClauses, parameters);
             }
 
             if (whereClauses.Count > 0)
@@ -70,7 +71,7 @@ namespace CineLog.Views.Helper
             return result;
         }
 
-        private static void appendFilterClauses(FilterSettings filterSettings, List<string> whereClauses, DynamicParameters parameters)
+        private static void AppendFilterClauses(FilterSettings filterSettings, List<string> whereClauses, DynamicParameters parameters)
         {
             whereClauses.Add("(t.rating >= @MinRating OR t.rating IS NULL)");
             whereClauses.Add("(t.rating <= @MaxRating OR t.rating IS NULL)");

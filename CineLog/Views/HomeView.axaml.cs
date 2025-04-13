@@ -82,8 +82,7 @@ namespace CineLog.Views
 
         private StackPanel CreateListPanel(string listName, string listId)
         {
-            Console.WriteLine($"Creating list panel for {listName} with ID {listId}");
-            var listsContainer = this.FindControl<StackPanel>("ListsContainer");
+            var listsContainer = this.FindControl<StackPanel>("CustomListsContainer");
             if (listsContainer is null) return new StackPanel();
 
             DockPanel dockPanel = new()
@@ -171,7 +170,7 @@ namespace CineLog.Views
                 {
                     DatabaseHandler.DeleteList(listName);
 
-                    var container = this.FindControl<StackPanel>("ListsContainer");
+                    var container = this.FindControl<StackPanel>("CustomListsContainer");
                     container?.Children.Clear();
                     _panelsList.Clear();
 
