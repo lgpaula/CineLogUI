@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ScrollViewer>
         <!-- Top Bar -->
-        <Grid RowDefinitions="Auto,Auto,Auto,Auto" Background="Transparent">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto">
             <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
                 <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Height="150" Width="100" HorizontalAlignment="Left" Name="ScrapeButtonBorder">
                     <Button Click="ViewChanger" Tag="Scraper" CornerRadius="10" Height="150" Width="100"/>
@@ -12,16 +12,16 @@
 
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
                 <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Height="30" Width="80" HorizontalAlignment="Left">
-                    <Button Click="AddListToTable" Content="Add List" Background="Transparent" />
+                    <Button Click="AddListToTable" Content="Add List"/>
                 </Border>
             </StackPanel>
                 
             <StackPanel Grid.Row="2" Name="PreMadeListsContainer" Orientation="Vertical" Margin="10" Spacing="10">
                 <DockPanel>
                     <TextBlock Text="Entire Collection" Foreground="White" FontSize="16" DockPanel.Dock="Left"/>
-                    <Button Click="ViewChanger" Content="See all" DockPanel.Dock="Right" FontSize="16" Tag="Collection" Foreground="White" Background="Transparent" BorderBrush="White"/>
+                    <Button Click="ViewChanger" Content="See all" DockPanel.Dock="Right" FontSize="16" Tag="Collection" Foreground="White" BorderBrush="White"/>
                 </DockPanel>
-                <Border BorderBrush="White" BorderThickness="1" CornerRadius="20" Background="Black" Margin="0,5,0,0" Padding="10">
+                <Border BorderBrush="White" BorderThickness="1" CornerRadius="20" Margin="0,5,0,0" Padding="10">
                     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                         <StackPanel Orientation="Horizontal" Name="CollectionContainer" />
                     </ScrollViewer>
