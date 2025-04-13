@@ -43,8 +43,8 @@ namespace CineLog.Views.Helper
             {
                 Padding = new Thickness(0),
                 Margin = new Thickness(10),
-                Width = 150,
-                Height = 250,
+                Width = 132,
+                Height = 220,
                 HorizontalContentAlignment = HorizontalAlignment.Stretch,
                 VerticalContentAlignment = VerticalAlignment.Stretch
             };
