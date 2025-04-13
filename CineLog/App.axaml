@@ -3,7 +3,20 @@
              x:Class="CineLog.App"
              RequestedThemeVariant="Default">
 
+    <Application.Resources>
+        <LinearGradientBrush x:Key="DiagonalBackground"
+                            StartPoint="100%, 0%"
+                            EndPoint="0%, 100%">
+            <GradientStop Color="#41295A" Offset="0" />
+            <GradientStop Color="#2F0743" Offset="1" />
+        </LinearGradientBrush>
+    </Application.Resources>
+
     <Application.Styles>
         <FluentTheme/>  <!-- Or "Light" depending on your preference -->
+        <Style Selector="Window, UserControl">
+            <Setter Property="Background" Value="{StaticResource DiagonalBackground}" />
+        </Style>
     </Application.Styles>
+
 </Application>

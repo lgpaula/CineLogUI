@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ScrollViewer>
         <!-- Top Bar -->
-        <Grid RowDefinitions="Auto,Auto,Auto,Auto" Background="Black">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto" Background="Transparent">
             <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
                 <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Height="150" Width="100" HorizontalAlignment="Left" Name="ScrapeButtonBorder">
                     <Button Click="ViewChanger" Tag="Scraper" CornerRadius="10" Height="150" Width="100"/>
