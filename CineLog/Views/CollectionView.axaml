@@ -62,7 +62,7 @@
                                         <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Type</TextBlock>
                                         <WrapPanel x:Name="TitleTypePanel" Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
                                                 <CheckBox Content="Movie" Tag="Movie"/>
-                                                <CheckBox Content="Series" Tag="Series"/>
+                                                <CheckBox Content="Series" Tag="TV Series"/>
                                         </WrapPanel>
                                         <Button Grid.Row="5" Grid.Column="0" Click="ApplyFilter" Content="Apply" HorizontalAlignment="Left" Margin="0,10,10,0"/>
                                 </Grid>
