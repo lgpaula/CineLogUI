@@ -15,7 +15,6 @@ namespace CineLog.Views.Helper
 
         public static List<Movie> GetMovies(string? list_uuid = null, int count = 20, int offset = 0, FilterSettings? filterSettings = null)
         {
-            Console.WriteLine($"Getting movies from database with list_uuid: {list_uuid}");
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
@@ -148,7 +147,7 @@ namespace CineLog.Views.Helper
             }
         }
 
-        public static void RemoveMovieFromList(string listName, string movieId)
+        public static void RemoveMovieFromList(string listId, string movieId)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
@@ -158,10 +157,9 @@ namespace CineLog.Views.Helper
             {
                 string query = @"
                     DELETE FROM list_movies_table 
-                    WHERE list_id IN (SELECT uuid FROM lists_table WHERE name = @ListName)
-                    AND movie_id = @MovieId";
+                    WHERE list_id = @ListId AND movie_id = @MovieId;";
 
-                connection.Execute(query, new { ListName = listName, MovieId = movieId });
+                connection.Execute(query, new { ListId = listId, MovieId = movieId });
                 transaction.Commit();
             }
             catch (Exception ex)

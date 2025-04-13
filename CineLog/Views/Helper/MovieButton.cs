@@ -152,7 +152,6 @@ namespace CineLog.Views.Helper
                 DatabaseHandler.RemoveMovieFromList(list_id, Id);
             }
 
-            Console.WriteLine($"Movie {Id} {(isChecked ? "added to" : "removed from")} list {list_id}");
             EventAggregator.Instance.Publish("ListUpdated", DatabaseHandler.GetListName(list_id), list_id);
         }
 
