@@ -23,18 +23,11 @@ namespace CineLog.Views.Helper
             PosterUrl = posterUrl;
         }
 
-        public Movie() 
+        public Movie(string id) 
         {
-            Id = string.Empty;
-            Title = string.Empty;
-            PosterUrl = string.Empty;
-        }
-
-        public Movie(string posterUrl)
-        {
-            Id = string.Empty;
-            Title = string.Empty;
-            PosterUrl = posterUrl;
+            Id = id;
+            Title = DatabaseHandler.GetMovieTitle(id);
+            PosterUrl = DatabaseHandler.GetPosterUrl(id);
         }
 
         public Button CreateMovieButton()

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using CineLog.Views.Helper;
 using CineLog.ViewModels;
+using System.Threading.Tasks;
 
 namespace CineLog.Views
 {
@@ -53,7 +54,7 @@ namespace CineLog.Views
             {
                 var movieButton = movie.CreateMovieButton();
                 movieButton.Tag = movie.Id;
-                movieButton.Click += ViewChanger;
+                movieButton.Click += MovieButton_Click;
                 _moviesContainer?.Children.Add(movieButton);
             }
 
@@ -69,6 +70,34 @@ namespace CineLog.Views
                 LoadNextPage();
             }
         }
+
+        private async void MovieButton_Click(object? sender, RoutedEventArgs e)
+		{
+			if (sender is Button button && button.Tag is string movieId)
+            {
+                var selectedTitle = await DatabaseHandler.GetTitleInfo(movieId);
+                ShowMovieDetails(selectedTitle);
+            }
+		}
+
+        private void ShowMovieDetails(DatabaseHandler.TitleInfo selectedTitle)
+        {
+            var panel = this.FindControl<StackPanel>("DetailsPanel")!;
+            
+            var movie = new Movie(selectedTitle.Title_Id);
+            var movieButton = movie.CreateMovieButton();
+            movieButton.Tag = movie.Id;
+            movieButton.Click += ViewChanger;
+            this.FindControl<Button>("MoviePosterButton")!.Content = movieButton;
+            this.FindControl<TextBlock>("MovieTitleText")!.Text = selectedTitle.Title_name;
+            this.FindControl<TextBlock>("MovieDescriptionText")!.Text = selectedTitle.Plot;
+            this.FindControl<Border>("DetailsBorder")!.IsVisible = true;
+        }
+
+		private void CloseDetails(object? sender, RoutedEventArgs e)
+		{
+            this.FindControl<Border>("DetailsBorder")!.IsVisible = false;
+		}
 
         #region Buttons
         

@@ -101,6 +101,8 @@ namespace CineLog.Views.Helper
             }
         }
 
+#region List related
+
         public static List<(string uuid, string name)> GetListsFromDatabase()
         {
             var lists = new List<(string, string)>();
@@ -232,25 +234,6 @@ namespace CineLog.Views.Helper
             connection.Execute("DELETE FROM lists_table WHERE uuid = @ListId", new { ListId = listId });
         }
 
-        public static async Task<TitleInfo> GetTitleInfo(string id)
-        {
-            using var connection = new SQLiteConnection(connectionString);
-            connection.Open();
-
-            string checkQuery = "SELECT updated FROM titles_table WHERE title_id = @id";
-            bool isUpdated = connection.ExecuteScalar<bool>(checkQuery, new { id });
-
-            if (!isUpdated)
-            {
-                await ServerHandler.ScrapeSingleTitle(id);
-            }
-
-            string query = @"SELECT * FROM titles_table WHERE title_id = @id";
-            var result = connection.QuerySingleOrDefault<TitleInfo>(query, new { id });
-
-            return result;
-        }
-
         public static void UpdateListName(string oldName, string newName)
         {
             using var connection = new SQLiteConnection(connectionString);
@@ -280,24 +263,54 @@ namespace CineLog.Views.Helper
             return result!;
         }
 
-        public class FilterSettings
-        {
-            public float? MinRating { get; set; } = 0;
-            public float? MaxRating { get; set; } = 10;
-            public List<string>? Genre { get; set; } = [];
-            public int YearStart { get; set; } = 1874;
-            public int YearEnd { get; set; } = DateTime.Now.Year + 1;
-            public string? Company { get; set; }
-            public string? Type { get; set; }
+#endregion
 
-            public FilterSettings() { }
+#region Title related
+
+        public static async Task<TitleInfo> GetTitleInfo(string id)
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            string checkQuery = "SELECT updated FROM titles_table WHERE title_id = @id";
+            bool isUpdated = connection.ExecuteScalar<bool>(checkQuery, new { id });
+
+            if (!isUpdated)
+            {
+                await ServerHandler.ScrapeSingleTitle(id);
+            }
+
+            string query = @"SELECT * FROM titles_table WHERE title_id = @id";
+            var result = connection.QuerySingleOrDefault<TitleInfo>(query, new { id });
+
+            return result;
+        }
+
+        internal static string GetPosterUrl(string id)
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            string query = "SELECT poster_url FROM titles_table WHERE title_id = @id";
+            var result = connection.ExecuteScalar<string>(query, new { id });
+            return result!;
+        }
+
+        internal static string GetMovieTitle(string id)
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            string query = "SELECT title_name FROM titles_table WHERE title_id = @id";
+            var result = connection.ExecuteScalar<string>(query, new { id });
+            return result!;
         }
 
         public struct TitleInfo
         {
             public string Title_Id { get; set; }
-            public string? Title_name { get; set; }
-            public string? Poster_url { get; set; }
+            public string Title_name { get; set; }
+            public string Poster_url { get; set; }
             public int? Year_start { get; set; }
             public int? Year_end { get; set; }
             public string? Plot { get; set; }
@@ -310,6 +323,20 @@ namespace CineLog.Views.Helper
             public string? Creators { get; set; }
             public string? Companies { get; set; }
             public string? Schedule { get; set; }
+        }
+#endregion
+
+        public class FilterSettings
+        {
+            public float? MinRating { get; set; } = 0;
+            public float? MaxRating { get; set; } = 10;
+            public List<string>? Genre { get; set; } = [];
+            public int YearStart { get; set; } = 1874;
+            public int YearEnd { get; set; } = DateTime.Now.Year + 1;
+            public string? Company { get; set; }
+            public string? Type { get; set; }
+
+            public FilterSettings() { }
         }
     }
 }

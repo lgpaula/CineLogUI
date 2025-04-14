@@ -76,7 +76,7 @@ namespace CineLog.Views
 
             if (_titlePoster is not null && !string.IsNullOrWhiteSpace(titleInfo.Poster_url))
             {
-                Movie movie = new(titleInfo.Poster_url);
+                Movie movie = new(titleInfo.Title_Id);
                 _titlePoster.Children.Add(movie.GetImageBorder());
             }
         }

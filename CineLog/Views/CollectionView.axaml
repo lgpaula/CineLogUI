@@ -2,7 +2,9 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-	<ScrollViewer x:Name="CollectionScrollViewer" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+	<Grid ColumnDefinitions="*, Auto">
+		<!-- Left: Collection and Filters -->
+		<ScrollViewer Grid.Column="0" x:Name="CollectionScrollViewer">
 		<StackPanel>
 			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
 				<Expander.Header>
@@ -51,5 +53,19 @@
 			
 			<WrapPanel Name="CollectionWrapPanel" Orientation="Horizontal"/>
 		</StackPanel>
-	</ScrollViewer>
+		</ScrollViewer>
+
+		<!-- Right: Drawer-style info panel -->
+		<Border Grid.Column="1" x:Name="DetailsBorder" Background="Transparent" Width="300" 
+				IsVisible="false"
+				Margin="10,0,0,0" Padding="10">
+			<StackPanel x:Name="DetailsPanel">
+				<Button x:Name="MoviePosterButton"/>
+				<TextBlock x:Name="MovieTitleText" FontSize="24" Foreground="White"/>
+				<TextBlock x:Name="MovieDescriptionText" Foreground="White" TextWrapping="Wrap"/>
+				<!-- add more fields as needed -->
+				<Button Content="Close" Click="CloseDetails"/>
+			</StackPanel>
+		</Border>
+	</Grid>
 </UserControl>
