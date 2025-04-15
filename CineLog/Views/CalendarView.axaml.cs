@@ -11,12 +11,12 @@ namespace CineLog.Views
 {
     public partial class CalendarView : UserControl
     {
-        private UniformGrid _calendarGrid;
-        private TextBlock _monthLabel;
+        private readonly UniformGrid _calendarGrid;
+        private readonly TextBlock _monthLabel;
         private DateTime _currentMonth;
 
         // Store buttons by date
-        private readonly Dictionary<DateTime, List<Control>> _buttonsByDate = new();
+        private readonly Dictionary<DateTime, List<Control>> _buttonsByDate = [];
 
         public CalendarView()
         {
@@ -42,7 +42,7 @@ namespace CineLog.Views
             _buttonsByDate[key].Add(movieButton);
 
             if (IsInCurrentMonth(date))
-                BuildCalendar(); // Refresh display
+                BuildCalendar();
         }
 
         private bool IsInCurrentMonth(DateTime date)
@@ -55,25 +55,47 @@ namespace CineLog.Views
             _calendarGrid.Children.Clear();
             _monthLabel.Text = _currentMonth.ToString("MMMM yyyy");
 
-            var firstDay = new DateTime(_currentMonth.Year, _currentMonth.Month, 1);
-            int dayOfWeekOffset = ((int)firstDay.DayOfWeek + 6) % 7;
-            int daysInMonth = DateTime.DaysInMonth(_currentMonth.Year, _currentMonth.Month);
+            var firstDayOfMonth = new DateTime(_currentMonth.Year, _currentMonth.Month, 1);
+            int startOffset = ((int)firstDayOfMonth.DayOfWeek + 6) % 7;
+
+            int daysInCurrentMonth = DateTime.DaysInMonth(_currentMonth.Year, _currentMonth.Month);
+            var previousMonth = _currentMonth.AddMonths(-1);
+            int daysInPreviousMonth = DateTime.DaysInMonth(previousMonth.Year, previousMonth.Month);
+
             int totalCells = 42;
 
             for (int i = 0; i < totalCells; i++)
             {
-                DateTime? date = null;
-                if (i >= dayOfWeekOffset && i < dayOfWeekOffset + daysInMonth)
-                    date = firstDay.AddDays(i - dayOfWeekOffset);
+                DateTime date;
 
-                bool isToday = date.HasValue && date.Value.Date == DateTime.Today;
+                if (i < startOffset)
+                {
+                    // Days from previous month
+                    int day = daysInPreviousMonth - startOffset + i + 1;
+                    date = new DateTime(previousMonth.Year, previousMonth.Month, day);
+                }
+                else if (i < startOffset + daysInCurrentMonth)
+                {
+                    // Days from current month
+                    int day = i - startOffset + 1;
+                    date = new DateTime(_currentMonth.Year, _currentMonth.Month, day);
+                }
+                else
+                {
+                    // Days from next month
+                    int day = i - (startOffset + daysInCurrentMonth) + 1;
+                    var nextMonth = _currentMonth.AddMonths(1);
+                    date = new DateTime(nextMonth.Year, nextMonth.Month, day);
+                }
+
+                bool isToday = date.Date == DateTime.Today;
 
                 var border = new Border
                 {
                     BorderBrush = Brushes.Gray,
                     BorderThickness = new Thickness(1),
                     Padding = new Thickness(4),
-                    Background = isToday ? Brushes.LightBlue : Brushes.Transparent,
+                    Background = isToday ? Brushes.MediumPurple : Brushes.Transparent,
                     Child = CreateDayCell(date)
                 };
 
@@ -81,19 +103,18 @@ namespace CineLog.Views
             }
         }
 
-        private Control CreateDayCell(DateTime? date)
+        private StackPanel CreateDayCell(DateTime date)
         {
-            if (date == null)
-                return new TextBlock(); // blank cell
+            var isCurrentMonth = date.Month == _currentMonth.Month;
 
-            var day = date.Value;
             var stack = new StackPanel { Orientation = Orientation.Vertical };
 
             // Show day number
             stack.Children.Add(new TextBlock
             {
-                Text = day.Day.ToString(),
+                Text = date.Day.ToString(),
                 FontWeight = FontWeight.Bold,
+                Foreground = isCurrentMonth ? Brushes.Black : Brushes.Gray,
                 HorizontalAlignment = HorizontalAlignment.Left
             });
 
@@ -105,7 +126,7 @@ namespace CineLog.Views
                 Content = new StackPanel { Orientation = Orientation.Vertical }
             };
 
-            if (_buttonsByDate.TryGetValue(day.Date, out var buttons))
+            if (_buttonsByDate.TryGetValue(date.Date, out var buttons))
             {
                 foreach (var btn in buttons)
                     ((StackPanel)scroll.Content).Children.Add(btn);

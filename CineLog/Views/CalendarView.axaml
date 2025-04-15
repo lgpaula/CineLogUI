@@ -3,17 +3,23 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:CineLog.Views">
-    
-    <StackPanel Orientation="Vertical">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
         <!-- Month Navigation -->
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 10">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 10">
             <Button Content="⟨" Click="PreviousMonth_Click" Width="30" Margin="5"/>
             <TextBlock x:Name="MonthLabel" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" />
             <Button Content="⟩" Click="NextMonth_Click" Width="30" Margin="5"/>
         </StackPanel>
 
         <!-- Day of Week Header -->
-        <UniformGrid Columns="7" Margin="0 0 0 5">
+        <UniformGrid Grid.Row="1" Columns="7" Margin="0 0 0 5">
             <TextBlock Text="Mon" HorizontalAlignment="Center" FontWeight="Bold"/>
             <TextBlock Text="Tue" HorizontalAlignment="Center" FontWeight="Bold"/>
             <TextBlock Text="Wed" HorizontalAlignment="Center" FontWeight="Bold"/>
@@ -24,8 +30,8 @@
         </UniformGrid>
 
         <!-- Calendar Grid -->
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <UniformGrid x:Name="CalendarGrid" Columns="7" Rows="6" />
+        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <UniformGrid x:Name="CalendarGrid" Columns="7" Rows="6"/>
         </ScrollViewer>
-    </StackPanel>
+    </Grid>
 </UserControl>
