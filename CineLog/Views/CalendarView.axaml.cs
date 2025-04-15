@@ -11,12 +11,12 @@ namespace CineLog.Views
 {
     public partial class CalendarView : UserControl
     {
-        private readonly UniformGrid _calendarGrid;
-        private readonly TextBlock _monthLabel;
-        private DateTime _currentMonth;
+        private static UniformGrid ?_calendarGrid;
+        private static TextBlock ?_monthLabel;
+        private static DateTime _currentMonth;
 
         // Store buttons by date
-        private readonly Dictionary<DateTime, List<Control>> _buttonsByDate = [];
+        private static readonly Dictionary<DateTime, List<Control>> _buttonsByDate = [];
 
         public CalendarView()
         {
@@ -33,27 +33,30 @@ namespace CineLog.Views
             AvaloniaXamlLoader.Load(this);
         }
 
-        public void AddMovieToDate(DateTime date, Control movieButton)
+        public static void AddMovieToCalendar(List<DateTime> dateList, Control movieButton)
         {
-            var key = date.Date;
-            if (!_buttonsByDate.ContainsKey(key))
-                _buttonsByDate[key] = [];
+            foreach (var date in dateList) 
+            {
+                var key = date.Date;
+                if (!_buttonsByDate.ContainsKey(key))
+                    _buttonsByDate[key] = [];
 
-            _buttonsByDate[key].Add(movieButton);
+                _buttonsByDate[key].Add(movieButton);
 
-            if (IsInCurrentMonth(date))
-                BuildCalendar();
+                if (IsInCurrentMonth(date))
+                    BuildCalendar();
+            }
         }
 
-        private bool IsInCurrentMonth(DateTime date)
+        private static bool IsInCurrentMonth(DateTime date)
         {
             return date.Year == _currentMonth.Year && date.Month == _currentMonth.Month;
         }
 
-        private void BuildCalendar()
+        private static void BuildCalendar()
         {
-            _calendarGrid.Children.Clear();
-            _monthLabel.Text = _currentMonth.ToString("MMMM yyyy");
+            _calendarGrid!.Children.Clear();
+            _monthLabel!.Text = _currentMonth.ToString("MMMM yyyy");
 
             var firstDayOfMonth = new DateTime(_currentMonth.Year, _currentMonth.Month, 1);
             int startOffset = ((int)firstDayOfMonth.DayOfWeek + 6) % 7;
@@ -103,7 +106,7 @@ namespace CineLog.Views
             }
         }
 
-        private StackPanel CreateDayCell(DateTime date)
+        private static StackPanel CreateDayCell(DateTime date)
         {
             var isCurrentMonth = date.Month == _currentMonth.Month;
 

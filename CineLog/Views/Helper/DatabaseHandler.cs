@@ -306,6 +306,22 @@ namespace CineLog.Views.Helper
             return result!;
         }
 
+        internal static List<DateTime> GetSchedule(string id)
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            string query = "SELECT schedule FROM titles_table WHERE title_id = @id";
+            var result = connection.ExecuteScalar<string>(query, new { id });
+
+            if (string.IsNullOrWhiteSpace(result))
+                return [];
+
+            return [.. result
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(dateStr => DateTime.Parse(dateStr.Trim()))];
+        }
+
         public struct TitleInfo
         {
             public string Title_Id { get; set; }

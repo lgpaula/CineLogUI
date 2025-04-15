@@ -57,8 +57,6 @@ namespace CineLog.Views
                 _moviesContainer?.Children.Add(movieButton);
             }
 
-            Console.WriteLine($"Loaded {count} more movies (starting from offset {_currentOffset})");
-
             _currentOffset += count;
         }
 
@@ -88,9 +86,10 @@ namespace CineLog.Views
             movieButton.Tag = movie.Id;
             movieButton.Click += ViewChanger;
             this.FindControl<Button>("MoviePosterButton")!.Content = movieButton;
-            this.FindControl<TextBlock>("MovieTitleText")!.Text = selectedTitle.Title_name;
+            this.FindControl<TextBlock>("MovieTitleText")!.Text = movie.Title;
             this.FindControl<TextBlock>("MovieDescriptionText")!.Text = selectedTitle.Plot;
             this.FindControl<Border>("DetailsBorder")!.IsVisible = true;
+            this.FindControl<Button>("Calendar")!.Tag = movie.Id;
         }
 
 		private void CloseDetails(object? sender, RoutedEventArgs e)
@@ -179,5 +178,14 @@ namespace CineLog.Views
             }
         }
 
+        private void AddToCalendar(object? sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is string title_id)
+            {
+                var scheduleList = DatabaseHandler.GetSchedule(title_id);
+                var title_button = this.FindControl<Button>("MoviePosterButton")!;
+                CalendarView.AddMovieToCalendar(scheduleList, title_button);
+            }
+        }
     }
 }

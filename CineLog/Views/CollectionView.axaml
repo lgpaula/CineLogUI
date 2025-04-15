@@ -64,6 +64,7 @@
 				<TextBlock x:Name="MovieTitleText" FontSize="24" Foreground="White"/>
 				<TextBlock x:Name="MovieDescriptionText" Foreground="White" TextWrapping="Wrap"/>
 				<!-- add more fields as needed -->
+				<Button Content="Calendar" Click="AddToCalendar"/>
 				<Button Content="Close" Click="CloseDetails"/>
 			</StackPanel>
 		</Border>

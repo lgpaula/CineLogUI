@@ -8,7 +8,7 @@
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Title" FontSize="36" HorizontalAlignment="Center" x:Name="TitleTextBox"/>
                 <WrapPanel Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right">
                     <Button x:Name="AddToFavlistButton" Content="FAV"/>
-                    <Button x:Name="AddToScheduleButton" Content="SCH"/>
+                    <Button x:Name="AddToCalendarButton" Click="AddToCalendar" Content="SCH"/>
                 </WrapPanel>
 
                 <TextBlock Grid.Row="1" Grid.Column="0" x:Name="InfoTextBlock"/>

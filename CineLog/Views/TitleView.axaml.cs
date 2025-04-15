@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using CineLog.Views.Helper;
@@ -19,13 +20,13 @@ namespace CineLog.Views
         private ScrollViewer ?_creatorsViewer;
         private ScrollViewer ?_companiesViewer;
         private StackPanel ?_titlePoster;
-
-        public TitleView(){}
+        private readonly Movie _currMovie;
 
         public TitleView(string id)
         {
             InitializeComponent();
-            LoadTitleInfo(id);
+            _currMovie = new(id);
+            LoadTitleInfo();
         }
 
         private void InitializeComponent()
@@ -54,9 +55,9 @@ namespace CineLog.Views
                 ?? throw new NullReferenceException("TitlePoster not found in XAML");
         }
 
-        private async void LoadTitleInfo(string id)
+        private async void LoadTitleInfo()
         {
-            var titleInfo = await DatabaseHandler.GetTitleInfo(id);
+            var titleInfo = await DatabaseHandler.GetTitleInfo(_currMovie.Id);
 
             _titleTextBox!.Text = titleInfo.Title_name;
 
@@ -78,8 +79,7 @@ namespace CineLog.Views
 
             if (_titlePoster is not null && !string.IsNullOrWhiteSpace(titleInfo.Poster_url))
             {
-                Movie movie = new(titleInfo.Title_Id);
-                _titlePoster.Children.Add(movie.GetImageBorder());
+                _titlePoster.Children.Add(_currMovie.GetImageBorder());
             }
         }
 
@@ -108,6 +108,16 @@ namespace CineLog.Views
             }
 
             wrap.Content = panel;
+        }
+
+        private void AddToCalendar(object? sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is string title_id)
+            {
+                var scheduleList = DatabaseHandler.GetSchedule(title_id);
+                var title_button = _currMovie.CreateMovieButton();
+                CalendarView.AddMovieToCalendar(scheduleList, title_button);
+            }
         }
     }
 }
