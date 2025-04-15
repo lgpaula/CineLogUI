@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using CineLog.Views.Helper;
 using CineLog.ViewModels;
-using System.Threading.Tasks;
 
 namespace CineLog.Views
 {

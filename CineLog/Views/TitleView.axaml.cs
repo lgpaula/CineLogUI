@@ -20,6 +20,8 @@ namespace CineLog.Views
         private ScrollViewer ?_companiesViewer;
         private StackPanel ?_titlePoster;
 
+        public TitleView(){}
+
         public TitleView(string id)
         {
             InitializeComponent();

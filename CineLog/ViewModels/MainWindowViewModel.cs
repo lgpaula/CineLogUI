@@ -25,6 +25,7 @@ namespace CineLog.ViewModels
             {
                 "Home" => new HomeView(),
                 "Scraper" => new ScraperView(),
+                "Calendar" => new CalendarView(),
                 "Collection" => new CollectionView(),
                 _ when viewName.StartsWith("tt") => new TitleView(viewName),
                 _ when IsValidUuid(viewName) => new CollectionView(viewName),
