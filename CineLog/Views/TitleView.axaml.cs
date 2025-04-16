@@ -64,9 +64,11 @@ namespace CineLog.Views
             _infoTextBlock!.Text = $" {titleInfo.Rating} • {titleInfo.Year_start}";
             if (titleInfo.Year_end != null)
                 _infoTextBlock.Text += $" - {titleInfo.Year_end}";
-            _infoTextBlock.Text += $" • {titleInfo.Runtime}";
-            _infoTextBlock.Text += $" • {titleInfo.Schedule}";
 
+            _infoTextBlock.Text += $" • {titleInfo.Runtime}";
+            
+            if (!string.IsNullOrEmpty(titleInfo.Season_count))
+                _infoTextBlock.Text += $" • {titleInfo.Season_count} Seasons";
 
             _descriptionBox!.Text = titleInfo.Plot;
 

@@ -33,18 +33,30 @@ namespace CineLog.Views
             AvaloniaXamlLoader.Load(this);
         }
 
-        public static void AddMovieToCalendar(List<DateTime> dateList, Control movieButton)
+        public static void AddMovieToCalendar(string dateList, Control movieButton)
         {
-            foreach (var date in dateList) 
+            if (string.IsNullOrEmpty(dateList)) return;
+
+            var dates = dateList.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var dateStr in dates)
             {
-                var key = date.Date;
-                if (!_buttonsByDate.ContainsKey(key))
-                    _buttonsByDate[key] = [];
+                if (DateTime.TryParse(dateStr.Trim(), out var date))
+                {
+                    var key = date.Date;
 
-                _buttonsByDate[key].Add(movieButton);
+                    if (!_buttonsByDate.ContainsKey(key))
+                        _buttonsByDate[key] = [];
 
-                if (IsInCurrentMonth(date))
-                    BuildCalendar();
+                    _buttonsByDate[key].Add(movieButton);
+
+                    if (IsInCurrentMonth(date))
+                        BuildCalendar();
+                }
+                else
+                {
+                    Console.WriteLine($"Invalid date format: {dateStr}");
+                }
             }
         }
 
@@ -95,7 +107,7 @@ namespace CineLog.Views
 
                 var border = new Border
                 {
-                    BorderBrush = Brushes.Gray,
+                    BorderBrush = IsInCurrentMonth(date) ? Brushes.Gray : Brushes.Transparent,
                     BorderThickness = new Thickness(1),
                     Padding = new Thickness(4),
                     Background = isToday ? Brushes.MediumPurple : Brushes.Transparent,
@@ -113,13 +125,16 @@ namespace CineLog.Views
             var stack = new StackPanel { Orientation = Orientation.Vertical };
 
             // Show day number
-            stack.Children.Add(new TextBlock
+            if (isCurrentMonth)
             {
-                Text = date.Day.ToString(),
-                FontWeight = FontWeight.Bold,
-                Foreground = isCurrentMonth ? Brushes.Black : Brushes.Gray,
-                HorizontalAlignment = HorizontalAlignment.Left
-            });
+                stack.Children.Add(new TextBlock
+                {
+                    Text = date.Day.ToString(),
+                    FontWeight = FontWeight.Bold,
+                    Foreground = isCurrentMonth ? Brushes.Black : Brushes.Gray,
+                    HorizontalAlignment = HorizontalAlignment.Left
+                });
+            }
 
             // Scrollable movie buttons
             var scroll = new ScrollViewer

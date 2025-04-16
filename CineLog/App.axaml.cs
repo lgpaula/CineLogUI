@@ -7,6 +7,8 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
+using System.Threading.Tasks;
+using System;
 
 namespace CineLog
 {
@@ -59,9 +61,32 @@ namespace CineLog
                 }
             };
             _pythonServerProcess.Start();
+            _ = WaitForFlaskReady();
         }
 
-        private bool IsServerRunning()
+        private async Task WaitForFlaskReady()
+        {
+            using var client = new HttpClient();
+            for (int i = 0; i < 20; i++) // try for 10 seconds
+            {
+                try
+                {
+                    var res = await client.GetAsync("http://127.0.0.1:5000/health");
+                    if (res.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine("Flask is ready.");
+                        return;
+                    }
+                }
+                catch { }
+
+                await Task.Delay(500);
+            }
+
+            Console.WriteLine("Flask did not become ready in time.");
+        }
+
+        private static bool IsServerRunning()
         {
             try
             {

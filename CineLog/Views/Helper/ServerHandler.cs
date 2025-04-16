@@ -36,7 +36,7 @@ namespace CineLog.Views.Helper
             try
             {
                 using var client = new HttpClient();
-                var response = await client.PostAsync($"http://localhost:5000/scrape/{title_id}", null);
+                var response = await client.PostAsync($"http://127.0.0.1:5000/scrape/{title_id}", null);
                 string result = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -47,6 +47,26 @@ namespace CineLog.Views.Helper
             catch (Exception ex)
             {
                 Console.WriteLine($"Scraper call failed: {ex.Message}");
+                return "Error";
+            }
+        }
+
+        public static async Task<string> FetchEpisodesDates(string title_id)
+        {
+            try
+            {
+                using var client = new HttpClient();
+                var response = await client.PostAsync($"http://127.0.0.1:5000/fetch_episodes/{title_id}", null);
+                string result = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                    return result;
+
+                return $"Flask Error: {result}";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fetch dates failed: {ex.Message}");
                 return "Error";
             }
         }

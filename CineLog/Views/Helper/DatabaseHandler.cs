@@ -306,20 +306,15 @@ namespace CineLog.Views.Helper
             return result!;
         }
 
-        internal static List<DateTime> GetSchedule(string id)
+        internal static string GetSchedule(string id)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
-            string query = "SELECT schedule FROM titles_table WHERE title_id = @id";
+            string query = "SELECT schedule_list FROM titles_table WHERE title_id = @id";
             var result = connection.ExecuteScalar<string>(query, new { id });
 
-            if (string.IsNullOrWhiteSpace(result))
-                return [];
-
-            return [.. result
-                .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(dateStr => DateTime.Parse(dateStr.Trim()))];
+            return result!;
         }
 
         public struct TitleInfo
@@ -338,7 +333,8 @@ namespace CineLog.Views.Helper
             public string? Directors { get; set; }
             public string? Creators { get; set; }
             public string? Companies { get; set; }
-            public string? Schedule { get; set; }
+            public string? Schedule_list { get; set; }
+            public string? Season_count { get; set; }
         }
 #endregion
 
