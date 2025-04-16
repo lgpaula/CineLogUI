@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using Avalonia.Controls.Primitives;
 using Avalonia;
+using System.Text.Json;
 
 namespace CineLog.Views
 {
@@ -35,13 +36,24 @@ namespace CineLog.Views
 
         public static void AddMovieToCalendar(string dateList, Control movieButton)
         {
-            if (string.IsNullOrEmpty(dateList)) return;
+            if (string.IsNullOrWhiteSpace(dateList)) return;
 
-            var dates = dateList.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            string[] dates;
 
-            foreach (var dateStr in dates)
+            try
             {
-                if (DateTime.TryParse(dateStr.Trim(), out var date))
+                // Try to parse as a JSON array
+                dates = JsonSerializer.Deserialize<string[]>(dateList)!;
+            }
+            catch
+            {
+                // Fallback to simple split if it's not JSON
+                dates = dateList.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            foreach (var dateStr in dates!)
+            {
+                if (DateTime.TryParse(dateStr.Trim('"'), out var date))
                 {
                     var key = date.Date;
 

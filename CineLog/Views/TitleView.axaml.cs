@@ -61,14 +61,12 @@ namespace CineLog.Views
 
             _titleTextBox!.Text = titleInfo.Title_name;
 
-            _infoTextBlock!.Text = $" {titleInfo.Rating} • {titleInfo.Year_start}";
-            if (titleInfo.Year_end != null)
-                _infoTextBlock.Text += $" - {titleInfo.Year_end}";
-
-            _infoTextBlock.Text += $" • {titleInfo.Runtime}";
+            _infoTextBlock!.Text = $" {titleInfo.Rating} • {titleInfo.Year_start} - ";
+            if (titleInfo.Year_end != null) _infoTextBlock.Text += $"{titleInfo.Year_end}";
+            else _infoTextBlock.Text += "?";
+            if (titleInfo.Runtime != null) _infoTextBlock.Text += $" • {titleInfo.Runtime}";
             
-            if (!string.IsNullOrEmpty(titleInfo.Season_count))
-                _infoTextBlock.Text += $" • {titleInfo.Season_count} Seasons";
+            if (!string.IsNullOrEmpty(titleInfo.Season_count)) _infoTextBlock.Text += $" • {titleInfo.Season_count} Seasons";
 
             _descriptionBox!.Text = titleInfo.Plot;
 
@@ -114,9 +112,9 @@ namespace CineLog.Views
 
         private void AddToCalendar(object? sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.Tag is string title_id)
+            if (sender is Button button)
             {
-                var scheduleList = DatabaseHandler.GetSchedule(title_id);
+                var scheduleList = DatabaseHandler.GetSchedule(_currMovie.Id);
                 var title_button = _currMovie.CreateMovieButton();
                 CalendarView.AddMovieToCalendar(scheduleList, title_button);
             }

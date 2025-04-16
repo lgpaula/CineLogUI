@@ -51,13 +51,15 @@ namespace CineLog.Views.Helper
             }
         }
 
-        public static async Task<string> FetchEpisodesDates(string title_id)
+        public static async Task<string> FetchEpisodesDates(string title_id, string season_count)
         {
             try
             {
                 using var client = new HttpClient();
-                var response = await client.PostAsync($"http://127.0.0.1:5000/fetch_episodes/{title_id}", null);
+                var response = await client.GetAsync($"http://127.0.0.1:5000/fetch_episodes?title_id={title_id}&season_count={season_count}");
                 string result = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine("result: " + result);
 
                 if (response.IsSuccessStatusCode)
                     return result;

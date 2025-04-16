@@ -157,7 +157,7 @@ namespace CineLog.Views
                 BorderBrush = Brushes.White,
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(20),
-                Background = Brushes.Black,
+                Background = Brushes.Transparent,
                 Margin = new Thickness(0, 5, 0, 0),
                 Padding = new Thickness(10),
                 Child = scrollViewer
