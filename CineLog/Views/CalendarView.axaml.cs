@@ -7,17 +7,30 @@ using System.Collections.Generic;
 using Avalonia.Controls.Primitives;
 using Avalonia;
 using System.Text.Json;
+using CineLog.ViewModels;
+using Avalonia.Interactivity;
+using CineLog.Views.Helper;
 
 namespace CineLog.Views
 {
     public partial class CalendarView : UserControl
     {
-        private static UniformGrid ?_calendarGrid;
-        private static TextBlock ?_monthLabel;
+        private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext!;
+        private static UniformGrid? _calendarGrid;
+        private static TextBlock? _monthLabel;
         private static DateTime _currentMonth;
 
+        /*
+        
+            calendar class
+            calendar view has calendar object
+            viewChanger into calendar class
+            new calendar table in DB
+
+        */
+
         // Store buttons by date
-        private static readonly Dictionary<DateTime, List<Control>> _buttonsByDate = [];
+        private static readonly Dictionary<DateTime, List<string>> _idByDate = [];
 
         public CalendarView()
         {
@@ -34,7 +47,7 @@ namespace CineLog.Views
             AvaloniaXamlLoader.Load(this);
         }
 
-        public static void AddMovieToCalendar(string dateList, Control movieButton)
+        public static void AddMovieToCalendar(string dateList, string titleId)
         {
             if (string.IsNullOrWhiteSpace(dateList)) return;
 
@@ -57,10 +70,10 @@ namespace CineLog.Views
                 {
                     var key = date.Date;
 
-                    if (!_buttonsByDate.ContainsKey(key))
-                        _buttonsByDate[key] = [];
+                    if (!_idByDate.ContainsKey(key))
+                        _idByDate[key] = [];
 
-                    _buttonsByDate[key].Add(movieButton);
+                    _idByDate[key].Add(titleId);
 
                     if (IsInCurrentMonth(date))
                         BuildCalendar();
@@ -156,26 +169,39 @@ namespace CineLog.Views
                 Content = new StackPanel { Orientation = Orientation.Vertical }
             };
 
-            if (_buttonsByDate.TryGetValue(date.Date, out var buttons))
+            if (_idByDate.TryGetValue(date.Date, out var titles))
             {
-                foreach (var btn in buttons)
+                foreach (var id in titles)
+                {
+                    var movie = new Movie(id);
+                    var btn = movie.CreateMovieButton();
+                    btn.Click += ViewChanger;
                     ((StackPanel)scroll.Content).Children.Add(btn);
+                }
             }
 
             stack.Children.Add(scroll);
             return stack;
         }
 
-        private void PreviousMonth_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        private void PreviousMonth_Click(object? sender, RoutedEventArgs e)
         {
             _currentMonth = _currentMonth.AddMonths(-1);
             BuildCalendar();
         }
 
-        private void NextMonth_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        private void NextMonth_Click(object? sender, RoutedEventArgs e)
         {
             _currentMonth = _currentMonth.AddMonths(1);
             BuildCalendar();
+        }
+
+        private void ViewChanger(object? sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is string viewName)
+            {
+                ViewModel?.HandleButtonClick(viewName);
+            }
         }
     }
 }

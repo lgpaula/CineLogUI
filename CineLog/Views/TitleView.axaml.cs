@@ -10,22 +10,24 @@ namespace CineLog.Views
 {
     public partial class TitleView : UserControl
     {
-        private TextBlock ?_titleTextBox;
-        private TextBlock ?_infoTextBlock;
-        private TextBlock ?_descriptionBox;
-        private ScrollViewer ?_genreViewer;
-        private ScrollViewer ?_starsViewer;
-        private ScrollViewer ?_writersViewer;
-        private ScrollViewer ?_directorsViewer;
-        private ScrollViewer ?_creatorsViewer;
-        private ScrollViewer ?_companiesViewer;
-        private StackPanel ?_titlePoster;
+        private TextBlock? _titleTextBox;
+        private TextBlock? _infoTextBlock;
+        private TextBlock? _descriptionBox;
+        private ScrollViewer? _genreViewer;
+        private ScrollViewer? _starsViewer;
+        private ScrollViewer? _writersViewer;
+        private ScrollViewer? _directorsViewer;
+        private ScrollViewer? _creatorsViewer;
+        private ScrollViewer? _companiesViewer;
+        private StackPanel? _titlePoster;
         private readonly Movie _currMovie;
+        private Button? _addToSchedule;
 
         public TitleView(string id)
         {
             InitializeComponent();
             _currMovie = new(id);
+            _addToSchedule!.Tag = _currMovie.Id;
             LoadTitleInfo();
         }
 
@@ -53,6 +55,8 @@ namespace CineLog.Views
                 ?? throw new NullReferenceException("CompaniesExpander not found in XAML");
             _titlePoster = this.FindControl<StackPanel>("TitlePoster")
                 ?? throw new NullReferenceException("TitlePoster not found in XAML");
+            _addToSchedule = this.FindControl<Button>("AddToCalendarButton")!;
+            
         }
 
         private async void LoadTitleInfo()
@@ -65,7 +69,7 @@ namespace CineLog.Views
             if (titleInfo.Year_end != null) _infoTextBlock.Text += $"{titleInfo.Year_end}";
             else _infoTextBlock.Text += "?";
             if (titleInfo.Runtime != null) _infoTextBlock.Text += $" • {titleInfo.Runtime}";
-            
+
             if (!string.IsNullOrEmpty(titleInfo.Season_count)) _infoTextBlock.Text += $" • {titleInfo.Season_count} Seasons";
 
             _descriptionBox!.Text = titleInfo.Plot;
@@ -99,7 +103,7 @@ namespace CineLog.Views
 
             foreach (var item in itemList)
             {
-                panel.Children.Add(new Button 
+                panel.Children.Add(new Button
                 {
                     Content = item.Trim(),
                     FontSize = 12,
@@ -112,11 +116,10 @@ namespace CineLog.Views
 
         private void AddToCalendar(object? sender, RoutedEventArgs e)
         {
-            if (sender is Button button)
+            if (sender is Button button && button.Tag is string title_id)
             {
                 var scheduleList = DatabaseHandler.GetSchedule(_currMovie.Id);
-                var title_button = _currMovie.CreateMovieButton();
-                CalendarView.AddMovieToCalendar(scheduleList, title_button);
+                CalendarView.AddMovieToCalendar(scheduleList, title_id);
             }
         }
     }
