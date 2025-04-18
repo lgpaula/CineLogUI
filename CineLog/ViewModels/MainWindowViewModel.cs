@@ -27,7 +27,6 @@ namespace CineLog.ViewModels
                 "Scraper" => new ScraperView(),
                 "Calendar" => new CalendarView(),
                 "Collection" => new CollectionView(),
-                _ when viewName.StartsWith("tt") => new TitleView(viewName),
                 _ when IsValidUuid(viewName) => new CollectionView(viewName),
                 _ => throw new ArgumentException("Unknown view", nameof(viewName))
             };

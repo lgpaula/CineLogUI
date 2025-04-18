@@ -10,6 +10,7 @@ using CineLog.ViewModels;
 using CineLog.Views.Helper;
 using Avalonia.Controls.Primitives;
 using Avalonia;
+using Avalonia.Input;
 
 namespace CineLog.Views
 {
@@ -68,7 +69,7 @@ namespace CineLog.Views
                 {
                     Button movieButton = movie.CreateMovieButton();
                     movieButton.Tag = movie.Id;
-                    movieButton.Click += ViewChanger;
+                    movieButton.Cursor = new Cursor(StandardCursorType.Arrow);
                     panel.Children.Add(movieButton);
                 }
             }
