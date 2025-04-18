@@ -14,8 +14,8 @@ namespace CineLog.Views
         public string viewName = string.Empty;
         private int _currentOffset = 0;
         private const int count = 50;
-        private WrapPanel ?_moviesContainer;
-        private ScrollViewer ?_scrollViewer;
+        private WrapPanel? _moviesContainer;
+        private ScrollViewer? _scrollViewer;
         private DatabaseHandler.FilterSettings filterSettings = new();
 
         public CollectionView(string viewName)
@@ -35,7 +35,7 @@ namespace CineLog.Views
 
             _moviesContainer = this.FindControl<WrapPanel>("CollectionWrapPanel")
                         ?? throw new NullReferenceException("WrapPanel not found in XAML");
-            _scrollViewer = this.FindControl<ScrollViewer>("CollectionScrollViewer") 
+            _scrollViewer = this.FindControl<ScrollViewer>("CollectionScrollViewer")
                         ?? throw new NullReferenceException("ScrollViewer not found in XAML");
 
             LoadNextPage();
@@ -69,18 +69,18 @@ namespace CineLog.Views
         }
 
         private async void MovieButton_Click(object? sender, RoutedEventArgs e)
-		{
-			if (sender is Button button && button.Tag is string movieId)
+        {
+            if (sender is Button button && button.Tag is string movieId)
             {
                 var selectedTitle = await DatabaseHandler.GetTitleInfo(movieId);
                 ShowMovieDetails(selectedTitle);
             }
-		}
+        }
 
         private void ShowMovieDetails(DatabaseHandler.TitleInfo selectedTitle)
         {
             var panel = this.FindControl<StackPanel>("DetailsPanel")!;
-            
+
             var movie = new Movie(selectedTitle.Title_Id);
             var movieButton = movie.CreateMovieButton();
             movieButton.Tag = movie.Id;
@@ -92,13 +92,13 @@ namespace CineLog.Views
             this.FindControl<Button>("Calendar")!.Tag = movie.Id;
         }
 
-		private void CloseDetails(object? sender, RoutedEventArgs e)
-		{
+        private void CloseDetails(object? sender, RoutedEventArgs e)
+        {
             this.FindControl<Border>("DetailsBorder")!.IsVisible = false;
-		}
+        }
 
         #region Buttons
-        
+
         private void ApplyFilter(object? sender, RoutedEventArgs e)
         {
             _moviesContainer?.Children.Clear();
@@ -183,8 +183,7 @@ namespace CineLog.Views
             if (sender is Button button && button.Tag is string title_id)
             {
                 var scheduleList = DatabaseHandler.GetSchedule(title_id);
-                var title_button = this.FindControl<Button>("MoviePosterButton")!;
-                CalendarView.AddMovieToCalendar(scheduleList, title_button);
+                CalendarView.AddMovieToCalendar(scheduleList, title_id);
             }
         }
     }

@@ -57,7 +57,6 @@ namespace CineLog.Views.Helper
                 Spacing = 5
             };
 
-
             TextBlock movieTitle = new()
             {
                 Text = Title,
