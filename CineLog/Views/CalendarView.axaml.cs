@@ -21,67 +21,43 @@ namespace CineLog.Views
         private static TextBlock? _monthLabel;
         private static DateTime _currentMonth;
 
-        /*
-        
-            calendar class
-            calendar view has calendar object
-            viewChanger into calendar class
-            new calendar table in DB
-
-        */
-
-        // Store buttons by date
-        private static readonly Dictionary<DateTime, List<string>> _idByDate = [];
-
         public CalendarView()
         {
             InitializeComponent();
             _calendarGrid = this.FindControl<UniformGrid>("CalendarGrid")!;
             _monthLabel = this.FindControl<TextBlock>("MonthLabel")!;
-
             _currentMonth = DateTime.Today;
             BuildCalendar();
         }
 
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
+        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         public static void AddMovieToCalendar(string dateList, string titleId)
         {
             if (string.IsNullOrWhiteSpace(dateList)) return;
 
             string[] dates;
-
             try
             {
-                // Try to parse as a JSON array
                 dates = JsonSerializer.Deserialize<string[]>(dateList)!;
             }
             catch
             {
-                // Fallback to simple split if it's not JSON
                 dates = dateList.Split(',', StringSplitOptions.RemoveEmptyEntries);
             }
 
-            foreach (var dateStr in dates!)
+            foreach (var raw in dates)
             {
-                if (DateTime.TryParse(dateStr.Trim('"'), out var date))
+                if (DateTime.TryParse(raw.Trim('"'), out var dt))
                 {
-                    var key = date.Date;
+                    var d = dt.Date.ToString("yyyy-MM-dd");
+                    DatabaseHandler.AddMovieToDate(d, titleId);
 
-                    if (!_idByDate.ContainsKey(key))
-                        _idByDate[key] = [];
-
-                    _idByDate[key].Add(titleId);
-
-                    if (IsInCurrentMonth(date))
-                        BuildCalendar();
+                    if (IsInCurrentMonth(dt)) BuildCalendar();
                 }
                 else
                 {
-                    Console.WriteLine($"Invalid date format: {dateStr}");
+                    Console.WriteLine($"Invalid date format: {raw}");
                 }
             }
         }
@@ -96,86 +72,75 @@ namespace CineLog.Views
             _calendarGrid!.Children.Clear();
             _monthLabel!.Text = _currentMonth.ToString("MMMM yyyy");
 
-            var firstDayOfMonth = new DateTime(_currentMonth.Year, _currentMonth.Month, 1);
-            int startOffset = ((int)firstDayOfMonth.DayOfWeek + 6) % 7;
+            var firstOf = new DateTime(_currentMonth.Year, _currentMonth.Month, 1);
+            int startOffset = ((int)firstOf.DayOfWeek + 6) % 7;
+            int daysInThis = DateTime.DaysInMonth(_currentMonth.Year, _currentMonth.Month);
+            var prevMonth = _currentMonth.AddMonths(-1);
+            int daysInPrev = DateTime.DaysInMonth(prevMonth.Year, prevMonth.Month);
 
-            int daysInCurrentMonth = DateTime.DaysInMonth(_currentMonth.Year, _currentMonth.Month);
-            var previousMonth = _currentMonth.AddMonths(-1);
-            int daysInPreviousMonth = DateTime.DaysInMonth(previousMonth.Year, previousMonth.Month);
+            // fetch all (date, title_id) in this month
+            var lastOf = firstOf.AddMonths(1).AddDays(-1);
+            var idByDate = DatabaseHandler.LoadEntriesForMonth(firstOf, lastOf);
 
-            int totalCells = 42;
-
-            for (int i = 0; i < totalCells; i++)
+            for (int i = 0; i < 42; i++)
             {
                 DateTime date;
-
                 if (i < startOffset)
                 {
-                    // Days from previous month
-                    int day = daysInPreviousMonth - startOffset + i + 1;
-                    date = new DateTime(previousMonth.Year, previousMonth.Month, day);
+                    int day = daysInPrev - startOffset + i + 1;
+                    date = new DateTime(prevMonth.Year, prevMonth.Month, day);
                 }
-                else if (i < startOffset + daysInCurrentMonth)
+                else if (i < startOffset + daysInThis)
                 {
-                    // Days from current month
-                    int day = i - startOffset + 1;
-                    date = new DateTime(_currentMonth.Year, _currentMonth.Month, day);
+                    date = firstOf.AddDays(i - startOffset);
                 }
                 else
                 {
-                    // Days from next month
-                    int day = i - (startOffset + daysInCurrentMonth) + 1;
-                    var nextMonth = _currentMonth.AddMonths(1);
-                    date = new DateTime(nextMonth.Year, nextMonth.Month, day);
+                    int day = i - (startOffset + daysInThis) + 1;
+                    var nxt = _currentMonth.AddMonths(1);
+                    date = new DateTime(nxt.Year, nxt.Month, day);
                 }
 
                 bool isToday = date.Date == DateTime.Today;
-
                 var border = new Border
                 {
                     BorderBrush = IsInCurrentMonth(date) ? Brushes.Gray : Brushes.Transparent,
                     BorderThickness = new Thickness(1),
                     Padding = new Thickness(4),
                     Background = isToday ? Brushes.MediumPurple : Brushes.Transparent,
-                    Child = CreateDayCell(date)
+                    Child = CreateDayCell(date, idByDate)
                 };
 
                 _calendarGrid.Children.Add(border);
             }
         }
 
-        private static StackPanel CreateDayCell(DateTime date)
+        private static StackPanel CreateDayCell(DateTime date, Dictionary<DateTime, List<string>> map)
         {
-            var isCurrentMonth = date.Month == _currentMonth.Month;
-
+            bool isCur = date.Month == _currentMonth.Month;
             var stack = new StackPanel { Orientation = Orientation.Vertical };
 
-            // Show day number
-            if (isCurrentMonth)
+            if (isCur)
             {
-                stack.Children.Add(new TextBlock
-                {
+                stack.Children.Add(new TextBlock {
                     Text = date.Day.ToString(),
                     FontWeight = FontWeight.Bold,
-                    Foreground = isCurrentMonth ? Brushes.Black : Brushes.Gray,
+                    Foreground = Brushes.Black,
                     HorizontalAlignment = HorizontalAlignment.Left
                 });
             }
 
-            // Scrollable movie buttons
-            var scroll = new ScrollViewer
-            {
+            var scroll = new ScrollViewer {
                 MaxHeight = 100,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
                 Content = new StackPanel { Orientation = Orientation.Vertical }
             };
 
-            if (_idByDate.TryGetValue(date.Date, out var titles))
+            if (map.TryGetValue(date.Date, out var titles))
             {
                 foreach (var id in titles)
                 {
-                    var movie = new Movie(id);
-                    var btn = movie.CreateMovieButton();
+                    var btn = new Movie(id).CreateMovieButton();
                     btn.Cursor = new Cursor(StandardCursorType.Arrow);
                     ((StackPanel)scroll.Content).Children.Add(btn);
                 }
@@ -195,14 +160,6 @@ namespace CineLog.Views
         {
             _currentMonth = _currentMonth.AddMonths(1);
             BuildCalendar();
-        }
-
-        private void ViewChanger(object? sender, RoutedEventArgs e)
-        {
-            if (sender is Button button && button.Tag is string viewName)
-            {
-                ViewModel?.HandleButtonClick(viewName);
-            }
         }
     }
 }

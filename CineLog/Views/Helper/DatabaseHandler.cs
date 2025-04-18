@@ -208,6 +208,47 @@ namespace CineLog.Views.Helper
             ");
         }
 
+        public static void CreateCalendarTable()
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            connection.Execute(@"
+                CREATE TABLE IF NOT EXISTS calendar_table (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    date TEXT NOT NULL,
+                    title_id TEXT NOT NULL
+                );
+            ");
+        }
+
+        public static void AddMovieToDate(string date, string title_id)
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+            
+            connection.Execute(
+                @"INSERT OR IGNORE INTO calendar_table(date, title_id) VALUES(@Date, @Title);",
+                    new { Date = date, Title = title_id }
+            );
+        }
+
+        public static Dictionary<DateTime, List<string>> LoadEntriesForMonth(DateTime start, DateTime end)
+        {
+            using var conn = new SQLiteConnection(connectionString);
+            conn.Open();
+
+            var rows = conn.Query<(string date, string title_id)>(@"
+                SELECT DISTINCT date, title_id
+                FROM calendar_table
+                WHERE date BETWEEN @Start AND @End;
+            ", new { Start = start.ToString("yyyy-MM-dd"), End = end.ToString("yyyy-MM-dd") });
+
+            return rows
+                .GroupBy(r => DateTime.Parse(r.date))
+                .ToDictionary(g => g.Key, g => g.Select(r => r.title_id).ToList());
+        }
+
         public static List<string> CreateNewList() 
         {
             string listName = "My List";

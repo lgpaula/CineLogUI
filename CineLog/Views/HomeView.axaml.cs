@@ -25,6 +25,7 @@ namespace CineLog.Views
             EventAggregator.Instance.Subscribe("ListUpdated", LoadListUI);
 
             DatabaseHandler.CreateListsTable();
+            DatabaseHandler.CreateCalendarTable();
             LoadMoviesAndLists();
         }
 
