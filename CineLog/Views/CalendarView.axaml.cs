@@ -10,6 +10,7 @@ using System.Text.Json;
 using CineLog.ViewModels;
 using Avalonia.Interactivity;
 using CineLog.Views.Helper;
+using Avalonia.Input;
 
 namespace CineLog.Views
 {
@@ -175,7 +176,7 @@ namespace CineLog.Views
                 {
                     var movie = new Movie(id);
                     var btn = movie.CreateMovieButton();
-                    btn.Click += ViewChanger;
+                    btn.Cursor = new Cursor(StandardCursorType.Arrow);
                     ((StackPanel)scroll.Content).Children.Add(btn);
                 }
             }
