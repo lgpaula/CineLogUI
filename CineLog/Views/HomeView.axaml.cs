@@ -148,7 +148,7 @@ namespace CineLog.Views
 
             ScrollViewer scrollViewer = new()
             {
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
                 Content = listPanel
             };

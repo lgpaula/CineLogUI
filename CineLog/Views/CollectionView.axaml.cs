@@ -79,12 +79,8 @@ namespace CineLog.Views
 
         private void ShowMovieDetails(DatabaseHandler.TitleInfo selectedTitle)
         {
-            var panel = this.FindControl<StackPanel>("DetailsPanel")!;
-
             var movie = new Movie(selectedTitle.Title_Id);
             var movieButton = movie.CreateMovieButton();
-            movieButton.Tag = movie.Id;
-            movieButton.Click += ViewChanger;
             this.FindControl<Button>("MoviePosterButton")!.Content = movieButton;
             this.FindControl<TextBlock>("MovieTitleText")!.Text = movie.Title;
             this.FindControl<TextBlock>("MovieDescriptionText")!.Text = selectedTitle.Plot;
@@ -169,14 +165,6 @@ namespace CineLog.Views
         }
 
         #endregion
-
-        private void ViewChanger(object? sender, RoutedEventArgs e)
-        {
-            if (sender is Button button && button.Tag is string viewName)
-            {
-                ViewModel?.HandleButtonClick(viewName);
-            }
-        }
 
         private void AddToCalendar(object? sender, RoutedEventArgs e)
         {

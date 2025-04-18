@@ -35,11 +35,10 @@ namespace CineLog.Views.Helper
             Button movieButton = new()
             {
                 Padding = new Thickness(0),
-                Margin = new Thickness(10),
-                Width = 132,
-                Height = 220,
-                HorizontalContentAlignment = HorizontalAlignment.Stretch,
-                VerticalContentAlignment = VerticalAlignment.Stretch
+                Margin = new Thickness(2),
+                Background = Brushes.Transparent,
+                Width = 140,
+                Height = 207
             };
 
             Border movieBox = new()
@@ -48,7 +47,7 @@ namespace CineLog.Views.Helper
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(5),
                 Padding = new Thickness(5),
-                Background = new SolidColorBrush(Color.Parse("#222222"))
+                Background = Brushes.Transparent
             };
 
             StackPanel contentPanel = new()
@@ -57,20 +56,7 @@ namespace CineLog.Views.Helper
                 Spacing = 5
             };
 
-            TextBlock movieTitle = new()
-            {
-                Text = Title,
-                Foreground = Brushes.White,
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                TextAlignment = TextAlignment.Center,
-                FontSize = 14,
-                MaxLines = 2,
-                Margin = new Thickness(0, 5, 0, 0)
-            };
-
             contentPanel.Children.Add(GetImageBorder());
-            contentPanel.Children.Add(movieTitle);
             movieBox.Child = contentPanel;
             movieButton.Content = movieBox;
 

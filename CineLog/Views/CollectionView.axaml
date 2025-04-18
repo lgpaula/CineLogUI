@@ -60,10 +60,9 @@
 				IsVisible="false"
 				Margin="10,0,0,0" Padding="10">
 			<StackPanel x:Name="DetailsPanel">
-				<Button x:Name="MoviePosterButton"/>
+				<Button x:Name="MoviePosterButton" Background="Transparent"/>
 				<TextBlock x:Name="MovieTitleText" FontSize="24" Foreground="White"/>
 				<TextBlock x:Name="MovieDescriptionText" Foreground="White" TextWrapping="Wrap"/>
-				<!-- add more fields as needed -->
 				<Button x:Name="Calendar" Content="Calendar" Click="AddToCalendar"/>
 				<Button Content="Close" Click="CloseDetails"/>
 			</StackPanel>
