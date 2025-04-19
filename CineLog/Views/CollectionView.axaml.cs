@@ -4,13 +4,11 @@ using Avalonia.Interactivity;
 using System;
 using System.Collections.Generic;
 using CineLog.Views.Helper;
-using CineLog.ViewModels;
 
 namespace CineLog.Views
 {
     public partial class CollectionView : UserControl
     {
-        private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext!;
         public string viewName = string.Empty;
         private int _currentOffset = 0;
         private const int count = 50;
