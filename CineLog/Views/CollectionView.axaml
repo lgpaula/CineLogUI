@@ -5,54 +5,54 @@
 	<Grid ColumnDefinitions="*, Auto">
 		<!-- Left: Collection and Filters -->
 		<ScrollViewer Grid.Column="0" x:Name="CollectionScrollViewer">
-		<StackPanel>
-			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-				<Expander.Header>
-						<TextBlock Text="Filter" FontSize="20"/>
-				</Expander.Header>
-				<Grid RowDefinitions="*,*,*,*,*,*" ColumnDefinitions="150,*">
-					<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Rating</TextBlock>
-					<StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="5">
-						<TextBlock Text="From" Foreground="White"/>
-						<TextBox x:Name="MinRating" Width="50" Text="0.0" Foreground="Black" Background="White"/>
-						<TextBlock Text="To" Foreground="White"/>
-						<TextBox x:Name="MaxRating" Width="50" Text="10.0" Foreground="Black" Background="White"/>
-					</StackPanel>
+			<StackPanel>
+				<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
+					<Expander.Header>
+							<TextBlock Text="Filter" FontSize="20"/>
+					</Expander.Header>
+					<Grid RowDefinitions="*,*,*,*,*,*" ColumnDefinitions="150,*">
+						<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Rating</TextBlock>
+						<StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="5">
+							<TextBlock Text="From" Foreground="White"/>
+							<TextBox x:Name="MinRating" Width="50" Text="0.0" Foreground="Black" Background="White"/>
+							<TextBlock Text="To" Foreground="White"/>
+							<TextBox x:Name="MaxRating" Width="50" Text="10.0" Foreground="Black" Background="White"/>
+						</StackPanel>
 
-					<TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Genre</TextBlock>
-					<ScrollViewer Grid.Row="1" Grid.Column="1">
-						<WrapPanel x:Name="GenreCheckBoxPanel" Orientation="Horizontal">
-								<!-- add companies here as checkboxes dynamically -->
+						<TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Genre</TextBlock>
+						<ScrollViewer Grid.Row="1" Grid.Column="1">
+							<WrapPanel x:Name="GenreCheckBoxPanel" Orientation="Horizontal">
+									<!-- add companies here as checkboxes dynamically -->
+							</WrapPanel>
+						</ScrollViewer>
+
+						<TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Year release</TextBlock>
+						<StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="5">
+							<TextBlock Text="From" Foreground="White"/>
+							<TextBox x:Name="yearStart" Width="50" Text="" Foreground="Black" Background="White"/>
+							<TextBlock Text="To" Foreground="White"/>
+							<TextBox x:Name="yearEnd" Width="50" Text="" Foreground="Black" Background="White"/>
+						</StackPanel>
+						
+						<TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center">Company</TextBlock>
+						<ScrollViewer Grid.Row="3" Grid.Column="1">
+							<WrapPanel x:Name="CompaniesPanel" Orientation="Horizontal">
+									<!-- add companies here as radioButtons dynamically -->
+							</WrapPanel>
+						</ScrollViewer>
+
+						<TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Type</TextBlock>
+						<WrapPanel x:Name="TitleTypePanel" Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+							<CheckBox Content="Movie" Tag="Movie"/>
+							<CheckBox Content="Series" Tag="TV Series"/>
 						</WrapPanel>
-					</ScrollViewer>
+						<Button Grid.Row="5" Grid.Column="0" Click="ApplyFilter" Content="Apply" HorizontalAlignment="Left" Margin="0,10,10,0"/>
+					</Grid>
 
-					<TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Year release</TextBlock>
-					<StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="5">
-						<TextBlock Text="From" Foreground="White"/>
-						<TextBox x:Name="yearStart" Width="50" Text="" Foreground="Black" Background="White"/>
-						<TextBlock Text="To" Foreground="White"/>
-						<TextBox x:Name="yearEnd" Width="50" Text="" Foreground="Black" Background="White"/>
-					</StackPanel>
-					
-					<TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center">Company</TextBlock>
-					<ScrollViewer Grid.Row="3" Grid.Column="1">
-						<WrapPanel x:Name="CompaniesPanel" Orientation="Horizontal">
-								<!-- add companies here as radioButtons dynamically -->
-						</WrapPanel>
-					</ScrollViewer>
-
-					<TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Type</TextBlock>
-					<WrapPanel x:Name="TitleTypePanel" Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
-						<CheckBox Content="Movie" Tag="Movie"/>
-						<CheckBox Content="Series" Tag="TV Series"/>
-					</WrapPanel>
-					<Button Grid.Row="5" Grid.Column="0" Click="ApplyFilter" Content="Apply" HorizontalAlignment="Left" Margin="0,10,10,0"/>
-				</Grid>
-
-			</Expander>
-			
-			<WrapPanel Name="CollectionWrapPanel" Orientation="Horizontal"/>
-		</StackPanel>
+				</Expander>
+				
+				<WrapPanel Name="CollectionWrapPanel" Orientation="Horizontal"/>
+			</StackPanel>
 		</ScrollViewer>
 
 		<!-- Right: Drawer-style info panel -->
