@@ -90,7 +90,7 @@ namespace CineLog.Views
 
             DockPanel dockPanel = new()
             {
-                LastChildFill = true
+                LastChildFill = false
             };
 
             TextBox listTitle = new()
@@ -99,7 +99,8 @@ namespace CineLog.Views
                 Foreground = Brushes.White,
                 FontSize = 16,
                 Background = Brushes.Transparent,
-                BorderBrush = Brushes.Transparent
+                BorderBrush = Brushes.Transparent,
+                Margin = new Thickness(0, 0, 5, 0)
             };
 
             listTitle.LostFocus += (s, e) =>
@@ -109,6 +110,24 @@ namespace CineLog.Views
                     DatabaseHandler.UpdateListName(listName, listTitle.Text);
                     listName = listTitle.Text;
                 }
+            };
+
+            StackPanel listPanel = new()
+            {
+                Orientation = Orientation.Horizontal,
+                Name = listId
+            };
+
+            ScrollViewer scrollViewer = new()
+            {
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+                Content = listPanel
+            };
+
+            Border listBorder = new()
+            {
+                Child = scrollViewer
             };
 
             Button seeAllButton = new()
@@ -129,44 +148,57 @@ namespace CineLog.Views
                 Tag = listId,
                 Foreground = Brushes.White,
                 Background = Brushes.Transparent,
-                BorderBrush = Brushes.White
+                BorderBrush = Brushes.White,
+                Margin = new Thickness(0, 0, 5, 0)
             };
             deleteListButton.Click += DeleteList;
+
+            Button showListButton = new()
+            {
+                Content = "+",
+                FontSize = 10,
+                Background = Brushes.Transparent,
+                BorderBrush = Brushes.White,
+                IsVisible = false
+            };
+
+            Button hideListButton = new()
+            {
+                Content = "-",
+                FontSize = 10,
+                Background = Brushes.Transparent,
+                BorderBrush = Brushes.White
+            };
+
+            var panelGroup = new ListPanelGroup
+            {
+                ContentPanel = listPanel,
+                ShowButton = showListButton,
+                HideButton = hideListButton,
+                DeleteButton = deleteListButton,
+                SeeAllButton = seeAllButton
+            };
+
+            showListButton.Tag = panelGroup;
+            hideListButton.Tag = panelGroup;
+
+            showListButton.Click += ShowPanel;
+            hideListButton.Click += HidePanel;
 
             DockPanel.SetDock(listTitle, Dock.Left);
             DockPanel.SetDock(deleteListButton, Dock.Right);
             DockPanel.SetDock(seeAllButton, Dock.Right);
+            DockPanel.SetDock(hideListButton, Dock.Left);
+            DockPanel.SetDock(showListButton, Dock.Left);
 
             dockPanel.Children.Add(listTitle);
             dockPanel.Children.Add(seeAllButton);
             dockPanel.Children.Add(deleteListButton);
+            dockPanel.Children.Add(hideListButton);
+            dockPanel.Children.Add(showListButton);
 
-            StackPanel listPanel = new()
-            {
-                Orientation = Orientation.Horizontal,
-                Name = listId
-            };
-
-            ScrollViewer scrollViewer = new()
-            {
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                Content = listPanel
-            };
-
-            Border listBorder = new()
-            {
-                BorderBrush = Brushes.White,
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(20),
-                Background = Brushes.Transparent,
-                Margin = new Thickness(0, 5, 0, 0),
-                Padding = new Thickness(10),
-                Child = scrollViewer
-            };
-
-            listsContainer?.Children.Add(dockPanel);
-            listsContainer?.Children.Add(listBorder);
+            listsContainer.Children.Add(dockPanel);
+            listsContainer.Children.Add(listBorder);
 
             _panelsList.Add(listPanel);
             return listPanel;
@@ -201,6 +233,42 @@ namespace CineLog.Views
                 }
             }
 
+            private void HidePanel(object? sender, RoutedEventArgs e)
+            {
+                if (sender is Button button && button.Tag is ListPanelGroup group)
+                {
+                    group.ContentPanel!.IsVisible = false;
+                    group.HideButton!.IsVisible = false;
+                    group.ShowButton!.IsVisible = true;
+
+                    group.DeleteButton!.IsVisible = false;
+                    group.SeeAllButton!.IsVisible = false;
+                }
+            }
+
+            private void ShowPanel(object? sender, RoutedEventArgs e)
+            {
+                if (sender is Button button && button.Tag is ListPanelGroup group)
+                {
+                    group.ContentPanel!.IsVisible = true;
+                    group.HideButton!.IsVisible = true;
+                    group.ShowButton!.IsVisible = false;
+
+                    group.DeleteButton!.IsVisible = true;
+                    group.SeeAllButton!.IsVisible = true;
+                }
+            }
+
         #endregion
+        private class ListPanelGroup
+        {
+            public StackPanel? ContentPanel { get; set; }
+            public Button? ShowButton { get; set; }
+            public Button? HideButton { get; set; }
+            public Button? DeleteButton { get; set; }
+            public Button? SeeAllButton { get; set; }
+
+        }
+
     }
 }

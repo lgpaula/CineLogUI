@@ -20,11 +20,11 @@
             </StackPanel>
                 
             <StackPanel Grid.Row="2" Name="PreMadeListsContainer" Orientation="Vertical" Margin="10" Spacing="10">
-                <DockPanel>
-                    <TextBlock Text="Entire Collection" Foreground="White" FontSize="16" DockPanel.Dock="Left"/>
+                <DockPanel LastChildFill="False">
+                    <TextBlock Text="Collection" Foreground="White" FontSize="16" DockPanel.Dock="Left" VerticalAlignment="Center"/>
                     <Button Click="ViewChanger" Content="See all" DockPanel.Dock="Right" FontSize="16" Tag="Collection" Foreground="White" Background="Transparent" BorderBrush="White"/>
                 </DockPanel>
-                <Border BorderBrush="White" BorderThickness="1" CornerRadius="20" Margin="0,5,0,0" Padding="10">
+                <Border>
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled">
                         <StackPanel Orientation="Horizontal" Name="CollectionContainer" />
                     </ScrollViewer>

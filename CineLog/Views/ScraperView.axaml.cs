@@ -57,7 +57,7 @@ namespace CineLog.Views
         private static async Task StartScraping(ScraperCriteria criteria)
         {
             string stringCriteria = ConvertCriteria(criteria);
-            string response = await Helper.ServerHandler.ScrapeMultipleTitles(stringCriteria);
+            await Helper.ServerHandler.ScrapeMultipleTitles(stringCriteria);
         }
 
         private List<CheckBox> GetCheckBoxes(string parentName)

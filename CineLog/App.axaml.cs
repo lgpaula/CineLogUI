@@ -110,12 +110,8 @@ namespace CineLog
 
         private static void StartWorkerThreads() 
         {
-
-            Console.WriteLine("thread cal");
-
             Thread infoGatherer = new(async () =>
             {
-                Console.WriteLine("inside");
                 var lists = DatabaseHandler.GetListsFromDatabase();
                 foreach (var (list_uuid, _) in lists)
                 {
