@@ -115,39 +115,51 @@ namespace CineLog.Views
             }
         }
 
-        private static StackPanel CreateDayCell(DateTime date, Dictionary<DateTime, List<string>> map)
+        private static Grid CreateDayCell(DateTime date, Dictionary<DateTime, List<string>> map)
         {
             bool isCur = date.Month == _currentMonth.Month;
-            var stack = new StackPanel { Orientation = Orientation.Vertical };
+
+            var grid = new Grid
+            {
+                RowDefinitions = new RowDefinitions("Auto, *"),
+                ColumnDefinitions = new ColumnDefinitions("1*"),
+            };
 
             if (isCur)
             {
-                stack.Children.Add(new TextBlock {
+                var header = new TextBlock
+                {
                     Text = date.Day.ToString(),
                     FontWeight = FontWeight.Bold,
                     Foreground = Brushes.Black,
                     HorizontalAlignment = HorizontalAlignment.Left
-                });
+                };
+                Grid.SetRow(header, 0);
+                grid.Children.Add(header);
             }
 
-            var scroll = new ScrollViewer {
-                MaxHeight = 100,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                Content = new StackPanel { Orientation = Orientation.Vertical }
-            };
+            var wrapPanel = new WrapPanel { Orientation = Orientation.Horizontal };
 
             if (map.TryGetValue(date.Date, out var titles))
             {
                 foreach (var id in titles)
                 {
-                    var btn = new Movie(id).CreateMovieButton();
+                    var btn = new Movie(id).CreateMovieButton(0.4);
                     btn.Cursor = new Cursor(StandardCursorType.Arrow);
-                    ((StackPanel)scroll.Content).Children.Add(btn);
+                    wrapPanel.Children.Add(btn);
                 }
             }
 
-            stack.Children.Add(scroll);
-            return stack;
+            var scroll = new ScrollViewer
+            {
+                VerticalScrollBarVisibility = ScrollBarVisibility.Hidden,
+                Content = wrapPanel
+            };
+
+            Grid.SetRow(scroll, 1);
+            grid.Children.Add(scroll);
+
+            return grid;
         }
 
         private void PreviousMonth_Click(object? sender, RoutedEventArgs e)
