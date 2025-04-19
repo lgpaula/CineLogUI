@@ -30,15 +30,15 @@ namespace CineLog.Views.Helper
             PosterUrl = DatabaseHandler.GetPosterUrl(id);
         }
 
-        public Button CreateMovieButton()
+        public Button CreateMovieButton(double percentage = 1.0)
         {
             Button movieButton = new()
             {
                 Padding = new Thickness(0),
                 Margin = new Thickness(2),
                 Background = Brushes.Transparent,
-                Width = 140,
-                Height = 207
+                Width = 140 * percentage,
+                Height = 207 * percentage
             };
 
             Border movieBox = new()
