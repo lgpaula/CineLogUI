@@ -5,11 +5,11 @@
         <!-- Top Bar -->
         <Grid RowDefinitions="Auto,Auto,Auto,Auto">
             <WrapPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
-                <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Height="150" Width="100" HorizontalAlignment="Left" Name="ScrapeButtonBorder">
+                <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Height="150" Width="100" HorizontalAlignment="Left">
                     <Button Click="ViewChanger" Tag="Scraper" CornerRadius="10" Height="150" Width="100"/>
                 </Border>
                 <Border BorderBrush="White" BorderThickness="1" CornerRadius="10" Height="150" Width="100" HorizontalAlignment="Right">
-                    <Button Click="ViewChanger" Tag="Calendar" Height="150" Width="100"/> 
+                    <Button Click="ViewChanger" Tag="Calendar" CornerRadius="10" Height="150" Width="100"/> 
                 </Border>
             </WrapPanel>
 
