@@ -1,7 +1,8 @@
 <UserControl x:Class="CineLog.Views.HomeView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <ScrollViewer>
+    
+    <ScrollViewer VerticalScrollBarVisibility="Hidden">
         <!-- Top Bar -->
         <Grid RowDefinitions="Auto,Auto,Auto,Auto">
             <WrapPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
@@ -25,9 +26,7 @@
                     <Button Click="ViewChanger" Content="See all" DockPanel.Dock="Right" FontSize="16" Tag="Collection" Foreground="White" Background="Transparent" BorderBrush="White"/>
                 </DockPanel>
                 <Border>
-                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled">
-                        <StackPanel Orientation="Horizontal" Name="CollectionContainer" />
-                    </ScrollViewer>
+                    <StackPanel Orientation="Horizontal" Name="CollectionContainer" />
                 </Border>
             </StackPanel>
 
