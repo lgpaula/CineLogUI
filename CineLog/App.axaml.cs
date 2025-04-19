@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Net.Http;
-using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -64,7 +63,7 @@ namespace CineLog
             _ = WaitForFlaskReady();
         }
 
-        private async Task WaitForFlaskReady()
+        private static async Task WaitForFlaskReady()
         {
             using var client = new HttpClient();
             for (int i = 0; i < 20; i++) // try for 10 seconds

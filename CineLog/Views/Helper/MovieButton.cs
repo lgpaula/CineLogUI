@@ -6,6 +6,8 @@ using Avalonia.Media;
 using Avalonia.Layout;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
+using Avalonia.Controls.Shapes;
+using Avalonia.Animation;
 
 namespace CineLog.Views.Helper 
 {
@@ -32,42 +34,95 @@ namespace CineLog.Views.Helper
 
         public Button CreateMovieButton(double percentage = 1.0)
         {
-            Button movieButton = new()
+            var button = new Button
             {
-                Padding = new Thickness(0),
-                Margin = new Thickness(2),
-                Background = Brushes.Transparent,
                 Width = 140 * percentage,
-                Height = 207 * percentage
+                Height = 207 * percentage,
+                Background = Brushes.Transparent,
+                BorderThickness = new Thickness(0)
             };
 
-            Border movieBox = new()
+            // Gradient overlay rectangle
+            var gradientBrush = new LinearGradientBrush
             {
-                BorderBrush = Brushes.Transparent,
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(5),
-                Padding = new Thickness(5),
-                Background = Brushes.Transparent
+                StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
+                EndPoint = new RelativePoint(0, 1, RelativeUnit.Relative),
+                GradientStops =
+                [
+                    new GradientStop(Color.FromRgb(0, 0, 0), 0),
+                    new GradientStop(Color.FromArgb(200, 0, 0, 0), 1)
+                ]
             };
 
-            StackPanel contentPanel = new()
+            var overlayRect = new Rectangle
             {
-                Orientation = Orientation.Vertical,
-                Spacing = 5
+                Fill = gradientBrush,
+                Opacity = 0,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                IsHitTestVisible = false,
+                Transitions =
+                [
+                    new DoubleTransition
+                    {
+                        Property = Rectangle.OpacityProperty,
+                        Duration = TimeSpan.FromMilliseconds(250)
+                    }
+                ]
             };
 
-            contentPanel.Children.Add(GetImageBorder());
-            movieBox.Child = contentPanel;
-            movieButton.Content = movieBox;
+            var titleText = new TextBlock
+            {
+                Text = Title,
+                Foreground = Brushes.White,
+                FontSize = 16,
 
-            movieButton.PointerPressed += (s, e) =>
+                TextWrapping = TextWrapping.Wrap,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+
+                TextAlignment = TextAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(2, 10, 2, 0),
+                Opacity = 0,
+                IsHitTestVisible = false,
+                Transitions =
+                [
+                    new DoubleTransition
+                    {
+                        Property = Visual.OpacityProperty,
+                        Duration = TimeSpan.FromMilliseconds(100)
+                    }
+                ]
+            };
+
+            var grid = new Grid();
+            grid.Children.Add(GetImageBorder());
+            grid.Children.Add(overlayRect);
+            grid.Children.Add(titleText);
+
+            button.Content = grid;
+
+            button.PointerEntered += (_, __) =>
+            {
+                overlayRect.Opacity = 1;
+                titleText.Opacity = 1;
+            };
+
+            button.PointerExited += (_, __) =>
+            {
+                overlayRect.Opacity = 0;
+                titleText.Opacity = 0;
+            };
+
+            button.PointerPressed += (s, e) =>
             {
                 var contextMenu = CreateContextMenu();
-                movieButton.ContextMenu = contextMenu;
-                contextMenu.Open(movieButton);
+                button.ContextMenu = contextMenu;
+                contextMenu.Open(button);
             };
 
-            return movieButton;
+            return button;
         }
 
         private ContextMenu CreateContextMenu()
