@@ -8,6 +8,8 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using System.Threading.Tasks;
 using System;
+using CineLog.Views.Helper;
+using System.Threading;
 
 namespace CineLog
 {
@@ -19,6 +21,7 @@ namespace CineLog
         {
             AvaloniaXamlLoader.Load(this);
             StartPythonServer();
+            StartWorkerThreads();
         }
 
         public override void OnFrameworkInitializationCompleted()
@@ -103,6 +106,35 @@ namespace CineLog
         {
             _pythonServerProcess?.Kill();
             _pythonServerProcess?.Dispose();
+        }
+
+        private static void StartWorkerThreads() 
+        {
+
+            Console.WriteLine("thread cal");
+
+            Thread infoGatherer = new(async () =>
+            {
+                Console.WriteLine("inside");
+                var lists = DatabaseHandler.GetListsFromDatabase();
+                foreach (var (list_uuid, _) in lists)
+                {
+                    var titles = DatabaseHandler.GetMovies(list_uuid);
+                    foreach (var title in titles)
+                    {
+                        await DatabaseHandler.UpdateTitleInfo(title.Id);
+                    }
+                }
+                var dbTitles = DatabaseHandler.GetMovies();
+                foreach (var title in dbTitles)
+                {
+                    await DatabaseHandler.UpdateTitleInfo(title.Id);
+                }
+            })
+            {
+                IsBackground = true,
+            };
+            infoGatherer.Start();
         }
     }
 }

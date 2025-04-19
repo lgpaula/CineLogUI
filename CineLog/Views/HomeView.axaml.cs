@@ -52,7 +52,7 @@ namespace CineLog.Views
             StackPanel? panel = _panelsList.FirstOrDefault(p => p.Name == (listId ?? listName));
             panel ??= CreateListPanel(listName, listId ?? listName);
 
-            var moviesInDatabase = DatabaseHandler.GetMovies(listId);
+            var moviesInDatabase = DatabaseHandler.GetMovies(listId, 20);
 
             var movieButtonsInUI = new Dictionary<string, Button>();
             foreach (var child in panel.Children)

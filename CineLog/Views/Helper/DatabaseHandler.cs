@@ -13,7 +13,7 @@ namespace CineLog.Views.Helper
         private static readonly string dbPath = "/home/legion/CLionProjects/pyScraper/scraper/cinelog.db";
         private static readonly string connectionString = $"Data Source={dbPath};Version=3;";
 
-        public static List<Movie> GetMovies(string? list_uuid = null, int count = 20, int offset = 0, FilterSettings? filterSettings = null)
+        public static List<Movie> GetMovies(string? list_uuid = null, int limit = -1, int offset = 0, FilterSettings? filterSettings = null)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
@@ -59,8 +59,8 @@ namespace CineLog.Views.Helper
             if (whereClauses.Count > 0)
                 query.Append(" WHERE " + string.Join(" AND ", whereClauses));
 
-            query.Append(" LIMIT @Count OFFSET @Offset");
-            parameters.Add("Count", count);
+            query.Append(" LIMIT @Limit OFFSET @Offset");
+            parameters.Add("Limit", limit);
             parameters.Add("Offset", offset);
 
             var result = connection.Query<(string, string, string)>(query.ToString(), parameters)
@@ -103,7 +103,7 @@ namespace CineLog.Views.Helper
 
 #region List related
 
-        public static List<(string uuid, string name)> GetListsFromDatabase()
+        public static List<(string name, string uuid)> GetListsFromDatabase()
         {
             var lists = new List<(string, string)>();
             using var connection = new SQLiteConnection(connectionString);
@@ -310,6 +310,19 @@ namespace CineLog.Views.Helper
 
         public static async Task<TitleInfo> GetTitleInfo(string id)
         {
+            await UpdateTitleInfo(id);
+
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            string query = @"SELECT * FROM titles_table WHERE title_id = @id";
+            var result = connection.QuerySingleOrDefault<TitleInfo>(query, new { id });
+
+            return result;
+        }
+
+        public static async Task UpdateTitleInfo(string id)
+        {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
@@ -320,11 +333,6 @@ namespace CineLog.Views.Helper
             {
                 await ServerHandler.ScrapeSingleTitle(id);
             }
-
-            string query = @"SELECT * FROM titles_table WHERE title_id = @id";
-            var result = connection.QuerySingleOrDefault<TitleInfo>(query, new { id });
-
-            return result;
         }
 
         internal static string GetPosterUrl(string id)
