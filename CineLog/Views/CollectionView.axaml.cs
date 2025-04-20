@@ -4,6 +4,9 @@ using Avalonia.Interactivity;
 using System;
 using System.Collections.Generic;
 using CineLog.Views.Helper;
+using Avalonia.Media;
+using Avalonia;
+using System.Linq;
 
 namespace CineLog.Views
 {
@@ -78,11 +81,65 @@ namespace CineLog.Views
         private void ShowMovieDetails(DatabaseHandler.TitleInfo selectedTitle)
         {
             var movie = new Movie(selectedTitle.Title_Id);
-            var movieButton = movie.CreateMovieButton();
-            this.FindControl<Button>("MoviePosterButton")!.Content = movieButton;
-            this.FindControl<TextBlock>("MovieTitleText")!.Text = movie.Title;
-            this.FindControl<TextBlock>("MovieDescriptionText")!.Text = selectedTitle.Plot;
+
+            // Swap poster with image with rounded corners
+            var posterImage = movie.GetImageBorder();
+            posterImage.Height = 100;
+            posterImage.Width = 70;
+            this.FindControl<Border>("PosterButton")!.Child = posterImage;
+
+            // Set basic text fields
+            this.FindControl<TextBlock>("TitleText")!.Text = movie.Title;
+            this.FindControl<TextBlock>("YearStartText")!.Text = selectedTitle.Year_start?.ToString() ?? "";
+            this.FindControl<TextBlock>("YearEndText")!.Text = selectedTitle.Year_end?.ToString() ?? "";
+            this.FindControl<TextBlock>("RatingText")!.Text = selectedTitle.Rating?.ToString() ?? "";
+            this.FindControl<TextBlock>("RuntimeText")!.Text = selectedTitle.Runtime != null ? $"{selectedTitle.Runtime}" : "";
+            this.FindControl<TextBlock>("SeasonCountText")!.Text = selectedTitle.Season_count?.ToString() ?? "";
+            this.FindControl<TextBlock>("DescriptionText")!.Text = selectedTitle.Plot ?? "";
+
+            // Helper to insert button list into TextBlock's parent
+            void InsertButtons(string name, string? items)
+            {
+                var textBlock = this.FindControl<TextBlock>(name)!;
+                var parent = textBlock.Parent as Panel;
+
+                // Remove the existing TextBlock (used for layout only)
+                parent?.Children.Remove(textBlock);
+
+                if (!string.IsNullOrWhiteSpace(items) && parent != null)
+                {
+                    var panel = new WrapPanel();
+                    var entries = items.Split(',')
+                                    .Select(s => s.Trim())
+                                    .Where(s => !string.IsNullOrEmpty(s));
+
+                    foreach (var item in entries)
+                    {
+                        panel.Children.Add(new Button
+                        {
+                            Content = item,
+                            FontSize = 12,
+                            Padding = new Thickness(4, 2),
+                            Margin = new Thickness(4, 2),
+                            CornerRadius = new CornerRadius(8)
+                        });
+                    }
+
+                    parent.Children.Add(panel);
+                }
+            }
+
+            InsertButtons("GenresText", selectedTitle.Genres);
+            InsertButtons("CompaniesText", selectedTitle.Companies);
+            InsertButtons("StarsText", selectedTitle.Stars);
+            InsertButtons("DirectorsText", selectedTitle.Directors);
+            InsertButtons("WritersText", selectedTitle.Writers);
+            InsertButtons("CreatorsText", selectedTitle.Creators);
+
+            // Reveal the details panel
             this.FindControl<Border>("DetailsBorder")!.IsVisible = true;
+
+            // Set calendar tag for later use
             this.FindControl<Button>("Calendar")!.Tag = movie.Id;
         }
 

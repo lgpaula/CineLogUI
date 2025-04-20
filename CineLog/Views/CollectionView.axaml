@@ -59,13 +59,24 @@
 		</ScrollViewer>
 
 		<!-- Right: Drawer-style info panel -->
-		<Border Grid.Column="1" x:Name="DetailsBorder" Background="Transparent" Width="300" 
+		<Border Grid.Column="1" x:Name="DetailsBorder" Background="Transparent" Width="400" 
 				IsVisible="false"
 				BorderBrush="White" BorderThickness="1" CornerRadius="20" Margin="10" Padding="10">
 			<StackPanel x:Name="DetailsPanel">
-				<Button x:Name="MoviePosterButton" Background="Transparent"/>
-				<TextBlock x:Name="MovieTitleText" FontSize="24" Foreground="White"/>
-				<TextBlock x:Name="MovieDescriptionText" Foreground="White" TextWrapping="Wrap"/>
+				<Border x:Name="PosterButton" Background="Transparent"/>
+				<TextBlock x:Name="TitleText" FontSize="24" Foreground="White"/>
+				<TextBlock x:Name="YearStartText" Foreground="White"/>
+				<TextBlock x:Name="YearEndText" Foreground="White"/>
+				<TextBlock x:Name="RatingText" Foreground="White"/>
+				<TextBlock x:Name="RuntimeText" Foreground="White"/>
+				<TextBlock x:Name="SeasonCountText" Foreground="White"/>
+				<TextBlock x:Name="DescriptionText" Foreground="White" TextWrapping="Wrap"/>
+				<TextBlock x:Name="GenresText" Foreground="White"/>
+				<TextBlock x:Name="CompaniesText" Foreground="White"/>
+				<TextBlock x:Name="StarsText" Foreground="White"/>
+				<TextBlock x:Name="DirectorsText" Foreground="White"/>
+				<TextBlock x:Name="WritersText" Foreground="White"/>
+				<TextBlock x:Name="CreatorsText" Foreground="White"/>
 				<Button x:Name="Calendar" Content="Calendar" Click="AddToCalendar"/>
 				<Button Content="Close" Click="CloseDetails"/>
 			</StackPanel>
