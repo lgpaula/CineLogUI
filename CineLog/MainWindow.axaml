@@ -20,6 +20,7 @@
 
     <DockPanel>
 
+        <!-- Top Bar -->
         <Grid DockPanel.Dock="Top" Height="100">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250"/>
@@ -27,27 +28,26 @@
                 <ColumnDefinition Width="250"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Center">
-                <Button CornerRadius="50"
-                        Click="ViewChanger"
-                        Tag="Home"
-                        Margin="0"
-                        Padding="0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Focusable="False">
-                    <Image Source="avares://CineLog/Assets/logo.png" Width="155" Height="70"/>
-                </Button>
-            </Border>
+            <Button Grid.Column="0"
+                    Tag="Home"
+                    Click="ViewChanger"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Margin="10"
+                    Padding="0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Focusable="False"
+                    CornerRadius="50">
+                <Image Source="avares://CineLog/Assets/logo.png" Width="155" Height="70"/>
+            </Button>
 
-            <TextBox Grid.Column="1" Width="300" Height="30" VerticalAlignment="Center" HorizontalAlignment="Center" Watermark="Search..."/>
+            <!-- bring scrape and calendar tiny buttons to column 1 -->
+
         </Grid>
 
-        <Grid>
-            <ContentControl Content="{Binding CurrentView}" />
-        </Grid>
+        <!-- Main Content -->
+        <ContentControl Content="{Binding CurrentView}" />
 
     </DockPanel>
 
