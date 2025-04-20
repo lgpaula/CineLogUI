@@ -4,7 +4,6 @@ using Avalonia.Interactivity;
 using System;
 using System.Collections.Generic;
 using CineLog.Views.Helper;
-using Avalonia.Media;
 using Avalonia;
 using System.Linq;
 
@@ -82,28 +81,35 @@ namespace CineLog.Views
         {
             var movie = new Movie(selectedTitle.Title_Id);
 
-            // Swap poster with image with rounded corners
             var posterImage = movie.GetImageBorder();
-            posterImage.Height = 100;
-            posterImage.Width = 70;
+            posterImage.Height = 270;
+            posterImage.Width = 180;
             this.FindControl<Border>("PosterButton")!.Child = posterImage;
 
-            // Set basic text fields
-            this.FindControl<TextBlock>("TitleText")!.Text = movie.Title;
-            this.FindControl<TextBlock>("YearStartText")!.Text = selectedTitle.Year_start?.ToString() ?? "";
-            this.FindControl<TextBlock>("YearEndText")!.Text = selectedTitle.Year_end?.ToString() ?? "";
-            this.FindControl<TextBlock>("RatingText")!.Text = selectedTitle.Rating?.ToString() ?? "";
-            this.FindControl<TextBlock>("RuntimeText")!.Text = selectedTitle.Runtime != null ? $"{selectedTitle.Runtime}" : "";
-            this.FindControl<TextBlock>("SeasonCountText")!.Text = selectedTitle.Season_count?.ToString() ?? "";
+            var titleTextBlock = this.FindControl<TextBlock>("TitleText")!;
+            titleTextBlock.Text = selectedTitle.Title_name;
+
+            var basicInfoBlock = this.FindControl<TextBlock>("BasicInfo")!;
+            // add calendar emoji
+            basicInfoBlock.Text = selectedTitle.Year_start?.ToString() ?? "";
+            if (selectedTitle.Year_end != null) basicInfoBlock.Text += $" - {selectedTitle.Year_end}";
+            // add star emoji
+            if (!string.IsNullOrWhiteSpace(selectedTitle.Rating)) basicInfoBlock.Text += $" • {selectedTitle.Rating}";
+            // add clock emoji
+            if (!string.IsNullOrWhiteSpace(selectedTitle.Runtime)) basicInfoBlock.Text += $" • {selectedTitle.Runtime}";
+            if (!string.IsNullOrWhiteSpace(selectedTitle.Season_count))
+            {
+                basicInfoBlock.Text += $" • {selectedTitle.Season_count} season";
+                if (selectedTitle.Season_count != "1") basicInfoBlock.Text += "s";
+            } 
+
             this.FindControl<TextBlock>("DescriptionText")!.Text = selectedTitle.Plot ?? "";
 
-            // Helper to insert button list into TextBlock's parent
             void InsertButtons(string name, string? items)
             {
                 var textBlock = this.FindControl<TextBlock>(name)!;
                 var parent = textBlock.Parent as Panel;
 
-                // Remove the existing TextBlock (used for layout only)
                 parent?.Children.Remove(textBlock);
 
                 if (!string.IsNullOrWhiteSpace(items) && parent != null)
