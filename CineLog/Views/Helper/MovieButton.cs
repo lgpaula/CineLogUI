@@ -207,6 +207,23 @@ namespace CineLog.Views.Helper
             return imageBorder;
         }
 
+        public Bitmap? GetImageSource()
+        {
+            try
+            {
+                using var response = _httpClient.GetAsync(PosterUrl).Result;
+                response.EnsureSuccessStatusCode();
+
+                using var stream = response.Content.ReadAsStreamAsync().Result;
+                return new Bitmap(stream);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to load image from {PosterUrl}: {ex.Message}");
+                return null;
+            }
+        }
+
         private async Task LoadImageFromUrl(Image image)
         {
             try

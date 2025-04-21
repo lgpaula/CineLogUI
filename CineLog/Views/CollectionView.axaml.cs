@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using CineLog.Views.Helper;
 using Avalonia;
 using System.Linq;
+using Avalonia.Media;
 
 namespace CineLog.Views
 {
@@ -81,27 +82,37 @@ namespace CineLog.Views
         {
             var movie = new Movie(selectedTitle.Title_Id);
 
-            var posterImage = movie.GetImageBorder();
-            posterImage.Height = 270;
-            posterImage.Width = 180;
-            this.FindControl<Border>("PosterButton")!.Child = posterImage;
+            var imageSource = movie.GetImageSource();
+            if (imageSource != null)
+            {
+                var imageBrush = new ImageBrush
+                {
+                    Source = imageSource,
+                    Stretch = Stretch.UniformToFill,
+                    Opacity = 0.75
+                };
+                this.FindControl<Border>("DetailsBorder")!.Background = imageBrush;
+            }
 
-            var titleTextBlock = this.FindControl<TextBlock>("TitleText")!;
-            titleTextBlock.Text = selectedTitle.Title_name;
+            this.FindControl<TextBlock>("TitleText")!.Text = selectedTitle.Title_name;
 
             var basicInfoBlock = this.FindControl<TextBlock>("BasicInfo")!;
-            // add calendar emoji
             basicInfoBlock.Text = selectedTitle.Year_start?.ToString() ?? "";
-            if (selectedTitle.Year_end != null) basicInfoBlock.Text += $" - {selectedTitle.Year_end}";
-            // add star emoji
-            if (!string.IsNullOrWhiteSpace(selectedTitle.Rating)) basicInfoBlock.Text += $" • {selectedTitle.Rating}";
-            // add clock emoji
-            if (!string.IsNullOrWhiteSpace(selectedTitle.Runtime)) basicInfoBlock.Text += $" • {selectedTitle.Runtime}";
+
+            if (selectedTitle.Year_end != null)
+                basicInfoBlock.Text += $" - {selectedTitle.Year_end}";
+
+            if (!string.IsNullOrWhiteSpace(selectedTitle.Rating))
+                basicInfoBlock.Text += $" • {selectedTitle.Rating}";
+
+            if (!string.IsNullOrWhiteSpace(selectedTitle.Runtime))
+                basicInfoBlock.Text += $" • {selectedTitle.Runtime}";
+
             if (!string.IsNullOrWhiteSpace(selectedTitle.Season_count))
             {
                 basicInfoBlock.Text += $" • {selectedTitle.Season_count} season";
                 if (selectedTitle.Season_count != "1") basicInfoBlock.Text += "s";
-            } 
+            }
 
             this.FindControl<TextBlock>("DescriptionText")!.Text = selectedTitle.Plot ?? "";
 
@@ -142,10 +153,10 @@ namespace CineLog.Views
             InsertButtons("WritersText", selectedTitle.Writers);
             InsertButtons("CreatorsText", selectedTitle.Creators);
 
-            // Reveal the details panel
-            this.FindControl<Border>("DetailsBorder")!.IsVisible = true;
+            var detailsBorder = this.FindControl<Border>("DetailsBorder")!;
+            detailsBorder.ClipToBounds = true;
+            detailsBorder.IsVisible = true;
 
-            // Set calendar tag for later use
             this.FindControl<Button>("Calendar")!.Tag = movie.Id;
         }
 
