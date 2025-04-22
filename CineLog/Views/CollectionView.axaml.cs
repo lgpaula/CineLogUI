@@ -8,6 +8,7 @@ using Avalonia;
 using System.Linq;
 using Avalonia.Media;
 using System.Diagnostics;
+using System.Net;
 
 namespace CineLog.Views
 {
@@ -121,25 +122,29 @@ namespace CineLog.Views
             {
                 var panel = this.FindControl<WrapPanel>(panelName)!;
                 panel.Children.Clear();
+                var parent = panel.Parent as StackPanel;
 
-                if (!string.IsNullOrWhiteSpace(items))
+                if (string.IsNullOrWhiteSpace(items))
                 {
-                    var entries = items.Split(',')
-                                    .Select(s => s.Trim())
-                                    .Where(s => !string.IsNullOrEmpty(s));
+                    parent!.IsVisible = false;
+                    return;
+                }
+                parent!.IsVisible = true;
 
-                    foreach (var item in entries)
+                var entries = items.Split(',')
+                                .Select(s => s.Trim())
+                                .Where(s => !string.IsNullOrEmpty(s));
+
+                foreach (var item in entries)
+                {
+                    panel.Children.Add(new Button
                     {
-                        Console.WriteLine(item);
-                        panel.Children.Add(new Button
-                        {
-                            Content = item,
-                            FontSize = 12,
-                            Padding = new Thickness(4, 2),
-                            Margin = new Thickness(4, 2),
-                            CornerRadius = new CornerRadius(8)
-                        });
-                    }
+                        Content = item,
+                        FontSize = 12,
+                        Padding = new Thickness(4, 2),
+                        Margin = new Thickness(4, 2),
+                        CornerRadius = new CornerRadius(8)
+                    });
                 }
             }
 
