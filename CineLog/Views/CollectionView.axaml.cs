@@ -80,6 +80,7 @@ namespace CineLog.Views
 
         private void ShowMovieDetails(DatabaseHandler.TitleInfo selectedTitle)
         {
+            Console.WriteLine("Cast: " + selectedTitle.Stars);
             var movie = new Movie(selectedTitle.Title_Id);
 
             var imageSource = movie.GetImageSource();
@@ -146,12 +147,12 @@ namespace CineLog.Views
                 }
             }
 
-            InsertButtons("GenresText", selectedTitle.Genres);
-            InsertButtons("CompaniesText", selectedTitle.Companies);
-            InsertButtons("StarsText", selectedTitle.Stars);
-            InsertButtons("DirectorsText", selectedTitle.Directors);
-            InsertButtons("WritersText", selectedTitle.Writers);
-            InsertButtons("CreatorsText", selectedTitle.Creators);
+            InsertButtons("GenresButtons", selectedTitle.Genres);
+            InsertButtons("CastButtons", selectedTitle.Stars);
+            InsertButtons("DirectorsButtons", selectedTitle.Directors);
+            InsertButtons("WritersButtons", selectedTitle.Writers);
+            InsertButtons("CreatorsButtons", selectedTitle.Creators);
+            InsertButtons("ProductionButtons", selectedTitle.Companies);
 
             var detailsBorder = this.FindControl<Border>("DetailsBorder")!;
             detailsBorder.ClipToBounds = true;
