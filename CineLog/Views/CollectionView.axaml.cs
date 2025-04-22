@@ -7,6 +7,7 @@ using CineLog.Views.Helper;
 using Avalonia;
 using System.Linq;
 using Avalonia.Media;
+using System.Diagnostics;
 
 namespace CineLog.Views
 {
@@ -80,7 +81,6 @@ namespace CineLog.Views
 
         private void ShowMovieDetails(DatabaseHandler.TitleInfo selectedTitle)
         {
-            Console.WriteLine("Cast: " + selectedTitle.Stars);
             var movie = new Movie(selectedTitle.Title_Id);
 
             var imageSource = movie.GetImageSource();
@@ -117,22 +117,20 @@ namespace CineLog.Views
 
             this.FindControl<TextBlock>("DescriptionText")!.Text = selectedTitle.Plot ?? "";
 
-            void InsertButtons(string name, string? items)
+            void InsertButtons(string panelName, string? items)
             {
-                var textBlock = this.FindControl<TextBlock>(name)!;
-                var parent = textBlock.Parent as Panel;
+                var panel = this.FindControl<WrapPanel>(panelName)!;
+                panel.Children.Clear();
 
-                parent?.Children.Remove(textBlock);
-
-                if (!string.IsNullOrWhiteSpace(items) && parent != null)
+                if (!string.IsNullOrWhiteSpace(items))
                 {
-                    var panel = new WrapPanel();
                     var entries = items.Split(',')
                                     .Select(s => s.Trim())
                                     .Where(s => !string.IsNullOrEmpty(s));
 
                     foreach (var item in entries)
                     {
+                        Console.WriteLine(item);
                         panel.Children.Add(new Button
                         {
                             Content = item,
@@ -142,15 +140,13 @@ namespace CineLog.Views
                             CornerRadius = new CornerRadius(8)
                         });
                     }
-
-                    parent.Children.Add(panel);
                 }
             }
 
             InsertButtons("GenresButtons", selectedTitle.Genres);
             InsertButtons("CastButtons", selectedTitle.Stars);
-            InsertButtons("DirectorsButtons", selectedTitle.Directors);
             InsertButtons("WritersButtons", selectedTitle.Writers);
+            InsertButtons("DirectorsButtons", selectedTitle.Directors);
             InsertButtons("CreatorsButtons", selectedTitle.Creators);
             InsertButtons("ProductionButtons", selectedTitle.Companies);
 
