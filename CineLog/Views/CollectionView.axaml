@@ -77,14 +77,21 @@
 				<!-- Content on top -->
 				<ScrollViewer Margin="10">
 					<StackPanel x:Name="DetailsPanel">
-						<TextBlock x:Name="TitleText" FontSize="24" Foreground="White"/>
-						<TextBlock x:Name="BasicInfo" Foreground="White"/>
-						<TextBlock x:Name="DescriptionText" Foreground="White" TextWrapping="Wrap"/>
+						<TextBlock x:Name="TitleText" FontSize="24" Foreground="White" HorizontalAlignment="Center"/>
+						<Separator Margin="0,10"/>
+						<TextBlock x:Name="BasicInfo" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+						<TextBlock x:Name="DescriptionText" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,10"/>
+						<TextBlock x:Name="Genres" Foreground="White" Background="Transparent">GENRES</TextBlock>
 						<TextBlock x:Name="GenresText" Foreground="White"/>
-						<TextBlock x:Name="CompaniesText" Foreground="White"/>
+						<TextBlock x:Name="Cast" Foreground="White" Background="Transparent">CAST</TextBlock>
 						<TextBlock x:Name="StarsText" Foreground="White"/>
-						<TextBlock x:Name="DirectorsText" Foreground="White"/>
+						<TextBlock x:Name="Genres" Foreground="White" Background="Transparent">WRITERS</TextBlock>
 						<TextBlock x:Name="WritersText" Foreground="White"/>
+						<TextBlock x:Name="Genres" Foreground="White" Background="Transparent">DIRECTORS</TextBlock>
+						<TextBlock x:Name="DirectorsText" Foreground="White"/>
+						<TextBlock x:Name="Genres" Foreground="White" Background="Transparent">PRODUCTION</TextBlock>
+						<TextBlock x:Name="CompaniesText" Foreground="White"/>
+						<TextBlock x:Name="Genres" Foreground="White" Background="Transparent">CREATORS</TextBlock>
 						<TextBlock x:Name="CreatorsText" Foreground="White"/>
 						<Button x:Name="Calendar" Content="Calendar" Click="AddToCalendar"/>
 						<Button Content="Close" Click="CloseDetails"/>
