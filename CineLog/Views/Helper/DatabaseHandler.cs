@@ -324,7 +324,27 @@ namespace CineLog.Views.Helper
             string query = @"SELECT * FROM titles_table WHERE title_id = @id";
             var result = connection.QuerySingleOrDefault<TitleInfo>(query, new { id });
 
+            result.Genres = await GetJoinedNames(connection, "genres_table", "title_genre", "genres_id", id);
+            result.Stars = await GetJoinedNames(connection, "cast_table", "title_cast", "cast_id", id);
+            result.Writers = await GetJoinedNames(connection, "writers_table", "title_writer", "writers_id", id);
+            result.Directors = await GetJoinedNames(connection, "directors_table", "title_director", "directors_id", id);
+            result.Creators = await GetJoinedNames(connection, "creators_table", "title_creator", "creators_id", id);
+            result.Companies = await GetJoinedNames(connection, "companies_table", "title_company", "companies_id", id);
+
             return result;
+        }
+
+        private static async Task<string?> GetJoinedNames(SQLiteConnection connection, string entityTable, string joinTable, string joinColumn, string titleId)
+        {
+            string query = $@"
+                SELECT e.name 
+                FROM {entityTable} e
+                JOIN {joinTable} j ON e.id = j.{joinColumn}
+                WHERE j.title_id = @titleId";
+
+            var names = (await connection.QueryAsync<string>(query, new { titleId })).ToList();
+
+            return names.Count > 0 ? string.Join(", ", names) : null;
         }
 
         public static async Task UpdateTitleInfo(string id)
