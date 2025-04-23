@@ -109,6 +109,12 @@ namespace CineLog.Views.Helper
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
+            using (var checkCmd = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name='lists_table';", connection))
+            {
+                using var checkReader = checkCmd.ExecuteReader();
+                if (!checkReader.HasRows) return lists;
+            }
+
             using var command = new SQLiteCommand("SELECT name, uuid FROM lists_table;", connection);
             using var reader = command.ExecuteReader();
             while (reader.Read())
