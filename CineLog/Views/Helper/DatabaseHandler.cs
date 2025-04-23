@@ -101,6 +101,28 @@ namespace CineLog.Views.Helper
             }
         }
 
+        public static IEnumerable<IdNameItem> GetCompanies()
+        {
+            var result = new List<IdNameItem>();
+
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            using var command = new SQLiteCommand("SELECT id, name FROM companies_table", connection);
+            using var reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                result.Add(new IdNameItem
+                {
+                    Id = reader["id"].ToString() ?? "",
+                    Name = reader["name"].ToString() ?? ""
+                });
+            }
+
+            return result;
+        }
+
 #region List related
 
         public static List<(string name, string uuid)> GetListsFromDatabase()
