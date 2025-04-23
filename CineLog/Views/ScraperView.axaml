@@ -72,25 +72,13 @@
                 <ScrollViewer VerticalScrollBarVisibility="Hidden">
                     <WrapPanel x:Name="CompanyPanel">
                         <CheckBox Content="Disney" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Pixar" Foreground="White" Margin="5"/>
                         <CheckBox Content="DreamWorks" Foreground="White" Margin="5"/>
                         <CheckBox Content="Warner Bros." Foreground="White" Margin="5"/>
                         <CheckBox Content="Universal" Foreground="White" Margin="5"/>
                         <CheckBox Content="Paramount" Foreground="White" Margin="5"/>
                         <CheckBox Content="Sony" Foreground="White" Margin="5"/>
                         <CheckBox Content="20th Century Fox" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Lionsgate" Foreground="White" Margin="5"/>
                         <CheckBox Content="MGM" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Miramax" Foreground="White" Margin="5"/>
-                        <CheckBox Content="New Line Cinema" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Orion Pictures" Foreground="White" Margin="5"/>
-                        <CheckBox Content="TriStar Pictures" Foreground="White" Margin="5"/>
-                        <CheckBox Content="United Artists" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Columbia Pictures" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Touchstone Pictures" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Focus Features" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Studio Ghibli" Foreground="White" Margin="5"/>
-                        <CheckBox Content="A24" Foreground="White" Margin="5"/>
                     </WrapPanel>
                 </ScrollViewer>    
             </Expander>
