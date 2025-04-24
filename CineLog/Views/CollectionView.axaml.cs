@@ -7,8 +7,7 @@ using CineLog.Views.Helper;
 using Avalonia;
 using System.Linq;
 using Avalonia.Media;
-using System.Diagnostics;
-using System.Net;
+using Avalonia.Controls.Documents;
 
 namespace CineLog.Views
 {
@@ -99,21 +98,30 @@ namespace CineLog.Views
             this.FindControl<TextBlock>("TitleText")!.Text = selectedTitle.Title_name;
 
             var basicInfoBlock = this.FindControl<TextBlock>("BasicInfo")!;
-            basicInfoBlock.Text = selectedTitle.Year_start?.ToString() ?? "";
+            basicInfoBlock.Inlines!.Clear();
+            basicInfoBlock.Inlines.Add(new Run("🗓️") { FontFamily = new FontFamily("Noto Color Emoji") });
+
+            basicInfoBlock.Inlines.Add(new Run($" {selectedTitle.Year_start}") { FontFamily = new FontFamily("Segoe UI") });
 
             if (selectedTitle.Year_end != null)
-                basicInfoBlock.Text += $" - {selectedTitle.Year_end}";
+                basicInfoBlock.Inlines.Add(new Run($" - {selectedTitle.Year_end}") { FontFamily = new FontFamily("Segoe UI") });
 
-            if (!string.IsNullOrWhiteSpace(selectedTitle.Rating))
-                basicInfoBlock.Text += $" • {selectedTitle.Rating}";
+            basicInfoBlock.Inlines.Add(new Run($" • ") { FontFamily = new FontFamily("Segoe UI") });
+            basicInfoBlock.Inlines.Add(new Run("⭐") { FontFamily = new FontFamily("Noto Color Emoji") });
+            basicInfoBlock.Inlines.Add(new Run($" {selectedTitle.Rating}") { FontFamily = new FontFamily("Segoe UI") });
+            basicInfoBlock.Inlines.Add(new Run($" • ") { FontFamily = new FontFamily("Segoe UI") });
+            basicInfoBlock.Inlines.Add(new Run("🕑") { FontFamily = new FontFamily("Noto Color Emoji") });
 
             if (!string.IsNullOrWhiteSpace(selectedTitle.Runtime))
-                basicInfoBlock.Text += $" • {selectedTitle.Runtime}";
+                basicInfoBlock.Inlines.Add(new Run($" {selectedTitle.Runtime}") { FontFamily = new FontFamily("Segoe UI") });
 
             if (!string.IsNullOrWhiteSpace(selectedTitle.Season_count))
             {
-                basicInfoBlock.Text += $" • {selectedTitle.Season_count} season";
-                if (selectedTitle.Season_count != "1") basicInfoBlock.Text += "s";
+                var seasonText = $" • {selectedTitle.Season_count} season";
+                if (selectedTitle.Season_count != "1")
+                    seasonText += "s";
+
+                basicInfoBlock.Inlines.Add(new Run(seasonText) { FontFamily = new FontFamily("Segoe UI") });
             }
 
             this.FindControl<TextBlock>("DescriptionText")!.Text = selectedTitle.Plot ?? "";
