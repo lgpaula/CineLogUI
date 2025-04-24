@@ -34,7 +34,7 @@ namespace CineLog.Views
 
             _scrapeButton.Click += OnScrapeButtonClick;
 
-            _companyCheckBoxes = AddCheckboxesToPanel(CompanyPanel, DatabaseHandler.GetCompanies());
+            _companyCheckBoxes = AddCheckboxesToPanel(CompanyPanel, DatabaseHandler.GetAllItems("companies_table"));
         }
 
         private static List<CheckBox> AddCheckboxesToPanel(WrapPanel panel, IEnumerable<IdNameItem> items)

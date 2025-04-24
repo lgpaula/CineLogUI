@@ -19,30 +19,34 @@ namespace CineLog.Views
         private WrapPanel? _moviesContainer;
         private ScrollViewer? _scrollViewer;
         private DatabaseHandler.FilterSettings filterSettings = new();
+        private List<CheckBox>? _genreCheckBoxes;
+        private List<CheckBox>? _companyCheckBoxes;
 
         public CollectionView(string viewName)
         {
             this.viewName = viewName;
             InitializeComponent();
+            Init();
         }
 
         public CollectionView()
         {
             InitializeComponent();
+            Init();
         }
 
-        private void InitializeComponent()
+        private void Init()
         {
-            AvaloniaXamlLoader.Load(this);
-
             _moviesContainer = this.FindControl<WrapPanel>("CollectionWrapPanel")
                         ?? throw new NullReferenceException("WrapPanel not found in XAML");
             _scrollViewer = this.FindControl<ScrollViewer>("CollectionScrollViewer")
                         ?? throw new NullReferenceException("ScrollViewer not found in XAML");
 
             LoadNextPage();
-
             _scrollViewer.ScrollChanged += (sender, e) => OnScrollChanged();
+
+            _genreCheckBoxes = AddCheckboxesToPanel(GenresPanel, DatabaseHandler.GetAllItems("genres_table"));
+            _companyCheckBoxes = AddCheckboxesToPanel(CompaniesPanel, DatabaseHandler.GetAllItems("companies_table"));
         }
 
         private void LoadNextPage()
@@ -170,9 +174,25 @@ namespace CineLog.Views
             this.FindControl<Button>("Calendar")!.Tag = movie.Id;
         }
 
-        private void CloseDetails(object? sender, RoutedEventArgs e)
+        private static List<CheckBox> AddCheckboxesToPanel(WrapPanel panel, IEnumerable<IdNameItem> items)
         {
-            this.FindControl<Border>("DetailsBorder")!.IsVisible = false;
+            panel.Children.Clear();
+            var checkBoxes = new List<CheckBox>();
+
+            foreach (var item in items.OrderBy(i => i.Name))
+            {
+                var cb = new CheckBox
+                {
+                    Content = item.Name,
+                    Tag = item.Id,
+                    Margin = new Avalonia.Thickness(5),
+                    Width = 300
+                };
+                checkBoxes.Add(cb);
+                panel.Children.Add(cb);
+            }
+
+            return checkBoxes;
         }
 
         #region Buttons
@@ -191,22 +211,6 @@ namespace CineLog.Views
             if (minRatingBox != null && float.TryParse(minRatingBox.Text, out float minRatingParsed)) minRating = minRatingParsed;
             if (maxRatingBox != null && float.TryParse(maxRatingBox.Text, out float maxratingParsed)) maxRating = maxratingParsed;
 
-            // Read selected Genres
-            var selectedGenres = new List<string>();
-            var genrePanel = this.FindControl<WrapPanel>("GenreCheckBoxPanel");
-            if (genrePanel != null)
-            {
-                foreach (var child in genrePanel.Children)
-                {
-                    if (child is CheckBox checkBox && checkBox.IsChecked == true && checkBox.Content != null)
-                    {
-                        var content = checkBox.Content.ToString();
-                        if (!string.IsNullOrEmpty(content))
-                            selectedGenres.Add(content);
-                    }
-                }
-            }
-
             // Read Year values
             int yearStart = 1874;
             int yearEnd = DateTime.Now.Year;
@@ -215,9 +219,6 @@ namespace CineLog.Views
             var maxYearBox = this.FindControl<TextBox>("MaxYear");
             if (minYearBox != null && int.TryParse(minYearBox.Text, out int minYearParsed)) yearStart = minYearParsed;
             if (maxYearBox != null && int.TryParse(maxYearBox.Text, out int maxYearParsed)) yearEnd = maxYearParsed;
-
-            // Read Company TextBox
-            string? company = this.FindControl<TextBox>("CompanyTextBox")?.Text;
 
             // Read Title Type (Movie or Series)
             var selectedTypes = new List<string>();
@@ -236,17 +237,28 @@ namespace CineLog.Views
             {
                 MinRating = minRating,
                 MaxRating = maxRating,
-                Genre = selectedGenres,
+                Genre = GetSelectedIds(_genreCheckBoxes!),
                 YearStart = yearStart,
                 YearEnd = yearEnd,
-                Company = company,
+                Company = GetSelectedIds(_companyCheckBoxes!),
                 Type = selectedTypes.Count > 0 ? string.Join(",", selectedTypes) : null
             };
 
             LoadNextPage();
         }
 
-        #endregion
+        private static List<string> GetSelectedIds(List<CheckBox> checkBoxes)
+        {
+            return [.. checkBoxes
+                .Where(cb => cb.IsChecked == true)
+                .Select(cb => cb.Tag)
+                .OfType<string>()];
+        }
+
+        private void CloseDetails(object? sender, RoutedEventArgs e)
+        {
+            this.FindControl<Border>("DetailsBorder")!.IsVisible = false;
+        }
 
         private void AddToCalendar(object? sender, RoutedEventArgs e)
         {
@@ -256,5 +268,7 @@ namespace CineLog.Views
                 CalendarView.AddMovieToCalendar(scheduleList, title_id);
             }
         }
+
+        #endregion
     }
 }

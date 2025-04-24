@@ -10,9 +10,9 @@
 					<Expander.Header>
 							<TextBlock Text="Filter" FontSize="20"/>
 					</Expander.Header>
-					<Grid RowDefinitions="*,*,*,*,*,*" ColumnDefinitions="150,*">
-						<!-- <TextBox Grid.Row="0" Width="300" Height="30" VerticalAlignment="Center" HorizontalAlignment="Center" Watermark="Search..."/> -->
-
+					<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="150,*">
+						
+						<!-- Rating -->
 						<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Rating</TextBlock>
 						<StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="5">
 							<TextBlock Text="From" Foreground="White"/>
@@ -20,38 +20,44 @@
 							<TextBlock Text="To" Foreground="White"/>
 							<TextBox x:Name="MaxRating" Width="50" Text="10.0" Foreground="Black" Background="White"/>
 						</StackPanel>
+						<Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="0,5"/>
 
-						<TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Genre</TextBlock>
-						<ScrollViewer Grid.Row="1" Grid.Column="1">
-							<WrapPanel x:Name="GenreCheckBoxPanel" Orientation="Horizontal">
-									<!-- add companies here as checkboxes dynamically -->
-							</WrapPanel>
+						<!-- Genre -->
+						<TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Genre</TextBlock>
+						<ScrollViewer Grid.Row="2" Grid.Column="1" VerticalScrollBarVisibility="Auto" MaxHeight="200">
+							<WrapPanel x:Name="GenresPanel" Orientation="Horizontal"/>
 						</ScrollViewer>
+						<Rectangle Grid.Row="3" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="0,5"/>
 
-						<TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Year release</TextBlock>
-						<StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="5">
+						<!-- Year -->
+						<TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Year release</TextBlock>
+						<StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="5">
 							<TextBlock Text="From" Foreground="White"/>
 							<TextBox x:Name="yearStart" Width="50" Text="" Foreground="Black" Background="White"/>
 							<TextBlock Text="To" Foreground="White"/>
 							<TextBox x:Name="yearEnd" Width="50" Text="" Foreground="Black" Background="White"/>
 						</StackPanel>
-						
-						<TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center">Company</TextBlock>
-						<ScrollViewer Grid.Row="3" Grid.Column="1">
-							<WrapPanel x:Name="CompaniesPanel" Orientation="Horizontal">
-									<!-- add companies here as radioButtons dynamically -->
-							</WrapPanel>
-						</ScrollViewer>
+						<Rectangle Grid.Row="5" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="0,5"/>
 
-						<TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Type</TextBlock>
-						<WrapPanel x:Name="TitleTypePanel" Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+						<!-- Company -->
+						<TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center">Company</TextBlock>
+						<ScrollViewer Grid.Row="6" Grid.Column="1" VerticalScrollBarVisibility="Auto" MaxHeight="200">
+							<WrapPanel x:Name="CompaniesPanel" Orientation="Horizontal"/>
+						</ScrollViewer>
+						<Rectangle Grid.Row="7" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="0,5"/>
+
+						<!-- Type -->
+						<TextBlock Grid.Row="8" Grid.Column="0" VerticalAlignment="Center">Type</TextBlock>
+						<WrapPanel x:Name="TitleTypePanel" Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
 							<CheckBox Content="Movie" Tag="Movie"/>
 							<CheckBox Content="Series" Tag="TV Series"/>
 						</WrapPanel>
+						<Rectangle Grid.Row="9" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="0,5"/>
 
-						<Button Grid.Row="5" Grid.Column="0" Click="ApplyFilter" Content="Apply" HorizontalAlignment="Left" Margin="0,10,10,0"/>
+						<!-- Button -->
+						<Button Grid.Row="10" Grid.Column="0" Click="ApplyFilter" Content="Apply" HorizontalAlignment="Left" Margin="0,10,10,0"/>
+
 					</Grid>
-
 				</Expander>
 				
 				<WrapPanel Name="CollectionWrapPanel" Orientation="Horizontal"/>

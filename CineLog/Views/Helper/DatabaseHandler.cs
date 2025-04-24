@@ -82,17 +82,17 @@ namespace CineLog.Views.Helper
             parameters.Add("MinYear", filterSettings.YearStart);
             parameters.Add("MaxYear", filterSettings.YearEnd);
 
-            if (filterSettings.Genre is { Count: > 0 })
-            {
-                whereClauses.Add("t.genre IN @Genres");
-                parameters.Add("Genres", filterSettings.Genre);
-            }
+            // if (filterSettings.Genre is { Count: > 0 })
+            // {
+            //     whereClauses.Add("t.genre IN @Genres");
+            //     parameters.Add("Genres", filterSettings.Genre);
+            // }
 
-            if (!string.IsNullOrEmpty(filterSettings.Company))
-            {
-                whereClauses.Add("t.companies LIKE @Company");
-                parameters.Add("Company", "%" + filterSettings.Company + "%");
-            }
+            // if (filterSettings.Company is { Count: > 0 })
+            // {
+            //     whereClauses.Add("t.genre IN @Genres");
+            //     parameters.Add("Genres", filterSettings.Company);
+            // }
 
             if (!string.IsNullOrEmpty(filterSettings.Type))
             {
@@ -101,14 +101,14 @@ namespace CineLog.Views.Helper
             }
         }
 
-        public static IEnumerable<IdNameItem> GetCompanies()
+        public static IEnumerable<IdNameItem> GetAllItems(string table)
         {
             var result = new List<IdNameItem>();
 
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
-            using var command = new SQLiteCommand("SELECT id, name FROM companies_table", connection);
+            using var command = new SQLiteCommand($"SELECT id, name FROM {table}", connection);
             using var reader = command.ExecuteReader();
 
             while (reader.Read())
@@ -442,7 +442,7 @@ namespace CineLog.Views.Helper
             public List<string>? Genre { get; set; } = [];
             public int YearStart { get; set; } = 1874;
             public int YearEnd { get; set; } = DateTime.Now.Year + 1;
-            public string? Company { get; set; }
+            public List<string>? Company { get; set; }
             public string? Type { get; set; }
 
             public FilterSettings() { }
