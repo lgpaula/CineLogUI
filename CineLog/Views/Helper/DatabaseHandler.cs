@@ -32,34 +32,33 @@ namespace CineLog.Views.Helper
             var query = new StringBuilder();
             var parameters = new DynamicParameters();
 
+            // Components of the query
+            var whereClauses = new List<string>();
+            var joinClauses = new List<string>();
+
             // Base SELECT
             query.Append(@"
                 SELECT t.title_id, t.title_name, t.poster_url 
                 FROM titles_table t");
 
-            var whereClauses = new List<string>();
-
-            // if list
+            // If list
             if (!string.IsNullOrEmpty(list_uuid))
             {
-                query.Append(@"
-                    JOIN list_movies_table lm ON t.title_id = lm.movie_id
-                    JOIN lists_table l ON lm.list_id = l.uuid");
+                joinClauses.Add("JOIN list_movies_table lm ON t.title_id = lm.movie_id");
+                joinClauses.Add("JOIN lists_table l ON lm.list_id = l.uuid");
                 whereClauses.Add("l.uuid = @ListId");
                 parameters.Add("ListId", list_uuid);
             }
-                
-            if (string.IsNullOrEmpty(list_uuid)) whereClauses.Add("1 = 1");
+            else whereClauses.Add("1 = 1");
 
-            if (filterSettings != null)
-            {
-                AppendFilterClauses(filterSettings, whereClauses, parameters);
-            }
+            // Apply filters and collect join clauses
+            if (filterSettings != null) AppendFilterClauses(filterSettings, whereClauses, parameters, joinClauses);
 
-            if (whereClauses.Count > 0)
-                query.Append(" WHERE " + string.Join(" AND ", whereClauses));
+            foreach (var join in joinClauses) query.Append("\n" + join);
 
-            query.Append(" LIMIT @Limit OFFSET @Offset");
+            if (whereClauses.Count > 0) query.Append("\nWHERE " + string.Join(" AND ", whereClauses));
+
+            query.Append("\nLIMIT @Limit OFFSET @Offset");
             parameters.Add("Limit", limit);
             parameters.Add("Offset", offset);
 
@@ -70,7 +69,7 @@ namespace CineLog.Views.Helper
             return result;
         }
 
-        private static void AppendFilterClauses(FilterSettings filterSettings, List<string> whereClauses, DynamicParameters parameters)
+        private static void AppendFilterClauses(FilterSettings filterSettings, List<string> whereClauses, DynamicParameters parameters, List<string> joins)
         {
             whereClauses.Add("(t.rating >= @MinRating OR t.rating IS NULL)");
             whereClauses.Add("(t.rating <= @MaxRating OR t.rating IS NULL)");
@@ -82,17 +81,21 @@ namespace CineLog.Views.Helper
             parameters.Add("MinYear", filterSettings.YearStart);
             parameters.Add("MaxYear", filterSettings.YearEnd);
 
-            // if (filterSettings.Genre is { Count: > 0 })
-            // {
-            //     whereClauses.Add("t.genre IN @Genres");
-            //     parameters.Add("Genres", filterSettings.Genre);
-            // }
+            if (filterSettings.Genre is { Count: > 0 })
+            {
+                joins.Add("JOIN title_genre tg ON tg.title_id = t.title_id");
+                joins.Add("JOIN genres_table g ON g.id = tg.genres_id");
+                whereClauses.Add("g.id IN @Genres");
+                parameters.Add("Genres", filterSettings.Genre);
+            }
 
-            // if (filterSettings.Company is { Count: > 0 })
-            // {
-            //     whereClauses.Add("t.genre IN @Genres");
-            //     parameters.Add("Genres", filterSettings.Company);
-            // }
+            if (filterSettings.Company is { Count: > 0 })
+            {
+                joins.Add("JOIN title_company tc ON tc.title_id = t.title_id");
+                joins.Add("JOIN companies_table c ON c.id = tc.companies_id");
+                whereClauses.Add("c.id IN @Companies");
+                parameters.Add("Companies", filterSettings.Company);
+            }
 
             if (!string.IsNullOrEmpty(filterSettings.Type))
             {

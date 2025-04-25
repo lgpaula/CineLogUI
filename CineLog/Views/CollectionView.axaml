@@ -33,9 +33,9 @@
 						<TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Year release</TextBlock>
 						<StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="5">
 							<TextBlock Text="From" Foreground="White"/>
-							<TextBox x:Name="yearStart" Width="50" Text="" Foreground="Black" Background="White"/>
+							<TextBox x:Name="YearStart" Width="50" Text="" Foreground="Black" Background="White"/>
 							<TextBlock Text="To" Foreground="White"/>
-							<TextBox x:Name="yearEnd" Width="50" Text="" Foreground="Black" Background="White"/>
+							<TextBox x:Name="YearEnd" Width="50" Text="" Foreground="Black" Background="White"/>
 						</StackPanel>
 						<Rectangle Grid.Row="5" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="0,5"/>
 

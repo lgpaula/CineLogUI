@@ -215,8 +215,8 @@ namespace CineLog.Views
             int yearStart = 1874;
             int yearEnd = DateTime.Now.Year;
 
-            var minYearBox = this.FindControl<TextBox>("MinYear");
-            var maxYearBox = this.FindControl<TextBox>("MaxYear");
+            var minYearBox = this.FindControl<TextBox>("YearStart");
+            var maxYearBox = this.FindControl<TextBox>("YearEnd");
             if (minYearBox != null && int.TryParse(minYearBox.Text, out int minYearParsed)) yearStart = minYearParsed;
             if (maxYearBox != null && int.TryParse(maxYearBox.Text, out int maxYearParsed)) yearEnd = maxYearParsed;
 
