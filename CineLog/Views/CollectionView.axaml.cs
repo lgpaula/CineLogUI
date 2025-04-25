@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using Avalonia.Interactivity;
 using System;
 using System.Collections.Generic;
@@ -8,6 +7,7 @@ using Avalonia;
 using System.Linq;
 using Avalonia.Media;
 using Avalonia.Controls.Documents;
+using Avalonia.VisualTree;
 
 namespace CineLog.Views
 {
@@ -19,8 +19,6 @@ namespace CineLog.Views
         private WrapPanel? _moviesContainer;
         private ScrollViewer? _scrollViewer;
         private DatabaseHandler.FilterSettings filterSettings = new();
-        private List<CheckBox>? _genreCheckBoxes;
-        private List<CheckBox>? _companyCheckBoxes;
 
         public CollectionView(string viewName)
         {
@@ -44,9 +42,6 @@ namespace CineLog.Views
 
             LoadNextPage();
             _scrollViewer.ScrollChanged += (sender, e) => OnScrollChanged();
-
-            _genreCheckBoxes = AddCheckboxesToPanel(GenresPanel, DatabaseHandler.GetAllItems("genres_table"));
-            _companyCheckBoxes = AddCheckboxesToPanel(CompaniesPanel, DatabaseHandler.GetAllItems("companies_table"));
         }
 
         private void LoadNextPage()
@@ -174,85 +169,14 @@ namespace CineLog.Views
             this.FindControl<Button>("Calendar")!.Tag = movie.Id;
         }
 
-        private static List<CheckBox> AddCheckboxesToPanel(WrapPanel panel, IEnumerable<IdNameItem> items)
-        {
-            panel.Children.Clear();
-            var checkBoxes = new List<CheckBox>();
-
-            foreach (var item in items.OrderBy(i => i.Name))
-            {
-                var cb = new CheckBox
-                {
-                    Content = item.Name,
-                    Tag = item.Id,
-                    Margin = new Avalonia.Thickness(5),
-                    Width = 300
-                };
-                checkBoxes.Add(cb);
-                panel.Children.Add(cb);
-            }
-
-            return checkBoxes;
-        }
-
         #region Buttons
 
-        private void ApplyFilter(object? sender, RoutedEventArgs e)
+        private void ApplyFilter()
         {
             _moviesContainer?.Children.Clear();
             _currentOffset = 0;
 
-            float minRating = 0.0f;
-            float maxRating = 10.0f;
-
-            // Read Rating values
-            var minRatingBox = this.FindControl<TextBox>("MinRating");
-            var maxRatingBox = this.FindControl<TextBox>("MaxRating");
-            if (minRatingBox != null && float.TryParse(minRatingBox.Text, out float minRatingParsed)) minRating = minRatingParsed;
-            if (maxRatingBox != null && float.TryParse(maxRatingBox.Text, out float maxratingParsed)) maxRating = maxratingParsed;
-
-            // Read Year values
-            int yearStart = 1874;
-            int yearEnd = DateTime.Now.Year;
-
-            var minYearBox = this.FindControl<TextBox>("YearStart");
-            var maxYearBox = this.FindControl<TextBox>("YearEnd");
-            if (minYearBox != null && int.TryParse(minYearBox.Text, out int minYearParsed)) yearStart = minYearParsed;
-            if (maxYearBox != null && int.TryParse(maxYearBox.Text, out int maxYearParsed)) yearEnd = maxYearParsed;
-
-            // Read Title Type (Movie or Series)
-            var selectedTypes = new List<string>();
-            var typePanel = this.FindControl<WrapPanel>("TitleTypePanel");
-            if (typePanel != null)
-            {
-                foreach (var child in typePanel.Children)
-                {
-                    if (child is CheckBox checkBox && checkBox.IsChecked == true && checkBox.Tag is string typeTag)
-                        selectedTypes.Add(typeTag);
-                }
-            }
-
-            // Update the filter settings
-            filterSettings = new DatabaseHandler.FilterSettings
-            {
-                MinRating = minRating,
-                MaxRating = maxRating,
-                Genre = GetSelectedIds(_genreCheckBoxes!),
-                YearStart = yearStart,
-                YearEnd = yearEnd,
-                Company = GetSelectedIds(_companyCheckBoxes!),
-                Type = selectedTypes.Count > 0 ? string.Join(",", selectedTypes) : null
-            };
-
             LoadNextPage();
-        }
-
-        private static List<string> GetSelectedIds(List<CheckBox> checkBoxes)
-        {
-            return [.. checkBoxes
-                .Where(cb => cb.IsChecked == true)
-                .Select(cb => cb.Tag)
-                .OfType<string>()];
         }
 
         private void CloseDetails(object? sender, RoutedEventArgs e)
@@ -266,6 +190,20 @@ namespace CineLog.Views
             {
                 var scheduleList = DatabaseHandler.GetSchedule(title_id);
                 CalendarView.AddMovieToCalendar(scheduleList, title_id);
+            }
+        }
+
+        private async void OpenFilterModal(object? sender, RoutedEventArgs e)
+        {
+            var modal = new FilterModal();
+            if (VisualRoot is not Window window) return;
+
+            var result = await modal.ShowDialog<DatabaseHandler.FilterSettings?>(window);
+
+            if (result != null)
+            {
+                filterSettings = result;
+                ApplyFilter();
             }
         }
 

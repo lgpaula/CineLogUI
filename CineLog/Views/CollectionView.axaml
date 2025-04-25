@@ -6,60 +6,7 @@
 		<!-- Left: Collection and Filters -->
 		<ScrollViewer Grid.Column="0" x:Name="CollectionScrollViewer">
 			<StackPanel>
-				<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-					<Expander.Header>
-							<TextBlock Text="Filter" FontSize="20"/>
-					</Expander.Header>
-					<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="150,*">
-						
-						<!-- Rating -->
-						<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Rating</TextBlock>
-						<StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="5">
-							<TextBlock Text="From" Foreground="White"/>
-							<TextBox x:Name="MinRating" Width="50" Text="0.0" Foreground="Black" Background="White"/>
-							<TextBlock Text="To" Foreground="White"/>
-							<TextBox x:Name="MaxRating" Width="50" Text="10.0" Foreground="Black" Background="White"/>
-						</StackPanel>
-						<Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="0,5"/>
-
-						<!-- Genre -->
-						<TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Genre</TextBlock>
-						<ScrollViewer Grid.Row="2" Grid.Column="1" VerticalScrollBarVisibility="Auto" MaxHeight="200">
-							<WrapPanel x:Name="GenresPanel" Orientation="Horizontal"/>
-						</ScrollViewer>
-						<Rectangle Grid.Row="3" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="0,5"/>
-
-						<!-- Year -->
-						<TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Year release</TextBlock>
-						<StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="5">
-							<TextBlock Text="From" Foreground="White"/>
-							<TextBox x:Name="YearStart" Width="50" Text="" Foreground="Black" Background="White"/>
-							<TextBlock Text="To" Foreground="White"/>
-							<TextBox x:Name="YearEnd" Width="50" Text="" Foreground="Black" Background="White"/>
-						</StackPanel>
-						<Rectangle Grid.Row="5" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="0,5"/>
-
-						<!-- Company -->
-						<TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center">Company</TextBlock>
-						<ScrollViewer Grid.Row="6" Grid.Column="1" VerticalScrollBarVisibility="Auto" MaxHeight="200">
-							<WrapPanel x:Name="CompaniesPanel" Orientation="Horizontal"/>
-						</ScrollViewer>
-						<Rectangle Grid.Row="7" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="0,5"/>
-
-						<!-- Type -->
-						<TextBlock Grid.Row="8" Grid.Column="0" VerticalAlignment="Center">Type</TextBlock>
-						<WrapPanel x:Name="TitleTypePanel" Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
-							<CheckBox Content="Movie" Tag="Movie"/>
-							<CheckBox Content="Series" Tag="TV Series"/>
-						</WrapPanel>
-						<Rectangle Grid.Row="9" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="0,5"/>
-
-						<!-- Button -->
-						<Button Grid.Row="10" Grid.Column="0" Click="ApplyFilter" Content="Apply" HorizontalAlignment="Left" Margin="0,10,10,0"/>
-
-					</Grid>
-				</Expander>
-				
+				<Button Content="Filter" Click="OpenFilterModal" HorizontalAlignment="Left" Margin="10"/>
 				<WrapPanel Name="CollectionWrapPanel" Orientation="Horizontal"/>
 			</StackPanel>
 		</ScrollViewer>
