@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using CineLog.Views.Helper;
@@ -9,6 +10,8 @@ namespace CineLog.Views
 {
     public partial class FilterModal : Window
     {
+        private Window? _owner;
+        private Point _offset;
         private List<CheckBox>? _genreCheckBoxes;
         private List<CheckBox>? _companyCheckBoxes;
 
@@ -17,6 +20,33 @@ namespace CineLog.Views
             InitializeComponent();
             _genreCheckBoxes = AddCheckboxesToPanel(GenresPanel, DatabaseHandler.GetAllItems("genres_table"));
             _companyCheckBoxes = AddCheckboxesToPanel(CompaniesPanel, DatabaseHandler.GetAllItems("companies_table"));
+
+            Opened += (s, e) =>
+            {
+                _owner = (Window)Owner!;
+                if (_owner != null)
+                {
+                    _offset = new Point(
+                        Position.X - _owner.Position.X,
+                        Position.Y - _owner.Position.Y
+                    );
+                    
+                    _owner.PositionChanged += Owner_PositionChanged;
+                }
+            };
+            
+            Closed += (s, e) =>
+            {
+                if (_owner != null) _owner.PositionChanged -= Owner_PositionChanged;
+            };
+        }
+
+        private void Owner_PositionChanged(object? sender, PixelPointEventArgs e)
+        {
+            Position = new PixelPoint(
+                e.Point.X + (int)_offset.X,
+                e.Point.Y + (int)_offset.Y
+            );
         }
 
         private static List<CheckBox> AddCheckboxesToPanel(WrapPanel panel, IEnumerable<IdNameItem> items)
@@ -30,7 +60,7 @@ namespace CineLog.Views
                 {
                     Content = item.Name,
                     Tag = item.Id,
-                    Margin = new Avalonia.Thickness(5),
+                    Margin = new Thickness(5),
                     Width = 300
                 };
                 checkBoxes.Add(cb);
