@@ -13,6 +13,16 @@
         ExtendClientAreaToDecorationsHint="False"
         ExtendClientAreaChromeHints="NoChrome">
 
+	<Window.Styles>
+		<Style Selector="TextBox.CustomTextBox:focus /template/ Border#PART_BorderElement">
+			<Setter Property="Background" Value="White"/>
+		</Style>
+		<Style Selector="TextBox.CustomTextBox:focus">
+			<Setter Property="Foreground" Value="Black"/>
+			<Setter Property="CaretBrush" Value="Black"/>
+		</Style>
+	</Window.Styles>
+
     <Border Background="#DD1E1E1E" CornerRadius="10" BoxShadow="0 4 20 0 #66000000" Padding="20">
         <ScrollViewer>
             <StackPanel>
@@ -21,9 +31,9 @@
 					<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Rating</TextBlock>
 					<StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="5">
 						<TextBlock Text="From" Foreground="White" VerticalAlignment="Center"/>
-						<TextBox x:Name="MinRating" Width="50" Text="0.0" Foreground="Black" Background="White" Margin="0,0,10,0"/>
+						<TextBox Classes="CustomTextBox" x:Name="MinRating" Width="50" Text="0.0" Margin="0,0,10,0"/>
 						<TextBlock Text="To" Foreground="White" VerticalAlignment="Center"/>
-						<TextBox x:Name="MaxRating" Width="50" Text="10.0" Foreground="Black" Background="White"/>
+						<TextBox Classes="CustomTextBox" x:Name="MaxRating" Width="50" Text="10.0"/>
 					</StackPanel>
 					<Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
 
@@ -38,9 +48,9 @@
 					<TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Year release</TextBlock>
 					<StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="5">
 						<TextBlock Text="From" Foreground="White" VerticalAlignment="Center"/>
-						<TextBox x:Name="YearStart" Width="50" Text="" Foreground="Black" Background="White" Margin="0,0,10,0"/>
+						<TextBox Classes="CustomTextBox" x:Name="YearStart" Width="50" Text="" Margin="0,0,10,0"/>
 						<TextBlock Text="To" Foreground="White" VerticalAlignment="Center"/>
-						<TextBox x:Name="YearEnd" Width="50" Text="" Foreground="Black" Background="White"/>
+						<TextBox Classes="CustomTextBox" x:Name="YearEnd" Width="50" Text=""/>
 					</StackPanel>
 					<Rectangle Grid.Row="5" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
 
