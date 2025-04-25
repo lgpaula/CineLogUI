@@ -61,7 +61,7 @@ namespace CineLog.Views
                     Content = item.Name,
                     Tag = item.Id,
                     Margin = new Thickness(5),
-                    Width = 300
+                    Width = 220
                 };
                 checkBoxes.Add(cb);
                 panel.Children.Add(cb);

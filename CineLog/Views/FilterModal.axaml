@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="CineLog.Views.FilterModal"
-        Width="800"
+        Width="1000"
         Height="500"
         SystemDecorations="BorderOnly"
         ShowInTaskbar="False"
@@ -31,7 +31,7 @@
 					<!-- Genre -->
 					<TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Genre</TextBlock>
 					<ScrollViewer Grid.Row="2" Grid.Column="1" VerticalScrollBarVisibility="Auto" MaxHeight="200">
-						<WrapPanel x:Name="GenresPanel" Orientation="Horizontal"/>
+						<WrapPanel x:Name="GenresPanel" Orientation="Horizontal" HorizontalAlignment="Center"/>
 					</ScrollViewer>
 					<Rectangle Grid.Row="3" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="0,5"/>
 
@@ -48,7 +48,7 @@
 					<!-- Company -->
 					<TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center">Company</TextBlock>
 					<ScrollViewer Grid.Row="6" Grid.Column="1" VerticalScrollBarVisibility="Auto" MaxHeight="200">
-						<WrapPanel x:Name="CompaniesPanel" Orientation="Horizontal"/>
+						<WrapPanel x:Name="CompaniesPanel" Orientation="Horizontal" HorizontalAlignment="Center"/>
 					</ScrollViewer>
 					<Rectangle Grid.Row="7" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="0,5"/>
 
