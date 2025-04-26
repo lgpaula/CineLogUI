@@ -15,14 +15,13 @@ namespace CineLog.Views.Helper
                 var response = await client.GetAsync($"http://127.0.0.1:5000/scrape?criteria={Uri.EscapeDataString(criteria)}");
                 string result = await response.Content.ReadAsStringAsync();
                 
-                if (!response.IsSuccessStatusCode) return "Flask API Error: " + result;
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("ScrapeMultipleTitles completed successfully.");
+                    return result;
+                }
 
-                return result;
-            }
-            catch (TaskCanceledException ex) when (!ex.CancellationToken.IsCancellationRequested)
-            {
-                Console.WriteLine("Flask API timeout: " + ex.Message);
-                return "Error: Timeout";
+                return $"Flask Error: {result}";
             }
             catch (Exception ex)
             {
@@ -40,7 +39,10 @@ namespace CineLog.Views.Helper
                 string result = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("ScrapeMultipleTitles completed successfully.");
                     return result;
+                }
 
                 return $"Flask Error: {result}";
             }
@@ -59,10 +61,11 @@ namespace CineLog.Views.Helper
                 var response = await client.GetAsync($"http://127.0.0.1:5000/fetch_episodes?title_id={title_id}&season_count={season_count}");
                 string result = await response.Content.ReadAsStringAsync();
 
-                Console.WriteLine("result: " + result);
-
                 if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("ScrapeMultipleTitles completed successfully.");
                     return result;
+                }
 
                 return $"Flask Error: {result}";
             }
