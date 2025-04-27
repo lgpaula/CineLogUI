@@ -2,6 +2,16 @@
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <Window.Styles>
+		<Style Selector="TextBox.CustomTextBox:focus /template/ Border#PART_BorderElement">
+			<Setter Property="Background" Value="White"/>
+		</Style>
+		<Style Selector="TextBox.CustomTextBox:focus">
+			<Setter Property="Foreground" Value="Black"/>
+			<Setter Property="CaretBrush" Value="Black"/>
+		</Style>
+	</Window.Styles>
+
     <ScrollViewer VerticalScrollBarVisibility="Hidden">
         <StackPanel Spacing="10">
             <Expander HorizontalAlignment="Stretch">
@@ -47,9 +57,9 @@
                 </Expander.Header>
                 <StackPanel Orientation="Horizontal" Spacing="5">
                     <TextBlock Text="From" Foreground="White"/>
-                    <TextBox x:Name="yearFrom" Width="50" Watermark="1874" Foreground="Black" Background="White"/>
+                    <TextBox Classes="CustomTextBox" x:Name="yearFrom" Width="50" Watermark="1874" Foreground="Black" Background="White"/>
                     <TextBlock Text="To" Foreground="White"/>
-                    <TextBox x:Name="yearTo" Width="50" Watermark="2026" Foreground="Black" Background="White"/>
+                    <TextBox Classes="CustomTextBox" x:Name="yearTo" Width="50" Watermark="2026" Foreground="Black" Background="White"/>
                 </StackPanel>
             </Expander>
 
@@ -59,9 +69,9 @@
                 </Expander.Header>
                 <StackPanel Orientation="Horizontal" Spacing="5">
                     <TextBlock Text="From" Foreground="White"/>
-                    <TextBox x:Name="ratingFrom" Width="50" Watermark="0.0" Foreground="Black" Background="White"/>
+                    <TextBox Classes="CustomTextBox" x:Name="ratingFrom" Width="50" Watermark="0.0" Foreground="Black" Background="White"/>
                     <TextBlock Text="To" Foreground="White"/>
-                    <TextBox x:Name="ratingTo" Width="50" Watermark="10.0" Foreground="Black" Background="White"/>
+                    <TextBox Classes="CustomTextBox" x:Name="ratingTo" Width="50" Watermark="10.0" Foreground="Black" Background="White"/>
                 </StackPanel>
             </Expander>
 
