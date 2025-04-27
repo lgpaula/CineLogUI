@@ -42,15 +42,15 @@
             </Button>
 
             <WrapPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10">
-                <Button Tag="Scraper" Click="ViewChanger" Margin="10">
+                <Button Tag="Scraper" Click="ViewChanger" Margin="10" Background="Transparent">
                     <Image Source="avares://CineLog/Assets/scrapebutton.png" Width="40" Height="40" Stretch="Uniform"
                         StretchDirection="DownOnly" RenderOptions.BitmapInterpolationMode="HighQuality"/>
                 </Button>
-                <Button Tag="Calendar" Click="ViewChanger" Margin="10">
+                <Button Tag="Calendar" Click="ViewChanger" Margin="10" Background="Transparent">
                     <Image Source="avares://CineLog/Assets/calendarbutton.png" Width="40" Height="40" Stretch="Uniform"
                     StretchDirection="DownOnly" RenderOptions.BitmapInterpolationMode="HighQuality"/>
                 </Button>
-                <Button Tag="Filter" Margin="10" IsVisible="False">
+                <Button Tag="Filter" Margin="10" IsVisible="False" Background="Transparent">
                     <Image Source="avares://CineLog/Assets/filterbutton.png" Width="40" Height="40" Stretch="Uniform"
                     StretchDirection="DownOnly" RenderOptions.BitmapInterpolationMode="HighQuality"/>
                 </Button>
