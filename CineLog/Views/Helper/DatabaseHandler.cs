@@ -58,6 +58,7 @@ namespace CineLog.Views.Helper
 
             if (whereClauses.Count > 0) query.Append("\nWHERE " + string.Join(" AND ", whereClauses));
 
+            query.Append("\nORDER BY t.created_on DESC");
             query.Append("\nLIMIT @Limit OFFSET @Offset");
             parameters.Add("Limit", limit);
             parameters.Add("Offset", offset);
