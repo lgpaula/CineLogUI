@@ -40,7 +40,7 @@ namespace CineLog.Views.Helper
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine("ScrapeMultipleTitles completed successfully.");
+                    Console.WriteLine("ScrapeSingleTitle completed successfully.");
                     return result;
                 }
 
@@ -63,7 +63,7 @@ namespace CineLog.Views.Helper
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine("ScrapeMultipleTitles completed successfully.");
+                    Console.WriteLine("FetchEpisodesDates completed successfully.");
                     return result;
                 }
 

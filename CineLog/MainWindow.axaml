@@ -25,7 +25,6 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="250"/>
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0"
@@ -42,11 +41,22 @@
                 <Image Source="avares://CineLog/Assets/logo.png" Width="155" Height="70"/>
             </Button>
 
-            <!-- bring scrape and calendar tiny buttons to column 1 -->
-
+            <WrapPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10">
+                <Button Tag="Scraper" Click="ViewChanger" Margin="10">
+                    <Image Source="avares://CineLog/Assets/scrapebutton.png" Width="40" Height="40" Stretch="Uniform"
+                        StretchDirection="DownOnly" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+                </Button>
+                <Button Tag="Calendar" Click="ViewChanger" Margin="10">
+                    <Image Source="avares://CineLog/Assets/calendarbutton.png" Width="40" Height="40" Stretch="Uniform"
+                    StretchDirection="DownOnly" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+                </Button>
+                <Button Tag="Filter" Margin="10" IsVisible="False">
+                    <Image Source="avares://CineLog/Assets/filterbutton.png" Width="40" Height="40" Stretch="Uniform"
+                    StretchDirection="DownOnly" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+                </Button>
+            </WrapPanel>
         </Grid>
 
-        <!-- Main Content -->
         <ContentControl Content="{Binding CurrentView}" />
 
     </DockPanel>

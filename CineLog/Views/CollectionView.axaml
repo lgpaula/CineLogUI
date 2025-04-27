@@ -6,7 +6,7 @@
 		<!-- Left: Collection and Filters -->
 		<ScrollViewer Grid.Column="0" x:Name="CollectionScrollViewer">
 			<StackPanel>
-				<Button Content="Filter" Click="OpenFilterModal" HorizontalAlignment="Left" Margin="10"/>
+				<!-- <Button Content="Filter" Click="OpenFilterModal" HorizontalAlignment="Left" Margin="10"/> -->
 				<WrapPanel Name="CollectionWrapPanel" Orientation="Horizontal"/>
 			</StackPanel>
 		</ScrollViewer>
