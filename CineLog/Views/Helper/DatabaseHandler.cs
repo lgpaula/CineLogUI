@@ -112,6 +112,13 @@ namespace CineLog.Views.Helper
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
+            using (var checkCommand = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name=@tableName", connection))
+            {
+                checkCommand.Parameters.AddWithValue("@tableName", table);
+                var exists = checkCommand.ExecuteScalar();
+                if (exists == null) return result;
+            }
+
             using var command = new SQLiteCommand($"SELECT id, name FROM {table}", connection);
             using var reader = command.ExecuteReader();
 
