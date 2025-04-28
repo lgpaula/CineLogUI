@@ -1,13 +1,11 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using System;
-using System.Collections.Generic;
 using CineLog.Views.Helper;
 using Avalonia;
 using System.Linq;
 using Avalonia.Media;
 using Avalonia.Controls.Documents;
-using Avalonia.VisualTree;
 
 namespace CineLog.Views
 {

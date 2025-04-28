@@ -3,10 +3,9 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
 	<Grid ColumnDefinitions="*, Auto">
-		<!-- Left: Collection and Filters -->
+		<!-- Left: Collection -->
 		<ScrollViewer Grid.Column="0" x:Name="CollectionScrollViewer">
 			<StackPanel>
-				<!-- <Button Content="Filter" Click="OpenFilterModal" HorizontalAlignment="Left" Margin="10"/> -->
 				<WrapPanel Name="CollectionWrapPanel" Orientation="Horizontal"/>
 			</StackPanel>
 		</ScrollViewer>

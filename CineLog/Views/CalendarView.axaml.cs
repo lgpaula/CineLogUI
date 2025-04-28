@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using Avalonia.Controls.Primitives;
 using Avalonia;
 using System.Text.Json;
-using CineLog.ViewModels;
 using Avalonia.Interactivity;
 using CineLog.Views.Helper;
 using Avalonia.Input;
@@ -16,7 +15,6 @@ namespace CineLog.Views
 {
     public partial class CalendarView : UserControl
     {
-        private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext!;
         private static UniformGrid? _calendarGrid;
         private static TextBlock? _monthLabel;
         private static DateTime _currentMonth;
