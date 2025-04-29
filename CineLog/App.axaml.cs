@@ -48,6 +48,7 @@ namespace CineLog
         private void StartPythonServer()
         {
             if (IsServerRunning()) return;
+            _ = WaitForFlaskReady();
 
             _pythonServerProcess = new Process
             {
@@ -63,7 +64,6 @@ namespace CineLog
                 }
             };
             _pythonServerProcess.Start();
-            _ = WaitForFlaskReady();
         }
 
         private static async Task WaitForFlaskReady()
