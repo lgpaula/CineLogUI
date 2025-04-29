@@ -8,6 +8,16 @@
 				<Image Source="avares://CineLog/Assets/filterbutton.png" Width="40" Height="40" Stretch="Uniform"
 				StretchDirection="DownOnly" RenderOptions.BitmapInterpolationMode="HighQuality"/>
 			</Button>
+			<ComboBox Name="SortComboBox" Width="180" Margin="10,0" SelectedIndex="3" SelectionChanged="SortComboBox_SelectionChanged" VerticalAlignment="Center">
+				<ComboBoxItem Content="Rating ↑" Tag="rating ASC"/>
+				<ComboBoxItem Content="Rating ↓" Tag="rating DESC"/>
+				<ComboBoxItem Content="Date Added ↑" Tag="created_on ASC"/>
+				<ComboBoxItem Content="Date Added ↓" Tag="created_on DESC"/>
+				<ComboBoxItem Content="A → Z" Tag="title_name ASC"/>
+				<ComboBoxItem Content="Z → A" Tag="title_name DESC"/>
+				<ComboBoxItem Content="Release Year ↑" Tag="year_start ASC"/>
+				<ComboBoxItem Content="Release Year ↓" Tag="year_start DESC"/>
+			</ComboBox>
 		</WrapPanel>
 		<ScrollViewer Grid.Row="1" Grid.Column="0" x:Name="CollectionScrollViewer">
 				<WrapPanel Name="CollectionWrapPanel" Orientation="Horizontal"/>

@@ -58,7 +58,9 @@ namespace CineLog.Views.Helper
 
             if (whereClauses.Count > 0) query.Append("\nWHERE " + string.Join(" AND ", whereClauses));
 
-            query.Append("\nORDER BY t.created_on DESC");
+            if (filterSettings != null) query.Append("\nORDER BY " + filterSettings.SortBy);
+            else query.Append("\nORDER BY t.created_on DESC");
+
             query.Append("\nLIMIT @Limit OFFSET @Offset");
             parameters.Add("Limit", limit);
             parameters.Add("Offset", offset);
@@ -481,6 +483,7 @@ namespace CineLog.Views.Helper
             public List<string>? Company { get; set; }
             public string? Type { get; set; }
             public string? SearchTerm { get; set; }
+            public string? SortBy { get; set; } = "created_on DESC";
 
             public FilterSettings() { }
         }
