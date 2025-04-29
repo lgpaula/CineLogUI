@@ -50,10 +50,6 @@
                     <Image Source="avares://CineLog/Assets/calendarbutton.png" Width="40" Height="40" Stretch="Uniform"
                     StretchDirection="DownOnly" RenderOptions.BitmapInterpolationMode="HighQuality"/>
                 </Button>
-                <Button Tag="Filter" Margin="10" IsVisible="False" Background="Transparent">
-                    <Image Source="avares://CineLog/Assets/filterbutton.png" Width="40" Height="40" Stretch="Uniform"
-                    StretchDirection="DownOnly" RenderOptions.BitmapInterpolationMode="HighQuality"/>
-                </Button>
             </WrapPanel>
         </Grid>
 
