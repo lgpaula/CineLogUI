@@ -63,6 +63,16 @@ namespace CineLog.Views.Helper
             parameters.Add("Limit", limit);
             parameters.Add("Offset", offset);
 
+Console.WriteLine("Generated SQL Query:");
+Console.WriteLine(query.ToString());
+
+Console.WriteLine("Parameters:");
+foreach (var paramName in parameters.ParameterNames)
+{
+    Console.WriteLine($"{paramName}: {parameters.Get<dynamic>(paramName)}");
+}
+
+
             var result = connection.Query<(string, string, string)>(query.ToString(), parameters)
                 .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
                 .ToList();
@@ -102,6 +112,31 @@ namespace CineLog.Views.Helper
             {
                 whereClauses.Add("t.title_type IN @Types");
                 parameters.Add("Types", filterSettings.Type.Split(','));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filterSettings.SearchTerm))
+            {
+                joins.Add("LEFT JOIN title_cast tc ON tc.title_id = t.title_id");
+                joins.Add("LEFT JOIN cast_table cast_t ON cast_t.id = tc.cast_id");
+
+                joins.Add("LEFT JOIN title_director td ON td.title_id = t.title_id");
+                joins.Add("LEFT JOIN directors_table dir_t ON dir_t.id = td.directors_id");
+
+                joins.Add("LEFT JOIN title_writer tw ON tw.title_id = t.title_id");
+                joins.Add("LEFT JOIN writers_table wri_t ON wri_t.id = tw.writers_id");
+
+                joins.Add("LEFT JOIN title_creator tcr ON tcr.title_id = t.title_id");
+                joins.Add("LEFT JOIN creators_table cr_t ON cr_t.id = tcr.creators_id");
+
+                whereClauses.Add(@"(
+                    LOWER(t.title_name) LIKE @SearchTerm OR
+                    LOWER(cast_t.name) LIKE @SearchTerm OR
+                    LOWER(dir_t.name) LIKE @SearchTerm OR
+                    LOWER(wri_t.name) LIKE @SearchTerm OR
+                    LOWER(cr_t.name) LIKE @SearchTerm
+                )");
+
+                parameters.Add("SearchTerm", $"%{filterSettings.SearchTerm.ToLower()}%");
             }
         }
 
@@ -455,6 +490,7 @@ namespace CineLog.Views.Helper
             public int YearEnd { get; set; } = DateTime.Now.Year + 1;
             public List<string>? Company { get; set; }
             public string? Type { get; set; }
+            public string? SearchTerm { get; set; }
 
             public FilterSettings() { }
         }

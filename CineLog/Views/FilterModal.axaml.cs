@@ -119,7 +119,8 @@ namespace CineLog.Views
                 YearStart = yearStart,
                 YearEnd = yearEnd,
                 Company = GetSelectedIds(_companyCheckBoxes!),
-                Type = selectedTypes.Count > 0 ? string.Join(",", selectedTypes) : null
+                Type = selectedTypes.Count > 0 ? string.Join(",", selectedTypes) : null,
+                SearchTerm = SearchBox.Text
             };
 
             Close(filterSettings); // return filters to CollectionView
