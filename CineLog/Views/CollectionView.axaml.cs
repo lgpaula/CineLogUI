@@ -17,7 +17,6 @@ namespace CineLog.Views
         private WrapPanel? _moviesContainer;
         private ScrollViewer? _scrollViewer;
         private DatabaseHandler.FilterSettings filterSettings = new();
-        private ComboBox? sortComboBox;
 
         public CollectionView(string viewName)
         {
@@ -37,8 +36,6 @@ namespace CineLog.Views
             _moviesContainer = this.FindControl<WrapPanel>("CollectionWrapPanel")
                         ?? throw new NullReferenceException("WrapPanel not found in XAML");
             _scrollViewer = this.FindControl<ScrollViewer>("CollectionScrollViewer")
-                        ?? throw new NullReferenceException("ScrollViewer not found in XAML");
-            sortComboBox = this.FindControl<ComboBox>("SortComboBox")
                         ?? throw new NullReferenceException("ScrollViewer not found in XAML");
 
             LoadNextPage();
