@@ -38,7 +38,7 @@ namespace CineLog.Views.Helper
 
             // Base SELECT
             query.Append(@"
-                SELECT t.title_id, t.title_name, t.poster_url 
+                SELECT DISTINCT t.title_id, t.title_name, t.poster_url 
                 FROM titles_table t");
 
             // If list
@@ -62,16 +62,6 @@ namespace CineLog.Views.Helper
             query.Append("\nLIMIT @Limit OFFSET @Offset");
             parameters.Add("Limit", limit);
             parameters.Add("Offset", offset);
-
-Console.WriteLine("Generated SQL Query:");
-Console.WriteLine(query.ToString());
-
-Console.WriteLine("Parameters:");
-foreach (var paramName in parameters.ParameterNames)
-{
-    Console.WriteLine($"{paramName}: {parameters.Get<dynamic>(paramName)}");
-}
-
 
             var result = connection.Query<(string, string, string)>(query.ToString(), parameters)
                 .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))
