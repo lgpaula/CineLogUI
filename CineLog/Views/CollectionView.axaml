@@ -8,6 +8,9 @@
 				<Image Source="avares://CineLog/Assets/filterbutton.png" Width="40" Height="40" Stretch="Uniform"
 				StretchDirection="DownOnly" RenderOptions.BitmapInterpolationMode="HighQuality"/>
 			</Button>
+			<ScrollViewer x:Name="FilterChipScroll">
+				<WrapPanel x:Name="FilterChipPanel" Orientation="Horizontal"/>
+			</ScrollViewer>
 			<ComboBox Name="SortComboBox" Width="180" Margin="10,0" SelectedIndex="3" SelectionChanged="SortComboBox_SelectionChanged" VerticalAlignment="Center">
 				<ComboBoxItem Content="Rating ↑" Tag="rating ASC"/>
 				<ComboBoxItem Content="Rating ↓" Tag="rating DESC"/>

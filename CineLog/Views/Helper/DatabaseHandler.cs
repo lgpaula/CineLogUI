@@ -89,7 +89,7 @@ namespace CineLog.Views.Helper
                 joins.Add("JOIN title_genre tg ON tg.title_id = t.title_id");
                 joins.Add("JOIN genres_table g ON g.id = tg.genres_id");
                 whereClauses.Add("g.id IN @Genres");
-                parameters.Add("Genres", filterSettings.Genre);
+                parameters.Add("Genres", filterSettings.Genre.Select(g => g.Item1).ToList());
             }
 
             if (filterSettings.Company is { Count: > 0 })
@@ -97,7 +97,7 @@ namespace CineLog.Views.Helper
                 joins.Add("JOIN title_company tc ON tc.title_id = t.title_id");
                 joins.Add("JOIN companies_table c ON c.id = tc.companies_id");
                 whereClauses.Add("c.id IN @Companies");
-                parameters.Add("Companies", filterSettings.Company);
+                parameters.Add("Companies", filterSettings.Company.Select(c => c.Item1).ToList());
             }
 
             if (!string.IsNullOrEmpty(filterSettings.Type))
@@ -477,10 +477,10 @@ namespace CineLog.Views.Helper
         {
             public float? MinRating { get; set; } = 0;
             public float? MaxRating { get; set; } = 10;
-            public List<string>? Genre { get; set; } = [];
+            public List<Tuple<string, string>>? Genre { get; set; } = [];
             public int YearStart { get; set; } = 1874;
             public int YearEnd { get; set; } = DateTime.Now.Year + 1;
-            public List<string>? Company { get; set; }
+            public List<Tuple<string, string>>? Company { get; set; }
             public string? Type { get; set; }
             public string? SearchTerm { get; set; }
             public string? SortBy { get; set; } = "created_on DESC";

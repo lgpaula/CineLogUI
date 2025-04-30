@@ -200,62 +200,68 @@ namespace CineLog.Views
             if (result != null)
             {
                 filterSettings = result;
-                // UpdateFilterChip();
+                UpdateFilterChip();
                 ApplyFilter();
             }
         }
 
-        // private void UpdateFilterChip()
-        // {
-            // foreach (var setting in filterSettings.)
-            // {
-            //     AddFilterChip(setting);
-            // }
-        // }
+        private void UpdateFilterChip()
+        {
+            foreach (var genre in filterSettings.Genre!) AddFilterChip(genre.Item2);
+            foreach (var company in filterSettings.Company!) AddFilterChip(company.Item2);
 
-        // private void AddFilterChip(string filterText)
-        // {
-        //     var border = new Border
-        //     {
-        //         Background = Brushes.LightGray,
-        //         CornerRadius = new CornerRadius(10),
-        //         Margin = new Thickness(5),
-        //         Padding = new Thickness(8, 4, 8, 4),
-        //         Child = new StackPanel
-        //         {
-        //             Orientation = Orientation.Horizontal,
-        //             Children =
-        //             {
-        //                 new Button
-        //                 {
-        //                     Content = "✖",
-        //                     Width = 20,
-        //                     Height = 20,
-        //                     Padding = new Thickness(0),
-        //                     FontSize = 12,
-        //                     VerticalAlignment = VerticalAlignment.Center,
-        //                     Tag = filterText,
-        //                     Background = Brushes.Transparent,
-        //                     BorderBrush = Brushes.Transparent,
-        //                     Name = "xButton"
-        //                 },
-        //                 new TextBlock
-        //                 {
-        //                     Text = filterText,
-        //                     Margin = new Thickness(0, 0, 5, 0),
-        //                     VerticalAlignment = VerticalAlignment.Center
-        //                 }
-        //             }
-        //         }
-        //     };
+            if (!string.IsNullOrWhiteSpace(filterSettings.Type)) AddFilterChip(filterSettings.Type);
+            if (!string.IsNullOrWhiteSpace(filterSettings.SearchTerm)) AddFilterChip(filterSettings.SearchTerm);
 
-        //     // Hook up the button click event
-        //     var button = (border.Child as StackPanel).Children[1] as Button;
-        //     button.Click += RemoveFilterChip;
+            if (filterSettings.MinRating != 0) AddFilterChip(filterSettings.MinRating.ToString()!);
+            if (filterSettings.MaxRating != 10) AddFilterChip(filterSettings.MaxRating.ToString()!);
 
-        //     // Add to the panel
-        //     FilterChipPanel.Children.Add(border);
-        // }
+            if (filterSettings.YearStart != 1874) AddFilterChip(filterSettings.YearStart.ToString()!);
+            if (filterSettings.YearEnd != DateTime.Now.Year + 1) AddFilterChip(filterSettings.YearEnd.ToString()!);
+        }
+
+        private void AddFilterChip(string filterText)
+        {
+            var border = new Border
+            {
+                Background = Brushes.LightGray,
+                CornerRadius = new CornerRadius(10),
+                Margin = new Thickness(5),
+                Padding = new Thickness(8, 4, 8, 4),
+                VerticalAlignment = VerticalAlignment.Center,
+                Child = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Children =
+                    {
+                        new Button
+                        {
+                            Content = "✖",
+                            Width = 20,
+                            Height = 20,
+                            Padding = new Thickness(0),
+                            FontSize = 12,
+                            VerticalAlignment = VerticalAlignment.Center,
+                            Tag = filterText,
+                            Background = Brushes.Transparent,
+                            BorderBrush = Brushes.Transparent,
+                            Name = "xButton"
+                        },
+                        new TextBlock
+                        {
+                            Text = filterText,
+                            Margin = new Thickness(0, 0, 5, 0),
+                            VerticalAlignment = VerticalAlignment.Center
+                        }
+                    }
+                }
+            };
+
+            var button = (border.Child! as StackPanel).Children[1] as Button;
+            // button!.Click += RemoveFilterChip!;
+
+            FilterChipPanel.Children.Add(border);
+        }
 
         // private void RemoveFilterChip(object sender, RoutedEventArgs e)
         // {
@@ -263,8 +269,10 @@ namespace CineLog.Views
         //     {
         //         FilterChipPanel.Children.Remove(border);
                 
-        //         // Optional: do something with button.Tag (the filter identifier)
         //         string? removedFilter = button.Tag as string;
+        //         // update filterSettings
+        //         UpdateFilterChip();
+        //         ApplyFilter();
         //         Console.WriteLine($"Removed filter: {removedFilter}");
         //     }
         // }

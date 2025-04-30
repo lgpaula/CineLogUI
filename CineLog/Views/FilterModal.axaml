@@ -64,8 +64,8 @@
 					<!-- Type -->
 					<TextBlock Grid.Row="8" Grid.Column="0" VerticalAlignment="Center">Type</TextBlock>
 					<WrapPanel x:Name="TitleTypePanel" Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
-						<CheckBox Content="Movie" Tag="Movie" Margin="0,0,10,0"/>
-						<CheckBox Content="Series" Tag="TV Series"/>
+						<RadioButton GroupName="TypeGroup" Content="Movie" Tag="Movie" Margin="0,0,10,0"/>
+						<RadioButton GroupName="TypeGroup" Content="Series" Tag="TV Series"/>
 					</WrapPanel>
 					<Rectangle Grid.Row="9" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
 

@@ -47,14 +47,22 @@ namespace CineLog.Views
         {
             foreach (var cb in _genreCheckBoxes!)
             {
-                if (filterSettings.Genre != null && filterSettings.Genre.Contains(cb.Tag?.ToString() ?? ""))
+                if (cb.Tag is Tuple<string, string> tag &&
+                    filterSettings.Genre != null &&
+                    filterSettings.Genre.Any(t => t.Item1 == tag.Item1))
+                {
                     cb.IsChecked = true;
+                }
             }
 
             foreach (var cb in _companyCheckBoxes!)
             {
-                if (filterSettings.Company != null && filterSettings.Company.Contains(cb.Tag?.ToString() ?? ""))
+                if (cb.Tag is Tuple<string, string> tag &&
+                    filterSettings.Company != null &&
+                    filterSettings.Company.Any(t => t.Item1 == tag.Item1))
+                {
                     cb.IsChecked = true;
+                }
             }
 
             MinRating.Text = filterSettings.MinRating?.ToString("0.0") ?? "0.0";
@@ -63,7 +71,7 @@ namespace CineLog.Views
             YearStart.Text = filterSettings.YearStart.ToString();
             YearEnd.Text = filterSettings.YearEnd.ToString();
 
-            foreach (var cb in TitleTypePanel.Children.OfType<CheckBox>())
+            foreach (var cb in TitleTypePanel.Children.OfType<RadioButton>())
             {
                 var tag = cb.Tag?.ToString();
                 cb.IsChecked = tag == filterSettings.Type;
@@ -101,12 +109,11 @@ namespace CineLog.Views
             return checkBoxes;
         }
 
-        private static List<string> GetSelectedIds(List<CheckBox> checkBoxes)
+        private static List<Tuple<string, string>> GetSelectedIds(List<CheckBox> checkBoxes)
         {
             return [.. checkBoxes
                 .Where(cb => cb.IsChecked == true)
-                .Select(cb => cb.Tag)
-                .OfType<string>()];
+                .Select(cb => Tuple.Create(cb.Tag?.ToString() ?? "", cb.Content?.ToString() ?? ""))];
         }
 
         private void OnApplyClicked(object? sender, RoutedEventArgs e)
