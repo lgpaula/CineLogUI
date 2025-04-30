@@ -108,8 +108,8 @@ namespace CineLog.Views.Helper
 
             if (!string.IsNullOrWhiteSpace(filterSettings.SearchTerm))
             {
-                joins.Add("LEFT JOIN title_cast tc ON tc.title_id = t.title_id");
-                joins.Add("LEFT JOIN cast_table cast_t ON cast_t.id = tc.cast_id");
+                joins.Add("LEFT JOIN title_cast ts ON ts.title_id = t.title_id");
+                joins.Add("LEFT JOIN cast_table cast_t ON cast_t.id = ts.cast_id");
 
                 joins.Add("LEFT JOIN title_director td ON td.title_id = t.title_id");
                 joins.Add("LEFT JOIN directors_table dir_t ON dir_t.id = td.directors_id");

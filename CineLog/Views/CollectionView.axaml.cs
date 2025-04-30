@@ -6,6 +6,7 @@ using Avalonia;
 using System.Linq;
 using Avalonia.Media;
 using Avalonia.Controls.Documents;
+using Avalonia.Layout;
 
 namespace CineLog.Views
 {
@@ -191,7 +192,7 @@ namespace CineLog.Views
 
         private async void OpenFilterModal(object? sender, RoutedEventArgs e)
         {
-            var modal = new FilterModal();
+            var modal = new FilterModal(filterSettings);
             if (VisualRoot is not Window window) return;
 
             var result = await modal.ShowDialog<DatabaseHandler.FilterSettings?>(window);
@@ -199,9 +200,74 @@ namespace CineLog.Views
             if (result != null)
             {
                 filterSettings = result;
+                // UpdateFilterChip();
                 ApplyFilter();
             }
         }
+
+        // private void UpdateFilterChip()
+        // {
+            // foreach (var setting in filterSettings.)
+            // {
+            //     AddFilterChip(setting);
+            // }
+        // }
+
+        // private void AddFilterChip(string filterText)
+        // {
+        //     var border = new Border
+        //     {
+        //         Background = Brushes.LightGray,
+        //         CornerRadius = new CornerRadius(10),
+        //         Margin = new Thickness(5),
+        //         Padding = new Thickness(8, 4, 8, 4),
+        //         Child = new StackPanel
+        //         {
+        //             Orientation = Orientation.Horizontal,
+        //             Children =
+        //             {
+        //                 new Button
+        //                 {
+        //                     Content = "✖",
+        //                     Width = 20,
+        //                     Height = 20,
+        //                     Padding = new Thickness(0),
+        //                     FontSize = 12,
+        //                     VerticalAlignment = VerticalAlignment.Center,
+        //                     Tag = filterText,
+        //                     Background = Brushes.Transparent,
+        //                     BorderBrush = Brushes.Transparent,
+        //                     Name = "xButton"
+        //                 },
+        //                 new TextBlock
+        //                 {
+        //                     Text = filterText,
+        //                     Margin = new Thickness(0, 0, 5, 0),
+        //                     VerticalAlignment = VerticalAlignment.Center
+        //                 }
+        //             }
+        //         }
+        //     };
+
+        //     // Hook up the button click event
+        //     var button = (border.Child as StackPanel).Children[1] as Button;
+        //     button.Click += RemoveFilterChip;
+
+        //     // Add to the panel
+        //     FilterChipPanel.Children.Add(border);
+        // }
+
+        // private void RemoveFilterChip(object sender, RoutedEventArgs e)
+        // {
+        //     if (sender is Button button && button.Parent is StackPanel stack && stack.Parent is Border border)
+        //     {
+        //         FilterChipPanel.Children.Remove(border);
+                
+        //         // Optional: do something with button.Tag (the filter identifier)
+        //         string? removedFilter = button.Tag as string;
+        //         Console.WriteLine($"Removed filter: {removedFilter}");
+        //     }
+        // }
 
         private void SortComboBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {

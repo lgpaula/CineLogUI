@@ -15,7 +15,7 @@ namespace CineLog.Views
         private List<CheckBox>? _genreCheckBoxes;
         private List<CheckBox>? _companyCheckBoxes;
 
-        public FilterModal()
+        public FilterModal(DatabaseHandler.FilterSettings filterSettings)
         {
             InitializeComponent();
             _genreCheckBoxes = AddCheckboxesToPanel(GenresPanel, DatabaseHandler.GetAllItems("genres_table"));
@@ -39,6 +39,37 @@ namespace CineLog.Views
             {
                 if (_owner != null) _owner.PositionChanged -= Owner_PositionChanged;
             };
+
+            if (filterSettings != null) TickSettings(filterSettings);
+        }
+
+        private void TickSettings(DatabaseHandler.FilterSettings filterSettings)
+        {
+            foreach (var cb in _genreCheckBoxes!)
+            {
+                if (filterSettings.Genre != null && filterSettings.Genre.Contains(cb.Tag?.ToString() ?? ""))
+                    cb.IsChecked = true;
+            }
+
+            foreach (var cb in _companyCheckBoxes!)
+            {
+                if (filterSettings.Company != null && filterSettings.Company.Contains(cb.Tag?.ToString() ?? ""))
+                    cb.IsChecked = true;
+            }
+
+            MinRating.Text = filterSettings.MinRating?.ToString("0.0") ?? "0.0";
+            MaxRating.Text = filterSettings.MaxRating?.ToString("0.0") ?? "10.0";
+
+            YearStart.Text = filterSettings.YearStart.ToString();
+            YearEnd.Text = filterSettings.YearEnd.ToString();
+
+            foreach (var cb in TitleTypePanel.Children.OfType<CheckBox>())
+            {
+                var tag = cb.Tag?.ToString();
+                cb.IsChecked = tag == filterSettings.Type;
+            }
+
+            SearchBox.Text = filterSettings.SearchTerm ?? "";
         }
 
         private void Owner_PositionChanged(object? sender, PixelPointEventArgs e)
@@ -110,7 +141,6 @@ namespace CineLog.Views
                 }
             }
 
-            // Update the filter settings
             var filterSettings = new DatabaseHandler.FilterSettings
             {
                 MinRating = minRating,
@@ -123,7 +153,7 @@ namespace CineLog.Views
                 SearchTerm = SearchBox.Text
             };
 
-            Close(filterSettings); // return filters to CollectionView
+            Close(filterSettings);
         }
 
         private void OnCloseClicked(object? sender, RoutedEventArgs e)
