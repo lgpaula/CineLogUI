@@ -3,15 +3,26 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
 	<Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, *">
-		<WrapPanel Grid.Row="0" >
-			<Button Tag="Filter" Click="OpenFilterModal" Margin="10" Background="Transparent">
+		<Grid Grid.Row="0" Grid.ColumnSpan="2" ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+			<Button Grid.Column="0" Tag="Filter" Click="OpenFilterModal" Margin="10" Background="Transparent">
 				<Image Source="avares://CineLog/Assets/filterbutton.png" Width="40" Height="40" Stretch="Uniform"
-				StretchDirection="DownOnly" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+					StretchDirection="DownOnly" RenderOptions.BitmapInterpolationMode="HighQuality"/>
 			</Button>
-			<ScrollViewer x:Name="FilterChipScroll">
+
+			<ScrollViewer Grid.Column="1"
+						x:Name="FilterChipScroll"
+						HorizontalScrollBarVisibility="Auto"
+						VerticalScrollBarVisibility="Disabled">
 				<StackPanel x:Name="FilterChipPanel" Orientation="Horizontal"/>
 			</ScrollViewer>
-			<ComboBox Name="SortComboBox" Width="180" Margin="10,0" SelectedIndex="3" SelectionChanged="SortComboBox_SelectionChanged" VerticalAlignment="Center">
+
+			<ComboBox Grid.Column="2"
+					Name="SortComboBox"
+					Width="180"
+					Margin="10,0"
+					SelectedIndex="3"
+					SelectionChanged="SortComboBox_SelectionChanged"
+					VerticalAlignment="Center">
 				<ComboBoxItem Content="Rating ↑" Tag="rating ASC"/>
 				<ComboBoxItem Content="Rating ↓" Tag="rating DESC"/>
 				<ComboBoxItem Content="Date Added ↑" Tag="created_on ASC"/>
@@ -21,7 +32,7 @@
 				<ComboBoxItem Content="Release Year ↑" Tag="year_start ASC"/>
 				<ComboBoxItem Content="Release Year ↓" Tag="year_start DESC"/>
 			</ComboBox>
-		</WrapPanel>
+		</Grid>
 		<ScrollViewer Grid.Row="1" Grid.Column="0" x:Name="CollectionScrollViewer">
 				<WrapPanel Name="CollectionWrapPanel" Orientation="Horizontal"/>
 		</ScrollViewer>
