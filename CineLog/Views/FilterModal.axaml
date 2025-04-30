@@ -71,7 +71,7 @@
 
 					<!-- Search -->
 					<TextBlock Grid.Row="10" Grid.Column="0" VerticalAlignment="Center">Search</TextBlock>
-					<TextBox x:Name="SearchBox" Grid.Row="10" Grid.Column="1" Width="200" Watermark="Search title..." Margin="0,0,0,10"/>
+					<TextBox x:Name="SearchBox" Grid.Row="10" Grid.Column="1" Width="200" Watermark="Search ..." Margin="0,0,0,10"/>
 					<Rectangle Grid.Row="11" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
 
 					<!-- Button -->
