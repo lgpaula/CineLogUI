@@ -71,10 +71,11 @@ namespace CineLog.Views
             YearStart.Text = filterSettings.YearStart.ToString();
             YearEnd.Text = filterSettings.YearEnd.ToString();
 
-            foreach (var cb in TitleTypePanel.Children.OfType<RadioButton>())
+            foreach (var rb in TitleTypePanel.Children.OfType<RadioButton>())
             {
-                var tag = cb.Tag?.ToString();
-                cb.IsChecked = tag == filterSettings.Type;
+                var tag = rb.Tag?.ToString();
+                if (tag == filterSettings.Type) rb.IsChecked = true;
+                else rb.IsChecked = false;
             }
 
             SearchBox.Text = filterSettings.SearchTerm ?? "";
@@ -137,14 +138,17 @@ namespace CineLog.Views
             if (maxYearBox != null && int.TryParse(maxYearBox.Text, out int maxYearParsed)) yearEnd = maxYearParsed;
 
             // Read Title Type (Movie or Series)
-            var selectedTypes = new List<string>();
+            string? selectedType = null;
             var typePanel = this.FindControl<WrapPanel>("TitleTypePanel");
             if (typePanel != null)
             {
                 foreach (var child in typePanel.Children)
                 {
-                    if (child is CheckBox checkBox && checkBox.IsChecked == true && checkBox.Tag is string typeTag)
-                        selectedTypes.Add(typeTag);
+                    if (child is RadioButton radioButton && radioButton.IsChecked == true && radioButton.Tag is string typeTag)
+                    {
+                        selectedType = typeTag;
+                        break;
+                    }
                 }
             }
 
@@ -156,7 +160,7 @@ namespace CineLog.Views
                 YearStart = yearStart,
                 YearEnd = yearEnd,
                 Company = GetSelectedIds(_companyCheckBoxes!),
-                Type = selectedTypes.Count > 0 ? string.Join(",", selectedTypes) : null,
+                Type = selectedType,
                 SearchTerm = SearchBox.Text
             };
 

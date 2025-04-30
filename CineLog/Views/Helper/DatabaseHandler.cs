@@ -58,12 +58,22 @@ namespace CineLog.Views.Helper
 
             if (whereClauses.Count > 0) query.Append("\nWHERE " + string.Join(" AND ", whereClauses));
 
-            if (filterSettings != null) query.Append("\nORDER BY " + filterSettings.SortBy);
+            if (filterSettings != null && filterSettings.SortBy != null) query.Append("\nORDER BY t." + filterSettings.SortBy);
             else query.Append("\nORDER BY t.created_on DESC");
 
             query.Append("\nLIMIT @Limit OFFSET @Offset");
             parameters.Add("Limit", limit);
             parameters.Add("Offset", offset);
+
+            // Console.WriteLine("Generated SQL Query:");
+            // Console.WriteLine(query.ToString());
+
+            // Console.WriteLine("Query Parameters:");
+            // foreach (var paramName in parameters.ParameterNames)
+            // {
+            //     var paramValue = parameters.Get<dynamic>(paramName);
+            //     Console.WriteLine($"{paramName}: {paramValue}");
+            // }
 
             var result = connection.Query<(string, string, string)>(query.ToString(), parameters)
                 .Select(tuple => new Movie(tuple.Item1, tuple.Item2, tuple.Item3))

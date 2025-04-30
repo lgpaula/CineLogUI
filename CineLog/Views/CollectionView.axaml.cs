@@ -207,20 +207,22 @@ namespace CineLog.Views
 
         private void UpdateFilterChip()
         {
-            foreach (var genre in filterSettings.Genre!) AddFilterChip(genre.Item2);
-            foreach (var company in filterSettings.Company!) AddFilterChip(company.Item2);
+            FilterChipPanel.Children.Clear();
 
-            if (!string.IsNullOrWhiteSpace(filterSettings.Type)) AddFilterChip(filterSettings.Type);
-            if (!string.IsNullOrWhiteSpace(filterSettings.SearchTerm)) AddFilterChip(filterSettings.SearchTerm);
+            foreach (var genre in filterSettings.Genre!) AddFilterChip("Genre", genre.Item2);
+            foreach (var company in filterSettings.Company!) AddFilterChip("Company", company.Item2);
 
-            if (filterSettings.MinRating != 0) AddFilterChip(filterSettings.MinRating.ToString()!);
-            if (filterSettings.MaxRating != 10) AddFilterChip(filterSettings.MaxRating.ToString()!);
+            if (!string.IsNullOrWhiteSpace(filterSettings.Type)) AddFilterChip("Type", filterSettings.Type);
+            if (!string.IsNullOrWhiteSpace(filterSettings.SearchTerm)) AddFilterChip("SearchTerm", filterSettings.SearchTerm);
 
-            if (filterSettings.YearStart != 1874) AddFilterChip(filterSettings.YearStart.ToString()!);
-            if (filterSettings.YearEnd != DateTime.Now.Year + 1) AddFilterChip(filterSettings.YearEnd.ToString()!);
+            if (filterSettings.MinRating != 0) AddFilterChip("MinRating", filterSettings.MinRating.ToString()!);
+            if (filterSettings.MaxRating != 10) AddFilterChip("MaxRating", filterSettings.MaxRating.ToString()!);
+
+            if (filterSettings.YearStart != 1874) AddFilterChip("YearStart", filterSettings.YearStart.ToString()!);
+            if (filterSettings.YearEnd != DateTime.Now.Year + 1) AddFilterChip("YearEnd", filterSettings.YearEnd.ToString()!);
         }
 
-        private void AddFilterChip(string filterText)
+        private void AddFilterChip(string source, string filterText)
         {
             var border = new Border
             {
@@ -242,14 +244,13 @@ namespace CineLog.Views
                             Padding = new Thickness(0),
                             FontSize = 12,
                             VerticalAlignment = VerticalAlignment.Center,
-                            Tag = filterText,
+                            Tag = new FilterChipTag(source, filterText),
                             Background = Brushes.Transparent,
-                            BorderBrush = Brushes.Transparent,
-                            Name = "xButton"
+                            BorderBrush = Brushes.Transparent
                         },
                         new TextBlock
                         {
-                            Text = filterText,
+                            Text = source + ": " + filterText,
                             Margin = new Thickness(0, 0, 5, 0),
                             VerticalAlignment = VerticalAlignment.Center
                         }
@@ -257,25 +258,56 @@ namespace CineLog.Views
                 }
             };
 
-            var button = (border.Child! as StackPanel).Children[1] as Button;
-            // button!.Click += RemoveFilterChip!;
+            var button = (border.Child! as StackPanel)!.Children[0] as Button;
+            button!.Click += RemoveFilterChip!;
 
             FilterChipPanel.Children.Add(border);
+            Console.WriteLine($"Added filter: {source} = {filterText}");
         }
 
-        // private void RemoveFilterChip(object sender, RoutedEventArgs e)
-        // {
-        //     if (sender is Button button && button.Parent is StackPanel stack && stack.Parent is Border border)
-        //     {
-        //         FilterChipPanel.Children.Remove(border);
-                
-        //         string? removedFilter = button.Tag as string;
-        //         // update filterSettings
-        //         UpdateFilterChip();
-        //         ApplyFilter();
-        //         Console.WriteLine($"Removed filter: {removedFilter}");
-        //     }
-        // }
+        private void RemoveFilterChip(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button &&
+                button.Parent is StackPanel stack &&
+                stack.Parent is Border border &&
+                button.Tag is FilterChipTag tag)
+            {
+                FilterChipPanel.Children.Remove(border);
+                string source = tag.Source;
+                string value = tag.Value;
+
+                switch (source)
+                {
+                    case "Genre":
+                        filterSettings.Genre?.RemoveAll(g => g.Item2 == value);
+                        break;
+                    case "Company":
+                        filterSettings.Company?.RemoveAll(c => c.Item2 == value);
+                        break;
+                    case "Type":
+                        if (filterSettings.Type == value) filterSettings.Type = null;
+                        break;
+                    case "SearchTerm":
+                        if (filterSettings.SearchTerm == value) filterSettings.SearchTerm = null;
+                        break;
+                    case "MinRating":
+                        filterSettings.MinRating = 0;
+                        break;
+                    case "MaxRating":
+                        filterSettings.MaxRating = 10;
+                        break;
+                    case "YearStart":
+                        filterSettings.YearStart = 1874;
+                        break;
+                    case "YearEnd":
+                        filterSettings.YearEnd = DateTime.Now.Year + 1;
+                        break;
+                }
+
+                UpdateFilterChip();
+                ApplyFilter();
+            }
+        }
 
         private void SortComboBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
@@ -294,5 +326,11 @@ namespace CineLog.Views
         }
 
         #endregion
+    }
+
+    public class FilterChipTag(string source, string value)
+    {
+        public string Source { get; set; } = source;
+        public string Value { get; set; } = value;
     }
 }
