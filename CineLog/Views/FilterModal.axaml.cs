@@ -47,9 +47,9 @@ namespace CineLog.Views
         {
             foreach (var cb in _genreCheckBoxes!)
             {
-                if (cb.Tag is Tuple<string, string> tag &&
+                if (cb.Tag is string tag &&
                     filterSettings.Genre != null &&
-                    filterSettings.Genre.Any(t => t.Item1 == tag.Item1))
+                    filterSettings.Genre.Any(t => t.Item1 == tag))
                 {
                     cb.IsChecked = true;
                 }
@@ -57,9 +57,9 @@ namespace CineLog.Views
 
             foreach (var cb in _companyCheckBoxes!)
             {
-                if (cb.Tag is Tuple<string, string> tag &&
+                if (cb.Tag is string tag &&
                     filterSettings.Company != null &&
-                    filterSettings.Company.Any(t => t.Item1 == tag.Item1))
+                    filterSettings.Company.Any(t => t.Item1 == tag))
                 {
                     cb.IsChecked = true;
                 }

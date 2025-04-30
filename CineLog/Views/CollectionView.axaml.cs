@@ -262,7 +262,6 @@ namespace CineLog.Views
             button!.Click += RemoveFilterChip!;
 
             FilterChipPanel.Children.Add(border);
-            Console.WriteLine($"Added filter: {source} = {filterText}");
         }
 
         private void RemoveFilterChip(object sender, RoutedEventArgs e)
