@@ -23,62 +23,78 @@
 		</Style>
 	</Window.Styles>
 
-    <Border Background="#DD1E1E1E" CornerRadius="10" BoxShadow="0 4 20 0 #66000000" Padding="20">
-        <ScrollViewer>
-            <StackPanel>
-                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="150,*" Margin="10">
-					<!-- Rating -->
-					<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Rating</TextBlock>
-					<StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="5">
-						<TextBlock Text="From" Foreground="White" VerticalAlignment="Center"/>
-						<TextBox Classes="CustomTextBox" x:Name="MinRating" Width="50" Text="0.0" Margin="0,0,10,0"/>
-						<TextBlock Text="To" Foreground="White" VerticalAlignment="Center"/>
-						<TextBox Classes="CustomTextBox" x:Name="MaxRating" Width="50" Text="10.0"/>
-					</StackPanel>
-					<Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+	<Border Background="#EE1E1E1E" CornerRadius="10" BoxShadow="0 4 20 0 #66000000" Padding="20">
+		<DockPanel LastChildFill="True">
 
-					<!-- Genre -->
-					<TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Genre</TextBlock>
-					<ScrollViewer Grid.Row="2" Grid.Column="1" VerticalScrollBarVisibility="Auto" MaxHeight="200">
-						<WrapPanel x:Name="GenresPanel" Orientation="Horizontal" HorizontalAlignment="Center"/>
-					</ScrollViewer>
-					<Rectangle Grid.Row="3" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+			<!-- Top buttons -->
+			<Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
 
-					<!-- Year -->
-					<TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Year release</TextBlock>
-					<StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="5">
-						<TextBlock Text="From" Foreground="White" VerticalAlignment="Center"/>
-						<TextBox Classes="CustomTextBox" x:Name="YearStart" Width="50" Text="" Margin="0,0,10,0"/>
-						<TextBlock Text="To" Foreground="White" VerticalAlignment="Center"/>
-						<TextBox Classes="CustomTextBox" x:Name="YearEnd" Width="50" Text=""/>
-					</StackPanel>
-					<Rectangle Grid.Row="5" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+				<Button Content="Clear" Click="OnClearClicked" HorizontalAlignment="Left" Grid.Column="0"/>
+				<Button Content="Close" Click="OnCloseClicked" HorizontalAlignment="Right" Grid.Column="1"/>
+			</Grid>
 
-					<!-- Company -->
-					<TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center">Company</TextBlock>
-					<ScrollViewer Grid.Row="6" Grid.Column="1" VerticalScrollBarVisibility="Auto" MaxHeight="200">
-						<WrapPanel x:Name="CompaniesPanel" Orientation="Horizontal" HorizontalAlignment="Center"/>
-					</ScrollViewer>
-					<Rectangle Grid.Row="7" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+			<!-- Bottom button -->
+			<Button DockPanel.Dock="Bottom" Content="Apply" Click="OnApplyClicked" HorizontalAlignment="Left"/>
 
-					<!-- Type -->
-					<TextBlock Grid.Row="8" Grid.Column="0" VerticalAlignment="Center">Type</TextBlock>
-					<WrapPanel x:Name="TitleTypePanel" Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
-						<RadioButton GroupName="TypeGroup" Content="Movie" Tag="Movie" Margin="0,0,10,0"/>
-						<RadioButton GroupName="TypeGroup" Content="Series" Tag="TV Series"/>
-					</WrapPanel>
-					<Rectangle Grid.Row="9" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+			<!-- Scrollable content -->
+			<ScrollViewer Background="#EE222222" Margin="0,0,0,10">
+				<StackPanel>
+					<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+						ColumnDefinitions="150,*" Margin="10">
 
-					<!-- Search -->
-					<TextBlock Grid.Row="10" Grid.Column="0" VerticalAlignment="Center">Search</TextBlock>
-					<TextBox x:Name="SearchBox" Grid.Row="10" Grid.Column="1" Width="200" Watermark="Search ..." Margin="0,0,0,10"/>
-					<Rectangle Grid.Row="11" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+						<!-- Rating -->
+						<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Rating</TextBlock>
+						<StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="5">
+							<TextBlock Text="From" Foreground="White" VerticalAlignment="Center"/>
+							<TextBox Classes="CustomTextBox" x:Name="MinRating" Width="50" Text="0.0" Margin="0,0,10,0"/>
+							<TextBlock Text="To" Foreground="White" VerticalAlignment="Center"/>
+							<TextBox Classes="CustomTextBox" x:Name="MaxRating" Width="50" Text="10.0"/>
+						</StackPanel>
+						<Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
 
-					<!-- Button -->
-					<Button Grid.Row="12" Grid.Column="0" Content="Apply" Click="OnApplyClicked" HorizontalAlignment="Left" Margin="0,10,10,0"/>
-					<Button Grid.Row="12" Grid.Column="0" Content="Close" Click="OnCloseClicked" HorizontalAlignment="Right" Margin="0,10,10,0"/>
-                </Grid>
-            </StackPanel>
-        </ScrollViewer>
-    </Border>
+						<!-- Genre -->
+						<TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Genre</TextBlock>
+						<ScrollViewer Grid.Row="2" Grid.Column="1" VerticalScrollBarVisibility="Auto" MaxHeight="200">
+							<WrapPanel x:Name="GenresPanel" Orientation="Horizontal" HorizontalAlignment="Center"/>
+						</ScrollViewer>
+						<Rectangle Grid.Row="3" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+
+						<!-- Year -->
+						<TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Year release</TextBlock>
+						<StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="5">
+							<TextBlock Text="From" Foreground="White" VerticalAlignment="Center"/>
+							<TextBox Classes="CustomTextBox" x:Name="YearStart" Width="50" Margin="0,0,10,0"/>
+							<TextBlock Text="To" Foreground="White" VerticalAlignment="Center"/>
+							<TextBox Classes="CustomTextBox" x:Name="YearEnd" Width="50"/>
+						</StackPanel>
+						<Rectangle Grid.Row="5" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+
+						<!-- Company -->
+						<TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center">Company</TextBlock>
+						<ScrollViewer Grid.Row="6" Grid.Column="1" VerticalScrollBarVisibility="Auto" MaxHeight="200">
+							<WrapPanel x:Name="CompaniesPanel" Orientation="Horizontal" HorizontalAlignment="Center"/>
+						</ScrollViewer>
+						<Rectangle Grid.Row="7" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+
+						<!-- Type -->
+						<TextBlock Grid.Row="8" Grid.Column="0" VerticalAlignment="Center">Type</TextBlock>
+						<WrapPanel x:Name="TitleTypePanel" Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
+							<RadioButton GroupName="TypeGroup" Content="Movie" Tag="Movie" Margin="0,0,10,0"/>
+							<RadioButton GroupName="TypeGroup" Content="Series" Tag="TV Series"/>
+						</WrapPanel>
+						<Rectangle Grid.Row="9" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+
+						<!-- Search -->
+						<TextBlock Grid.Row="10" Grid.Column="0" VerticalAlignment="Center">Search</TextBlock>
+						<TextBox x:Name="SearchBox" Grid.Row="10" Grid.Column="1" Width="200" Watermark="Search ..." Margin="0,0,0,10"/>
+						<Rectangle Grid.Row="11" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+					</Grid>
+				</StackPanel>
+			</ScrollViewer>
+		</DockPanel>
+	</Border>
 </Window>

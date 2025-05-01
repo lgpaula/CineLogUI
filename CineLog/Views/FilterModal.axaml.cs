@@ -171,5 +171,22 @@ namespace CineLog.Views
         {
             Close(null);
         }
+
+        private void OnClearClicked(object? sender, RoutedEventArgs e)
+        {
+            foreach (var cb in _genreCheckBoxes!) cb.IsChecked = false;
+
+            foreach (var cb in _companyCheckBoxes!) cb.IsChecked = false;
+
+            MinRating.Text = "0.0";
+            MaxRating.Text = "10.0";
+
+            YearStart.Text = "1874";
+            YearEnd.Text = (DateTime.Now.Year + 1).ToString();
+
+            foreach (var rb in TitleTypePanel.Children.OfType<RadioButton>()) rb.IsChecked = false;
+
+            SearchBox.Text = "";
+        }
     }
 }
