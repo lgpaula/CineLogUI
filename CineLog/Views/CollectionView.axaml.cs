@@ -41,6 +41,7 @@ namespace CineLog.Views
 
             LoadNextPage();
             _scrollViewer.ScrollChanged += (sender, e) => OnScrollChanged();
+            SortComboBox.SelectionChanged += SortComboBox_SelectionChanged;
         }
 
         private void LoadNextPage()

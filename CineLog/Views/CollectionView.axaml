@@ -21,7 +21,6 @@
 					Width="180"
 					Margin="10,0"
 					SelectedIndex="3"
-					SelectionChanged="SortComboBox_SelectionChanged"
 					VerticalAlignment="Center">
 				<ComboBoxItem Content="Rating ↑" Tag="rating ASC"/>
 				<ComboBoxItem Content="Rating ↓" Tag="rating DESC"/>
