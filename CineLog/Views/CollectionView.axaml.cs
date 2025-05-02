@@ -7,6 +7,7 @@ using System.Linq;
 using Avalonia.Media;
 using Avalonia.Controls.Documents;
 using Avalonia.Layout;
+using System.Collections.Generic;
 
 namespace CineLog.Views
 {
@@ -125,33 +126,33 @@ namespace CineLog.Views
 
             this.FindControl<TextBlock>("DescriptionText")!.Text = selectedTitle.Plot ?? "";
 
-            void InsertButtons(string panelName, string? items)
+            void InsertButtons(string panelName, List<Tuple<string, string>>? items)
             {
                 var panel = this.FindControl<WrapPanel>(panelName)!;
                 panel.Children.Clear();
                 var parent = panel.Parent as StackPanel;
 
-                if (string.IsNullOrWhiteSpace(items))
+                if (items == null || items.Count == 0)
                 {
                     parent!.IsVisible = false;
                     return;
                 }
+
                 parent!.IsVisible = true;
 
-                var entries = items.Split(',')
-                                .Select(s => s.Trim())
-                                .Where(s => !string.IsNullOrEmpty(s));
-
-                foreach (var item in entries)
+                foreach (var (id, name) in items)
                 {
-                    panel.Children.Add(new Button
+                    Button button = new()
                     {
-                        Content = item,
+                        Content = name,
                         FontSize = 12,
                         Padding = new Thickness(4, 2),
                         Margin = new Thickness(4, 2),
-                        CornerRadius = new CornerRadius(8)
-                    });
+                        CornerRadius = new CornerRadius(8),
+                        Tag = id
+                    };
+                    // button.Click += 
+                    panel.Children.Add(button);
                 }
             }
 
@@ -187,6 +188,7 @@ namespace CineLog.Views
             if (sender is Button button && button.Tag is string title_id)
             {
                 var scheduleList = DatabaseHandler.GetSchedule(title_id);
+                Console.WriteLine("shcedule listL: " + scheduleList);
                 CalendarView.AddMovieToCalendar(scheduleList, title_id);
             }
         }
