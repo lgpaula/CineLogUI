@@ -14,6 +14,7 @@ namespace CineLog.Views
         private Point _offset;
         private List<CheckBox>? _genreCheckBoxes;
         private List<CheckBox>? _companyCheckBoxes;
+        private List<Tuple<string, string>>? _names;
 
         public FilterModal()
         {
@@ -84,6 +85,8 @@ namespace CineLog.Views
             }
 
             SearchBox.Text = filterSettings.SearchTerm ?? "";
+
+            _names = filterSettings.Name;
         }
 
         private void Owner_PositionChanged(object? sender, PixelPointEventArgs e)
@@ -121,6 +124,12 @@ namespace CineLog.Views
                 .Where(cb => cb.IsChecked == true)
                 .Select(cb => Tuple.Create(cb.Tag?.ToString() ?? "", cb.Content?.ToString() ?? ""))];
         }
+
+        private List<Tuple<string, string>> GetNameIds()
+        {
+            return [.. _names!.Select(n => Tuple.Create(n.Item1, n.Item2))];
+        }
+
 
         private void OnApplyClicked(object? sender, RoutedEventArgs e)
         {
@@ -166,7 +175,8 @@ namespace CineLog.Views
                 YearEnd = yearEnd,
                 Company = GetSelectedIds(_companyCheckBoxes!),
                 Type = selectedType,
-                SearchTerm = SearchBox.Text
+                SearchTerm = SearchBox.Text,
+                Name = GetNameIds()
             };
 
             Close(filterSettings);
@@ -192,6 +202,8 @@ namespace CineLog.Views
             foreach (var rb in TitleTypePanel.Children.OfType<RadioButton>()) rb.IsChecked = false;
 
             SearchBox.Text = "";
+
+            _names!.Clear();
         }
     }
 }
