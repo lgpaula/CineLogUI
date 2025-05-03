@@ -139,10 +139,11 @@ namespace CineLog.Views.Helper
                 var checkBox = new CheckBox
                 {
                     IsChecked = DatabaseHandler.IsMovieInList(list_id, Id),
-                    Margin = new Thickness(0, 0, 2, 0)
+                    Margin = new Thickness(0, 0, 2, 0),
+                    VerticalAlignment = VerticalAlignment.Center
                 };
 
-                checkBox.IsCheckedChanged += (sender, e) => 
+                checkBox.IsCheckedChanged += (sender, e) =>
                 {
                     var isChecked = checkBox.IsChecked ?? false;
                     OnListCheckChanged(list_id, isChecked);
@@ -156,13 +157,14 @@ namespace CineLog.Views.Helper
                         Children =
                         {
                             checkBox,
-                            new TextBlock 
-                            { 
+                            new TextBlock
+                            {
                                 Text = DatabaseHandler.GetListName(list_id),
                                 VerticalAlignment = VerticalAlignment.Center
                             }
                         }
                     },
+                    StaysOpenOnClick = true // this is critical!
                 };
 
                 listSubMenu.Items.Add(menuItem);
