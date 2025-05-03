@@ -15,6 +15,11 @@ namespace CineLog.Views
         private List<CheckBox>? _genreCheckBoxes;
         private List<CheckBox>? _companyCheckBoxes;
 
+        public FilterModal()
+        {
+            throw new InvalidOperationException("This constructor is only for Avalonia XAML loader compatibility.");
+        }
+
         public FilterModal(DatabaseHandler.FilterSettings filterSettings)
         {
             InitializeComponent();
