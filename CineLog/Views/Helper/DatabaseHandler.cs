@@ -13,7 +13,7 @@ namespace CineLog.Views.Helper
         private static readonly string dbPath = "/home/legion/CLionProjects/pyScraper/scraper/cinelog.db";
         private static readonly string connectionString = $"Data Source={dbPath};Version=3;";
 
-        public static List<Movie> GetMovies(string? list_uuid = null, int limit = -1, int offset = 0, FilterSettings? filterSettings = null)
+        public static List<Movie> GetMovies(SQLQuerier sqlQuerier, FilterSettings? filterSettings = null)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
@@ -42,12 +42,12 @@ namespace CineLog.Views.Helper
                 FROM titles_table t");
 
             // If list
-            if (!string.IsNullOrEmpty(list_uuid))
+            if (!string.IsNullOrEmpty(sqlQuerier!.List_uuid))
             {
                 joinClauses.Add("JOIN list_movies_table lm ON t.title_id = lm.movie_id");
                 joinClauses.Add("JOIN lists_table l ON lm.list_id = l.uuid");
                 whereClauses.Add("l.uuid = @ListId");
-                parameters.Add("ListId", list_uuid);
+                parameters.Add("ListId", sqlQuerier.List_uuid);
             }
             else whereClauses.Add("1 = 1");
 
@@ -62,8 +62,8 @@ namespace CineLog.Views.Helper
             else query.Append("\nORDER BY t.created_on DESC");
 
             query.Append("\nLIMIT @Limit OFFSET @Offset");
-            parameters.Add("Limit", limit);
-            parameters.Add("Offset", offset);
+            parameters.Add("Limit", sqlQuerier.Limit);
+            parameters.Add("Offset", sqlQuerier.Offset);
 
             // Console.WriteLine("Generated SQL Query:");
             // Console.WriteLine(query.ToString());
@@ -108,6 +108,30 @@ namespace CineLog.Views.Helper
                 joins.Add("JOIN companies_table c ON c.id = tc.companies_id");
                 whereClauses.Add("c.id IN @Companies");
                 parameters.Add("Companies", filterSettings.Company.Select(c => c.Item1).ToList());
+            }
+
+            if (filterSettings.Name is { Count: > 0 })
+            {
+                joins.Add("LEFT JOIN title_cast ts2 ON ts2.title_id = t.title_id");
+                joins.Add("LEFT JOIN cast_table cast_n ON cast_n.id = ts2.cast_id");
+
+                joins.Add("LEFT JOIN title_director td2 ON td2.title_id = t.title_id");
+                joins.Add("LEFT JOIN directors_table dir_n ON dir_n.id = td2.directors_id");
+
+                joins.Add("LEFT JOIN title_writer tw2 ON tw2.title_id = t.title_id");
+                joins.Add("LEFT JOIN writers_table wri_n ON wri_n.id = tw2.writers_id");
+
+                joins.Add("LEFT JOIN title_creator tcr2 ON tcr2.title_id = t.title_id");
+                joins.Add("LEFT JOIN creators_table cr_n ON cr_n.id = tcr2.creators_id");
+
+                whereClauses.Add(@"(
+                    cast_n.id IN @Names OR
+                    dir_n.id IN @Names OR
+                    wri_n.id IN @Names OR
+                    cr_n.id IN @Names
+                )");
+
+                parameters.Add("Names", filterSettings.Name.Select(n => n.Item1).ToList());
             }
 
             if (!string.IsNullOrEmpty(filterSettings.Type))
@@ -494,12 +518,20 @@ namespace CineLog.Views.Helper
             public List<Tuple<string, string>>? Genre { get; set; } = [];
             public int YearStart { get; set; } = 1874;
             public int YearEnd { get; set; } = DateTime.Now.Year + 1;
-            public List<Tuple<string, string>>? Company { get; set; }
+            public List<Tuple<string, string>>? Company { get; set; } = [];
             public string? Type { get; set; }
             public string? SearchTerm { get; set; }
             public string? SortBy { get; set; } = "created_on DESC";
+            public List<Tuple<string, string>>? Name { get; set; } = [];
 
             public FilterSettings() { }
+        }
+
+        public class SQLQuerier
+        {
+            public string? List_uuid { get; set; }
+            public int Limit { get; set; } = -1;
+            public int Offset { get; set; } = 0;
         }
     }
 }

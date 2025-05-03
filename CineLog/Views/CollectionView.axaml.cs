@@ -8,6 +8,7 @@ using Avalonia.Media;
 using Avalonia.Controls.Documents;
 using Avalonia.Layout;
 using System.Collections.Generic;
+using System.IO;
 
 namespace CineLog.Views
 {
@@ -19,6 +20,7 @@ namespace CineLog.Views
         private WrapPanel? _moviesContainer;
         private ScrollViewer? _scrollViewer;
         private DatabaseHandler.FilterSettings filterSettings = new();
+        private Dictionary<string, Action<string, string>> _prefixHandlers = [];
 
         public CollectionView(string viewName)
         {
@@ -43,11 +45,24 @@ namespace CineLog.Views
             LoadNextPage();
             _scrollViewer.ScrollChanged += (sender, e) => OnScrollChanged();
             SortComboBox.SelectionChanged += SortComboBox_SelectionChanged;
+
+            _prefixHandlers = new Dictionary<string, Action<string, string>>
+            {
+                ["in"] = HandleInterest,
+                ["nm"] = HandleName,
+                ["co"] = HandleCompany,
+            };
         }
 
         private void LoadNextPage()
         {
-            var movies = DatabaseHandler.GetMovies(viewName, count, _currentOffset, filterSettings);
+            var sqlQuery = new DatabaseHandler.SQLQuerier {
+                List_uuid = viewName,
+                Limit = count,
+                Offset = _currentOffset
+            };
+
+            var movies = DatabaseHandler.GetMovies(sqlQuery, filterSettings);
 
             if (movies.Count == 0) return;
 
@@ -151,7 +166,7 @@ namespace CineLog.Views
                         CornerRadius = new CornerRadius(8),
                         Tag = id
                     };
-                    // button.Click += 
+                    button.Click += FilterBySpecific;
                     panel.Children.Add(button);
                 }
             }
@@ -168,6 +183,12 @@ namespace CineLog.Views
             detailsBorder.IsVisible = true;
 
             this.FindControl<Button>("Calendar")!.Tag = movie.Id;
+        }
+
+        private void RenewList()
+        {
+            _moviesContainer?.Children.Clear();
+            _currentOffset = 0;
         }
 
         #region Buttons
@@ -214,6 +235,7 @@ namespace CineLog.Views
 
             foreach (var genre in filterSettings.Genre!) AddFilterChip("Genre", genre.Item2);
             foreach (var company in filterSettings.Company!) AddFilterChip("Company", company.Item2);
+            foreach (var name in filterSettings.Name!) AddFilterChip("Name", name.Item2);
 
             if (!string.IsNullOrWhiteSpace(filterSettings.Type)) AddFilterChip("Type", filterSettings.Type);
             if (!string.IsNullOrWhiteSpace(filterSettings.SearchTerm)) AddFilterChip("SearchTerm", filterSettings.SearchTerm);
@@ -286,6 +308,9 @@ namespace CineLog.Views
                     case "Company":
                         filterSettings.Company?.RemoveAll(c => c.Item2 == value);
                         break;
+                    case "Name":
+                        filterSettings.Name?.RemoveAll(c => c.Item2 == value);
+                        break;
                     case "Type":
                         if (filterSettings.Type == value) filterSettings.Type = null;
                         break;
@@ -316,15 +341,44 @@ namespace CineLog.Views
             if (sender is ComboBox comboBox && comboBox.SelectedItem is ComboBoxItem item)
             {
                 filterSettings.SortBy = item.Tag!.ToString();
-                RenewList();
-                LoadNextPage();
+                ApplyFilter();
             }
         }
 
-        private void RenewList()
+        private void FilterBySpecific(object? sender, RoutedEventArgs e)
         {
-            _moviesContainer?.Children.Clear();
-            _currentOffset = 0;
+            if (sender is Button btn) {
+                string id = btn.Tag!.ToString()!;
+                string prefix = id[..2];
+                string name = btn.Content!.ToString()!;
+
+                if (_prefixHandlers.TryGetValue(prefix, out var handler))
+                {
+                    handler(name, id);
+                    UpdateFilterChip();
+                    ApplyFilter();
+                }
+                else
+                {
+                    Console.WriteLine("Unknown button type: " + id);
+                    return;
+                }
+            }
+        }
+
+        private void HandleInterest(string name, string id)
+        {
+            filterSettings.Genre!.Add(new Tuple<string, string>(id, name));
+        }
+
+        private void HandleName(string name, string id)
+        {
+            filterSettings.Name!.Add(new Tuple<string, string>(id, name));
+        }
+
+        private void HandleCompany(string name, string id)
+        {
+            filterSettings.Company!.Add(new Tuple<string, string>(id, name));
         }
 
         #endregion

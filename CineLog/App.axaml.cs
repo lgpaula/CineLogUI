@@ -112,16 +112,19 @@ namespace CineLog
         {
             Thread infoGatherer = new(async () =>
             {
-                var lists = DatabaseHandler.GetListsFromDatabase();
-                foreach (var (list_uuid, _) in lists)
+                var sqlQuery = new DatabaseHandler.SQLQuerier();
+                var custom_lists = DatabaseHandler.GetListsFromDatabase();
+                foreach (var (list_uuid, _) in custom_lists)
                 {
-                    var titles = DatabaseHandler.GetMovies(list_uuid);
+                    sqlQuery.List_uuid = list_uuid;
+                    var titles = DatabaseHandler.GetMovies(sqlQuery);
                     foreach (var title in titles)
                     {
                         await DatabaseHandler.UpdateTitleInfo(title.Id);
                     }
                 }
-                var dbTitles = DatabaseHandler.GetMovies();
+                sqlQuery.List_uuid = null;
+                var dbTitles = DatabaseHandler.GetMovies(sqlQuery);
                 foreach (var title in dbTitles)
                 {
                     await DatabaseHandler.UpdateTitleInfo(title.Id);
