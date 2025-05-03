@@ -249,6 +249,13 @@ namespace CineLog.Views
 
         private void AddFilterChip(string source, string filterText)
         {
+            var tag = (source + filterText).ToString();
+
+            foreach (var child in FilterChipPanel.Children)
+            {
+                if (child is Control control && control.Tag?.ToString() == tag) return;
+            }
+
             var border = new Border
             {
                 Background = Brushes.LightGray,
@@ -256,6 +263,7 @@ namespace CineLog.Views
                 Margin = new Thickness(5),
                 Padding = new Thickness(8, 4, 8, 4),
                 VerticalAlignment = VerticalAlignment.Center,
+                Tag = tag,
                 Child = new StackPanel
                 {
                     Orientation = Orientation.Horizontal,
