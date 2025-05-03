@@ -108,10 +108,12 @@ namespace CineLog
             _pythonServerProcess?.Dispose();
         }
 
-        private static void StartWorkerThreads() 
+        private static void StartWorkerThreads()
         {
-            Thread infoGatherer = new(async () =>
+            Thread infoGatherer = new(() =>
             {
+                WaitForFlaskReady().GetAwaiter().GetResult();
+
                 var sqlQuery = new DatabaseHandler.SQLQuerier();
                 var custom_lists = DatabaseHandler.GetListsFromDatabase();
                 foreach (var (list_uuid, _) in custom_lists)
@@ -120,14 +122,14 @@ namespace CineLog
                     var titles = DatabaseHandler.GetMovies(sqlQuery);
                     foreach (var title in titles)
                     {
-                        await DatabaseHandler.UpdateTitleInfo(title.Id);
+                        DatabaseHandler.UpdateTitleInfo(title.Id).GetAwaiter().GetResult();
                     }
                 }
                 sqlQuery.List_uuid = null;
                 var dbTitles = DatabaseHandler.GetMovies(sqlQuery);
                 foreach (var title in dbTitles)
                 {
-                    await DatabaseHandler.UpdateTitleInfo(title.Id);
+                    DatabaseHandler.UpdateTitleInfo(title.Id).GetAwaiter().GetResult();
                 }
             })
             {
