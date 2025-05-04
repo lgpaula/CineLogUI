@@ -116,9 +116,9 @@ namespace CineLog
 
                 var sqlQuery = new DatabaseHandler.SQLQuerier();
                 var custom_lists = DatabaseHandler.GetListsFromDatabase();
-                foreach (var (list_uuid, _) in custom_lists)
+                foreach (var list in custom_lists)
                 {
-                    sqlQuery.List_uuid = list_uuid;
+                    sqlQuery.List_uuid = list.Uuid;
                     var titles = DatabaseHandler.GetMovies(sqlQuery);
                     foreach (var title in titles)
                     {

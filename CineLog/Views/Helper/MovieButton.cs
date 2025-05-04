@@ -132,13 +132,13 @@ namespace CineLog.Views.Helper
             var calendarMenuItem = new MenuItem { Header = "Add to Calendar" };
 
             var listSubMenu = new MenuItem { Header = "Add/Remove from Lists" };
-            var listsInDb = DatabaseHandler.GetListsFromDatabase();
+            var customLists = DatabaseHandler.GetListsFromDatabase();
 
-            foreach (var (_, list_id) in listsInDb)
+            foreach (var list in customLists)
             {
                 var checkBox = new CheckBox
                 {
-                    IsChecked = DatabaseHandler.IsMovieInList(list_id, Id),
+                    IsChecked = DatabaseHandler.IsMovieInList(list.Uuid!, Id),
                     Margin = new Thickness(0, 0, 2, 0),
                     VerticalAlignment = VerticalAlignment.Center
                 };
@@ -146,7 +146,7 @@ namespace CineLog.Views.Helper
                 checkBox.IsCheckedChanged += (sender, e) =>
                 {
                     var isChecked = checkBox.IsChecked ?? false;
-                    OnListCheckChanged(list_id, isChecked);
+                    OnListCheckChanged(list, isChecked);
                 };
 
                 var menuItem = new MenuItem
@@ -159,7 +159,7 @@ namespace CineLog.Views.Helper
                             checkBox,
                             new TextBlock
                             {
-                                Text = DatabaseHandler.GetListName(list_id),
+                                Text = DatabaseHandler.GetListName(list.Uuid!),
                                 VerticalAlignment = VerticalAlignment.Center
                             }
                         }
@@ -176,18 +176,12 @@ namespace CineLog.Views.Helper
             return contextMenu;
         }
 
-        private void OnListCheckChanged(string list_id, bool isChecked)
+        private void OnListCheckChanged(DatabaseHandler.CustomList list, bool isChecked)
         {
-            if (isChecked)
-            {
-                DatabaseHandler.AddMovieToList(list_id, Id);
-            }
-            else
-            {
-                DatabaseHandler.RemoveMovieFromList(list_id, Id);
-            }
+            if (isChecked) DatabaseHandler.AddMovieToList(list.Uuid!, Id);
+            else DatabaseHandler.RemoveMovieFromList(list.Uuid!, Id);
 
-            EventAggregator.Instance.Publish("ListUpdated", DatabaseHandler.GetListName(list_id), list_id);
+            EventAggregator.Instance.Publish("ListUpdated", list);
         }
 
         public Border GetImageBorder()

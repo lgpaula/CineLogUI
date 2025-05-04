@@ -197,9 +197,9 @@ namespace CineLog.Views.Helper
 
 #region List related
 
-        public static List<(string name, string uuid)> GetListsFromDatabase()
+        public static List<CustomList> GetListsFromDatabase()
         {
-            var lists = new List<(string, string)>();
+            var lists = new List<CustomList>();
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
@@ -213,7 +213,7 @@ namespace CineLog.Views.Helper
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
-                lists.Add((reader.GetString(0), reader.GetString(1)));
+                lists.Add(new CustomList(reader.GetString(0), reader.GetString(1)));
             }
 
             return lists;
@@ -349,7 +349,7 @@ namespace CineLog.Views.Helper
                 .ToDictionary(g => g.Key, g => g.Select(r => r.title_id).ToList());
         }
 
-        public static List<string> CreateNewList() 
+        public static CustomList CreateNewList() 
         {
             string listName = "My List";
             string uuid = GetNewListUuid();
@@ -358,7 +358,7 @@ namespace CineLog.Views.Helper
             connection.Open();
             connection.Execute("INSERT INTO lists_table (uuid, name) VALUES (@id, @name)", new {id = uuid, name = listName });
 
-            return [listName, uuid];
+            return new CustomList(listName, uuid);
         }
 
         private static string GetNewListUuid()
@@ -375,13 +375,14 @@ namespace CineLog.Views.Helper
             connection.Execute("DELETE FROM lists_table WHERE uuid = @ListId", new { ListId = listId });
         }
 
-        public static void UpdateListName(string oldName, string newName)
+        public static void UpdateListName(CustomList list, string newName)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
+            var uuid = list.Uuid;
 
-            string query = "UPDATE lists_table SET name = @newName WHERE name = @oldName";
-            connection.Execute(query, new { newName, oldName });
+            string query = "UPDATE lists_table SET name = @newName WHERE uuid = @uuid";
+            connection.Execute(query, new { newName, uuid });
         }
 
         internal static object GetListUuid(string listName)
@@ -532,6 +533,12 @@ namespace CineLog.Views.Helper
             public string? List_uuid { get; set; }
             public int Limit { get; set; } = -1;
             public int Offset { get; set; } = 0;
+        }
+
+        public class CustomList(string listName, string? uuid = null)
+        {
+            public string? Name { get; set; } = listName;
+            public string? Uuid { get; set; } = uuid;
         }
     }
 }

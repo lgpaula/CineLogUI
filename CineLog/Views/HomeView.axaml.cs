@@ -38,22 +38,24 @@ namespace CineLog.Views
         {
             _panelsList.Add(this.FindControl<StackPanel>("CollectionContainer")!);
 
-            LoadListUI("CollectionContainer", null);
+            var collection = new DatabaseHandler.CustomList("CollectionContainer");
+
+            LoadListUI(collection);
 
             var lists = DatabaseHandler.GetListsFromDatabase();
-            foreach (var (list_name, list_uuid) in lists)
+            foreach (var list in lists)
             {
-                LoadListUI(list_name, list_uuid);
+                LoadListUI(list);
             }
         }
 
-        private void LoadListUI(string listName, string? listId)
+        private void LoadListUI(DatabaseHandler.CustomList customList)
         {
-            StackPanel? panel = _panelsList.FirstOrDefault(p => p.Name == (listId ?? listName));
-            panel ??= CreateListPanel(listName, listId ?? listName);
+            StackPanel? panel = _panelsList.FirstOrDefault(p => p.Name == (customList.Uuid ?? customList.Name));
+            panel ??= CreateListPanel(customList);
 
             var sqlQuery = new DatabaseHandler.SQLQuerier {
-                List_uuid = listId,
+                List_uuid = customList.Uuid,
                 Limit = 20
             };
 
@@ -89,7 +91,7 @@ namespace CineLog.Views
             }
         }
 
-        private StackPanel CreateListPanel(string listName, string listId)
+        private StackPanel CreateListPanel(DatabaseHandler.CustomList customList)
         {
             var listsContainer = this.FindControl<StackPanel>("CustomListsContainer")!;
 
@@ -100,7 +102,7 @@ namespace CineLog.Views
 
             TextBox listTitle = new()
             {
-                Text = listName,
+                Text = customList.Name,
                 Foreground = Brushes.White,
                 FontSize = 16,
                 Background = Brushes.Transparent,
@@ -110,17 +112,17 @@ namespace CineLog.Views
 
             listTitle.LostFocus += (s, e) =>
             {
-                if (listTitle.Text != listName)
+                if (listTitle.Text != customList.Name)
                 {
-                    DatabaseHandler.UpdateListName(listName, listTitle.Text);
-                    listName = listTitle.Text;
+                    DatabaseHandler.UpdateListName(customList, listTitle.Text!);
+                    customList.Name = listTitle.Text;
                 }
             };
 
             StackPanel listPanel = new()
             {
                 Orientation = Orientation.Horizontal,
-                Name = listId
+                Name = customList.Uuid ?? customList.Name
             };
 
             ScrollViewer scrollViewer = new()
@@ -139,7 +141,7 @@ namespace CineLog.Views
             {
                 Content = "See all",
                 FontSize = 16,
-                Tag = listId,
+                Tag = customList.Uuid ?? customList.Name,
                 Foreground = Brushes.White,
                 Background = Brushes.Transparent,
                 BorderBrush = Brushes.White
@@ -150,7 +152,7 @@ namespace CineLog.Views
             {
                 Content = "Delete",
                 FontSize = 16,
-                Tag = listId,
+                Tag = customList.Uuid ?? customList.Name,
                 Foreground = Brushes.White,
                 Background = Brushes.Transparent,
                 BorderBrush = Brushes.White,
@@ -221,7 +223,8 @@ namespace CineLog.Views
             private void AddListToTable(object sender, RoutedEventArgs e)
             {
                 var list = DatabaseHandler.CreateNewList();
-                CreateListPanel(list[0], list[1]);
+                Console.WriteLine("list: " + list);
+                CreateListPanel(list);
             }
 
             private void DeleteList(object? sender, RoutedEventArgs e)
