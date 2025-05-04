@@ -99,9 +99,10 @@
                     <!-- Quantity -->
                     <TextBlock Grid.Row="10" Grid.Column="0" VerticalAlignment="Center">Quantity</TextBlock>
                     <StackPanel Grid.Row="10" Grid.Column="1" Orientation="Horizontal" Spacing="5">
-                        <Button Content="-" Foreground="White" VerticalAlignment="Center"/>
-                        <TextBlock Classes="CustomTextBox" x:Name="Qantity" Width="20" Text="50" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <Button Content="+" Foreground="White" VerticalAlignment="Center"/>
+                        <Button x:Name="DecreaseButton" Content="-" Foreground="White" VerticalAlignment="Center"/>
+                        <TextBlock Classes="CustomTextBox" x:Name="Quantity" Width="40" Text="50" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <Button x:Name="IncreaseButton" Content="+" Foreground="White" VerticalAlignment="Center"/>
+                        <TextBlock Classes="TimeEstimationTextBox" x:Name="Time" Text="Time estimation: 10 seconds" Foreground="Red" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     </StackPanel>
                     <Rectangle Grid.Row="11" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
                 </Grid>

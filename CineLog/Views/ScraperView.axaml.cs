@@ -22,6 +22,9 @@ namespace CineLog.Views
         {
             InitializeComponent();
             AttachedToVisualTree += OnLoaded;
+
+            IncreaseButton.Click += (_, _) => ChangeQuantity(50);
+            DecreaseButton.Click += (_, _) => ChangeQuantity(-50);
         }
 
         private void OnLoaded(object? sender, VisualTreeAttachmentEventArgs e)
@@ -147,6 +150,20 @@ namespace CineLog.Views
             var stringCriteria = JsonConvert.SerializeObject(dict);
 
             return stringCriteria;
+        }
+
+        private void ChangeQuantity(int delta)
+        {
+            if (int.TryParse(Quantity.Text, out int currentQuantity))
+            {
+                currentQuantity += delta;
+                currentQuantity = Math.Clamp(currentQuantity, 50, 1000);
+
+                Quantity.Text = currentQuantity.ToString();
+
+                int timeSeconds = currentQuantity / 50 * 10;
+                Time.Text = $"Time estimation: {timeSeconds} seconds";
+            }
         }
     }
 
