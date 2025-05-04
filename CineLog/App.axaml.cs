@@ -22,7 +22,7 @@ namespace CineLog
         {
             AvaloniaXamlLoader.Load(this);
             StartPythonServer();
-            _ = StartWorkerThreadsAsync();
+            // _ = StartWorkerThreadsAsync();
         }
 
         public override void OnFrameworkInitializationCompleted()

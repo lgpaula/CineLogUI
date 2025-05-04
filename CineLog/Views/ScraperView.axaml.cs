@@ -4,57 +4,89 @@ using System.Collections.Generic;
 using Avalonia.Controls;
 using Newtonsoft.Json;
 using CineLog.Views.Helper;
+using Avalonia;
+using System;
 
 namespace CineLog.Views
 {
     public partial class ScraperView : UserControl
     {
-        private readonly List<CheckBox> _genreCheckBoxes = null!;
-        private readonly List<CheckBox> _companyCheckBoxes = null!;
-        private readonly List<CheckBox> _typeCheckBoxes = null!;
+        private List<CheckBox>? _genreCheckBoxes;
+        private List<CheckBox>? _companyCheckBoxes;
+        private List<CheckBox>? _typeCheckBoxes;
+        private List<IdNameItem>? _allCompanyItems;
+        private int _loadedCompanyCount = 0;
+        private const int CompanyBatchSize = 50;
 
         public ScraperView()
         {
             InitializeComponent();
-
-            _genreCheckBoxes = GetCheckBoxes(GenresPanel);
-            _typeCheckBoxes = GetCheckBoxes(TitleTypePanel);
-
-            _companyCheckBoxes = AddCheckboxesToPanel(CompaniesPanel, DatabaseHandler.GetAllItems("companies_table"));
+            AttachedToVisualTree += OnLoaded;
         }
 
-        private static List<CheckBox> AddCheckboxesToPanel(WrapPanel panel, IEnumerable<IdNameItem> items)
+        private void OnLoaded(object? sender, VisualTreeAttachmentEventArgs e)
         {
-            panel.Children.Clear();
-            var checkBoxes = new List<CheckBox>();
+            var genresPanel = this.FindControl<WrapPanel>("GenresPanel");
+            var typePanel = this.FindControl<WrapPanel>("TitleTypePanel");
+            var companiesPanel = this.FindControl<WrapPanel>("CompaniesPanel");
 
-            foreach (var item in items.OrderBy(i => i.Name))
+            _genreCheckBoxes = GetCheckBoxes(genresPanel!);
+            _typeCheckBoxes = GetCheckBoxes(typePanel!);
+            _allCompanyItems = [.. DatabaseHandler.GetAllItems("companies_table").OrderBy(i => i.Name)];
+            AddCompanyCheckboxesChunk();
+            CompanyScrollViewer.ScrollChanged += OnCompanyScrollChanged!;
+        }
+
+        private void AddCompanyCheckboxesChunk()
+        {
+            int remaining = _allCompanyItems!.Count - _loadedCompanyCount;
+            if (remaining <= 0) return;
+
+            int toLoad = Math.Min(CompanyBatchSize, remaining);
+            var nextItems = _allCompanyItems
+                .Skip(_loadedCompanyCount)
+                .Take(toLoad);
+
+            foreach (var item in nextItems)
             {
                 var cb = new CheckBox
                 {
                     Content = item.Name,
                     Tag = item.Id,
-                    Margin = new Avalonia.Thickness(5),
+                    Margin = new Thickness(5),
                     Width = 300
                 };
-                checkBoxes.Add(cb);
-                panel.Children.Add(cb);
+                CompaniesPanel.Children.Add(cb);
             }
 
-            return checkBoxes;
+            _loadedCompanyCount += toLoad;
+        }
+
+        private void OnCompanyScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (e.Source is not ScrollViewer scroll) return;
+
+            double offset = scroll.Offset.Y;
+            double max = scroll.Extent.Height - scroll.Viewport.Height;
+
+            if (max - offset < 200)
+            {
+                AddCompanyCheckboxesChunk();
+            }
         }
 
         private void OnScrapeButtonClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            var types = GetSelectedCheckBoxes(_typeCheckBoxes);
+            var types = GetSelectedCheckBoxes(_typeCheckBoxes!);
             if (types.Count == 0)
             {
-                types = [.. _typeCheckBoxes.Select(cb => cb.Content?.ToString() ?? "")];
+                types = [.. _typeCheckBoxes!.Select(cb => cb.Content?.ToString() ?? "")];
             }
+            _companyCheckBoxes = GetCheckBoxes(CompaniesPanel!);
             var criteria = new ScraperCriteria
             {
-                Genres = GetSelectedCheckBoxes(_genreCheckBoxes),
-                Companies = GetSelectedIds(_companyCheckBoxes),
+                Genres = GetSelectedCheckBoxes(_genreCheckBoxes!),
+                Companies = GetSelectedIds(_companyCheckBoxes!),
                 Types = types,
                 YearFrom = TryParseInt(YearStart.Text),
                 YearTo = TryParseInt(YearEnd.Text),

@@ -3,12 +3,10 @@ using Avalonia.Interactivity;
 using System;
 using CineLog.Views.Helper;
 using Avalonia;
-using System.Linq;
 using Avalonia.Media;
 using Avalonia.Controls.Documents;
 using Avalonia.Layout;
 using System.Collections.Generic;
-using System.IO;
 
 namespace CineLog.Views
 {
@@ -26,16 +24,16 @@ namespace CineLog.Views
         {
             this.viewName = viewName;
             InitializeComponent();
-            Init();
+            AttachedToVisualTree += OnLoaded;
         }
 
         public CollectionView()
         {
             InitializeComponent();
-            Init();
+            AttachedToVisualTree += OnLoaded;
         }
 
-        private void Init()
+        private void OnLoaded(object? sender, VisualTreeAttachmentEventArgs e)
         {
             _moviesContainer = this.FindControl<WrapPanel>("CollectionWrapPanel")
                         ?? throw new NullReferenceException("WrapPanel not found in XAML");
