@@ -115,27 +115,33 @@ namespace CineLog
                 WaitForFlaskReady().GetAwaiter().GetResult();
 
                 var sqlQuery = new DatabaseHandler.SQLQuerier();
-                var custom_lists = DatabaseHandler.GetListsFromDatabase();
-                foreach (var list in custom_lists)
-                {
-                    sqlQuery.List_uuid = list.Uuid;
-                    var titles = DatabaseHandler.GetMovies(sqlQuery);
-                    foreach (var title in titles)
-                    {
-                        DatabaseHandler.UpdateTitleInfo(title.Id).GetAwaiter().GetResult();
-                    }
-                }
-                sqlQuery.List_uuid = null;
                 var dbTitles = DatabaseHandler.GetMovies(sqlQuery);
                 foreach (var title in dbTitles)
                 {
-                    DatabaseHandler.UpdateTitleInfo(title.Id).GetAwaiter().GetResult();
+                    _ = DatabaseHandler.UpdateTitleInfo(title.Id);
                 }
             })
             {
-                IsBackground = true,
+                IsBackground = true
             };
-            infoGatherer.Start();
+
+            Thread episodeFetcher = new(() =>
+            {
+                WaitForFlaskReady().GetAwaiter().GetResult();
+
+                var sqlQuery = new DatabaseHandler.SQLQuerier();
+                var dbTitles = DatabaseHandler.GetMovies(sqlQuery);
+                foreach (var title in dbTitles)
+                {
+                    _ = DatabaseHandler.FetchEpisodes(title.Id);
+                }
+            }) 
+            {
+                IsBackground = true
+            };
+
+            // infoGatherer.Start();
+            // episodeFetcher.Start();
         }
     }
 }

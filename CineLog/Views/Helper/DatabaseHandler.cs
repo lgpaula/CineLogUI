@@ -460,6 +460,25 @@ namespace CineLog.Views.Helper
             }
         }
 
+        public static async Task FetchEpisodes(string id)
+        {
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            const string query = @"
+                SELECT title_type, season_count, year_end
+                FROM titles_table
+                WHERE title_id = @id";
+
+            var (TitleType, SeasonCount, YearEnd) = connection.QuerySingleOrDefault<(string TitleType, string SeasonCount, int? YearEnd)>(query, new { id });
+
+            if (TitleType == "Movie") return;
+            if (YearEnd is not null) return;
+
+            Console.WriteLine("Fetching: " + GetMovieTitle(id));
+            await ServerHandler.FetchEpisodesDates(id, SeasonCount);
+        }
+
         internal static string GetPosterUrl(string id)
         {
             using var connection = new SQLiteConnection(connectionString);
