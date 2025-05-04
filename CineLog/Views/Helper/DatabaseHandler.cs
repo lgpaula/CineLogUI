@@ -475,7 +475,6 @@ namespace CineLog.Views.Helper
             if (TitleType == "Movie") return;
             if (YearEnd is not null) return;
 
-            Console.WriteLine("Fetching: " + GetMovieTitle(id));
             await ServerHandler.FetchEpisodesDates(id, SeasonCount);
         }
 
