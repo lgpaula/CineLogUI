@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System;
 using CineLog.Views.Helper;
 using System.Threading;
+using System.Linq;
 
 namespace CineLog
 {
@@ -21,7 +22,7 @@ namespace CineLog
         {
             AvaloniaXamlLoader.Load(this);
             StartPythonServer();
-            StartWorkerThreads();
+            _ = StartWorkerThreadsAsync();
         }
 
         public override void OnFrameworkInitializationCompleted()
@@ -108,40 +109,60 @@ namespace CineLog
             _pythonServerProcess?.Dispose();
         }
 
-        private static void StartWorkerThreads()
+        private static async Task StartWorkerThreadsAsync()
         {
-            Thread infoGatherer = new(() =>
+            const int maxConcurrentTasks = 2;
+
+            var infoGatherer = Task.Run(async () =>
             {
-                WaitForFlaskReady().GetAwaiter().GetResult();
+                await WaitForFlaskReady();
 
                 var sqlQuery = new DatabaseHandler.SQLQuerier();
                 var dbTitles = DatabaseHandler.GetMovies(sqlQuery);
-                foreach (var title in dbTitles)
-                {
-                    _ = DatabaseHandler.UpdateTitleInfo(title.Id);
-                }
-            })
-            {
-                IsBackground = true
-            };
 
-            Thread episodeFetcher = new(() =>
+                using var throttler = new SemaphoreSlim(maxConcurrentTasks);
+                var tasks = dbTitles.Select(async title =>
+                {
+                    await throttler.WaitAsync();
+                    try
+                    {
+                        await DatabaseHandler.UpdateTitleInfo(title.Id);
+                    }
+                    finally
+                    {
+                        throttler.Release();
+                    }
+                });
+
+                await Task.WhenAll(tasks);
+            });
+
+            await infoGatherer;
+            var episodeFetcher = Task.Run(async () =>
             {
-                WaitForFlaskReady().GetAwaiter().GetResult();
+                await WaitForFlaskReady();
 
                 var sqlQuery = new DatabaseHandler.SQLQuerier();
                 var dbTitles = DatabaseHandler.GetMovies(sqlQuery);
-                foreach (var title in dbTitles)
-                {
-                    _ = DatabaseHandler.FetchEpisodes(title.Id);
-                }
-            }) 
-            {
-                IsBackground = true
-            };
 
-            // infoGatherer.Start();
-            // episodeFetcher.Start();
+                using var throttler = new SemaphoreSlim(maxConcurrentTasks);
+                var tasks = dbTitles.Select(async title =>
+                {
+                    await throttler.WaitAsync();
+                    try
+                    {
+                        await DatabaseHandler.FetchEpisodes(title.Id);
+                    }
+                    finally
+                    {
+                        throttler.Release();
+                    }
+                });
+
+                await Task.WhenAll(tasks);
+            });
+
+            await episodeFetcher;
         }
     }
 }
