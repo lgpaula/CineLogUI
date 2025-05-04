@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -10,31 +9,18 @@ namespace CineLog.Views
 {
     public partial class ScraperView : UserControl
     {
-        private readonly Button _scrapeButton = null!;
         private readonly List<CheckBox> _genreCheckBoxes = null!;
         private readonly List<CheckBox> _companyCheckBoxes = null!;
         private readonly List<CheckBox> _typeCheckBoxes = null!;
-        private readonly TextBox _yearFrom = null!;
-        private readonly TextBox _yearTo = null!;
-        private readonly TextBox _ratingFrom = null!;
-        private readonly TextBox _ratingTo = null!;
 
         public ScraperView()
         {
             InitializeComponent();
 
-            _scrapeButton = this.FindControl<Button>("scrapeButton") ?? throw new InvalidOperationException("scrapeButton not found");
-            _yearFrom = this.FindControl<TextBox>("yearFrom") ?? throw new InvalidOperationException("yearFrom not found");
-            _yearTo = this.FindControl<TextBox>("yearTo") ?? throw new InvalidOperationException("yearTo not found");
-            _ratingFrom = this.FindControl<TextBox>("ratingFrom") ?? throw new InvalidOperationException("ratingFrom not found");
-            _ratingTo = this.FindControl<TextBox>("ratingTo") ?? throw new InvalidOperationException("ratingTo not found");
+            _genreCheckBoxes = GetCheckBoxes(GenresPanel);
+            _typeCheckBoxes = GetCheckBoxes(TitleTypePanel);
 
-            _genreCheckBoxes = GetCheckBoxes("GenrePanel");
-            _typeCheckBoxes = GetCheckBoxes("TypePanel");
-
-            _scrapeButton.Click += OnScrapeButtonClick;
-
-            _companyCheckBoxes = AddCheckboxesToPanel(CompanyPanel, DatabaseHandler.GetAllItems("companies_table"));
+            _companyCheckBoxes = AddCheckboxesToPanel(CompaniesPanel, DatabaseHandler.GetAllItems("companies_table"));
         }
 
         private static List<CheckBox> AddCheckboxesToPanel(WrapPanel panel, IEnumerable<IdNameItem> items)
@@ -65,10 +51,10 @@ namespace CineLog.Views
                 Genres = GetSelectedCheckBoxes(_genreCheckBoxes),
                 Companies = GetSelectedIds(_companyCheckBoxes),
                 Types = GetSelectedCheckBoxes(_typeCheckBoxes),
-                YearFrom = TryParseInt(_yearFrom.Text),
-                YearTo = TryParseInt(_yearTo.Text),
-                RatingFrom = TryParseFloat(_ratingFrom.Text),
-                RatingTo = TryParseFloat(_ratingTo.Text)
+                YearFrom = TryParseInt(YearStart.Text),
+                YearTo = TryParseInt(YearEnd.Text),
+                RatingFrom = TryParseFloat(MinRating.Text),
+                RatingTo = TryParseFloat(MaxRating.Text)
             };
 
             _ = StartScraping(criteria);
@@ -82,11 +68,9 @@ namespace CineLog.Views
                 .OfType<string>()];
         }
 
-        private List<CheckBox> GetCheckBoxes(string parentName)
+        private static List<CheckBox> GetCheckBoxes(WrapPanel panel)
         {
-            if (this.FindControl<WrapPanel>(parentName) is WrapPanel panel)
-                return [.. panel.Children.OfType<CheckBox>()];
-            return [];
+            return [.. panel.Children.OfType<CheckBox>()];
         }
 
         private static async Task StartScraping(ScraperCriteria criteria)

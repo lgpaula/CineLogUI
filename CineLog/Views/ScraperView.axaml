@@ -12,83 +12,81 @@
 		</Style>
 	</UserControl.Styles>
 
-    <ScrollViewer VerticalScrollBarVisibility="Hidden">
-        <StackPanel Spacing="10">
-            <Expander HorizontalAlignment="Stretch">
-                <Expander.Header>
-                    <TextBlock Text="Genre" Foreground="White" FontSize="20"/>
-                </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Hidden">
-                    <WrapPanel x:Name="GenrePanel">
-                        <CheckBox Content="Action" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Adventure" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Animation" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Biography" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Comedy" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Crime" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Documentary" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Drama" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Family" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Fantasy" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Film-Noir" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Game-Show" Foreground="White" Margin="5"/>
-                        <CheckBox Content="History" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Horror" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Music" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Musical" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Mystery" Foreground="White" Margin="5"/>
-                        <CheckBox Content="News" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Reality-TV" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Romance" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Sci-Fi" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Short" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Sport" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Talk-Show" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Thriller" Foreground="White" Margin="5"/>
-                        <CheckBox Content="War" Foreground="White" Margin="5"/>
-                        <CheckBox Content="Western" Foreground="White" Margin="5"/>
-                    </WrapPanel>
-                </ScrollViewer>
-            </Expander>
+    <DockPanel LastChildFill="True">
+        <!-- Bottom button -->
+        <Button DockPanel.Dock="Bottom" x:Name="scrapeButton" Content="Scrape" Click="OnScrapeButtonClick" HorizontalAlignment="Left" Margin="10"/>
 
-            <Expander HorizontalAlignment="Stretch">
-                <Expander.Header>
-                    <TextBlock Text="Release Year" Foreground="White" FontSize="20"/>
-                </Expander.Header>
-                <StackPanel Orientation="Horizontal" Spacing="5">
-                    <TextBlock Text="From" Foreground="White"/>
-                    <TextBox Classes="CustomTextBox" x:Name="yearFrom" Width="50" Watermark="1874" Foreground="Black" Background="White"/>
-                    <TextBlock Text="To" Foreground="White"/>
-                    <TextBox Classes="CustomTextBox" x:Name="yearTo" Width="50" Watermark="2026" Foreground="Black" Background="White"/>
-                </StackPanel>
-            </Expander>
+        <!-- Scrollable content -->
+        <ScrollViewer Margin="0,0,0,10">
+            <StackPanel>
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                    ColumnDefinitions="150,*" Margin="10">
 
-            <Expander HorizontalAlignment="Stretch">
-                <Expander.Header>
-                    <TextBlock Text="Rating" Foreground="White" FontSize="20"/>
-                </Expander.Header>
-                <StackPanel Orientation="Horizontal" Spacing="5">
-                    <TextBlock Text="From" Foreground="White"/>
-                    <TextBox Classes="CustomTextBox" x:Name="ratingFrom" Width="50" Watermark="0.0" Foreground="Black" Background="White"/>
-                    <TextBlock Text="To" Foreground="White"/>
-                    <TextBox Classes="CustomTextBox" x:Name="ratingTo" Width="50" Watermark="10.0" Foreground="Black" Background="White"/>
-                </StackPanel>
-            </Expander>
+                    <!-- Rating -->
+                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Rating</TextBlock>
+                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="5">
+                        <TextBlock Text="From" Foreground="White" VerticalAlignment="Center"/>
+                        <TextBox Classes="CustomTextBox" x:Name="MinRating" Width="50" Text="0.0" Margin="0,0,10,0"/>
+                        <TextBlock Text="To" Foreground="White" VerticalAlignment="Center"/>
+                        <TextBox Classes="CustomTextBox" x:Name="MaxRating" Width="50" Text="10.0"/>
+                    </StackPanel>
+                    <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
 
-            <Expander HorizontalAlignment="Stretch">
-                <Expander.Header>
-                    <TextBlock Text="Company" Foreground="White" FontSize="20"/>
-                </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="200">
-                    <WrapPanel x:Name="CompanyPanel" />
-                </ScrollViewer> 
-            </Expander>
+                    <!-- Genre -->
+                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Genre</TextBlock>
+                    <ScrollViewer Grid.Row="2" Grid.Column="1" VerticalScrollBarVisibility="Auto" MaxHeight="200">
+                        <WrapPanel x:Name="GenresPanel" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <CheckBox Content="Action" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Adventure" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Animation" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Biography" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Comedy" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Crime" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Documentary" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Drama" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Family" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Fantasy" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Film-Noir" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Game-Show" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="History" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Horror" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Music" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Musical" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Mystery" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="News" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Reality-TV" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Romance" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Sci-Fi" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Short" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Sport" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Talk-Show" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Thriller" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="War" Foreground="White" Margin="5" Width="300"/>
+                            <CheckBox Content="Western" Foreground="White" Margin="5" Width="300"/>
+                        </WrapPanel>
+                    </ScrollViewer>
+                    <Rectangle Grid.Row="3" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
 
-            <Expander HorizontalAlignment="Stretch">
-                <Expander.Header>
-                    <TextBlock Text="Type" Foreground="White" FontSize="20"/>
-                </Expander.Header>
-                    <WrapPanel x:Name="TypePanel">
+                    <!-- Year -->
+                    <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Year release</TextBlock>
+                    <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="5">
+                        <TextBlock Text="From" Foreground="White" VerticalAlignment="Center"/>
+                        <TextBox Classes="CustomTextBox" x:Name="YearStart" Width="50" Margin="0,0,10,0"/>
+                        <TextBlock Text="To" Foreground="White" VerticalAlignment="Center"/>
+                        <TextBox Classes="CustomTextBox" x:Name="YearEnd" Width="50"/>
+                    </StackPanel>
+                    <Rectangle Grid.Row="5" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+
+                    <!-- Company -->
+                    <TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center">Company</TextBlock>
+                    <ScrollViewer Grid.Row="6" Grid.Column="1" VerticalScrollBarVisibility="Auto" MaxHeight="200">
+                        <WrapPanel x:Name="CompaniesPanel" Orientation="Horizontal" HorizontalAlignment="Center"/>
+                    </ScrollViewer>
+                    <Rectangle Grid.Row="7" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+
+                    <!-- Type -->
+                    <TextBlock Grid.Row="8" Grid.Column="0" VerticalAlignment="Center">Type</TextBlock>
+                    <WrapPanel x:Name="TitleTypePanel" Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
                         <CheckBox Content="Movie" Foreground="White" Margin="5"/>
                         <CheckBox Content="Series" Foreground="White" Margin="5"/>
                         <CheckBox Content="Short" Foreground="White" Margin="5"/>
@@ -96,10 +94,9 @@
                         <CheckBox Content="TV Special" Foreground="White" Margin="5"/>
                         <CheckBox Content="TV Mini-Series" Foreground="White" Margin="5"/>
                     </WrapPanel>
-            </Expander>
-
-            <!-- Scrape Button -->
-            <Button x:Name="scrapeButton" Content="scrape" Width="100" Height="40" Foreground="Black" Background="White"/>
-        </StackPanel>
-    </ScrollViewer>
+                    <Rectangle Grid.Row="9" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
 </UserControl>
