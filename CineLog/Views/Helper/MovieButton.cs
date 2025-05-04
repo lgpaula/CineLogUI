@@ -75,7 +75,7 @@ namespace CineLog.Views.Helper
             {
                 Text = Title,
                 Foreground = Brushes.White,
-                FontSize = 16,
+                FontSize = 16 * percentage,
 
                 TextWrapping = TextWrapping.Wrap,
                 TextTrimming = TextTrimming.CharacterEllipsis,
