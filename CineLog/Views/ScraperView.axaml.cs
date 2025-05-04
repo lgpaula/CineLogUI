@@ -46,11 +46,16 @@ namespace CineLog.Views
 
         private void OnScrapeButtonClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
+            var types = GetSelectedCheckBoxes(_typeCheckBoxes);
+            if (types.Count == 0)
+            {
+                types = [.. _typeCheckBoxes.Select(cb => cb.Content?.ToString() ?? "")];
+            }
             var criteria = new ScraperCriteria
             {
                 Genres = GetSelectedCheckBoxes(_genreCheckBoxes),
                 Companies = GetSelectedIds(_companyCheckBoxes),
-                Types = GetSelectedCheckBoxes(_typeCheckBoxes),
+                Types = types,
                 YearFrom = TryParseInt(YearStart.Text),
                 YearTo = TryParseInt(YearEnd.Text),
                 RatingFrom = TryParseFloat(MinRating.Text),
@@ -76,7 +81,7 @@ namespace CineLog.Views
         private static async Task StartScraping(ScraperCriteria criteria)
         {
             string stringCriteria = ConvertCriteria(criteria);
-            await Helper.ServerHandler.ScrapeMultipleTitles(stringCriteria);
+            await ServerHandler.ScrapeMultipleTitles(stringCriteria);
         }
 
         private static List<string> GetSelectedCheckBoxes(List<CheckBox> checkBoxes)

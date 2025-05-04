@@ -33,7 +33,7 @@
                     <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
 
                     <!-- Genre -->
-                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Genre</TextBlock>
+                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Genre (Bitwise AND)</TextBlock>
                     <ScrollViewer Grid.Row="2" Grid.Column="1" VerticalScrollBarVisibility="Auto" MaxHeight="200">
                         <WrapPanel x:Name="GenresPanel" Orientation="Horizontal" HorizontalAlignment="Center">
                             <CheckBox Content="Action" Foreground="White" Margin="5" Width="300"/>
@@ -78,14 +78,14 @@
                     <Rectangle Grid.Row="5" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
 
                     <!-- Company -->
-                    <TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center">Company</TextBlock>
+                    <TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center">Company (Bitwise OR)</TextBlock>
                     <ScrollViewer Grid.Row="6" Grid.Column="1" VerticalScrollBarVisibility="Auto" MaxHeight="200">
                         <WrapPanel x:Name="CompaniesPanel" Orientation="Horizontal" HorizontalAlignment="Center"/>
                     </ScrollViewer>
                     <Rectangle Grid.Row="7" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
 
                     <!-- Type -->
-                    <TextBlock Grid.Row="8" Grid.Column="0" VerticalAlignment="Center">Type</TextBlock>
+                    <TextBlock Grid.Row="8" Grid.Column="0" VerticalAlignment="Center">Type (Bitwise OR)</TextBlock>
                     <WrapPanel x:Name="TitleTypePanel" Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
                         <CheckBox Content="Movie" Foreground="White" Margin="5"/>
                         <CheckBox Content="Series" Foreground="White" Margin="5"/>
