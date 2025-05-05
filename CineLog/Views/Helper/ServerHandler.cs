@@ -6,13 +6,13 @@ namespace CineLog.Views.Helper
 {
     public static class ServerHandler
     {
-        public static async Task<string> ScrapeMultipleTitles(string criteria)
+        public static async Task<string> ScrapeMultipleTitles(string criteria, int? quantity)
         {
             using var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(120);
             try
             {
-                var response = await client.GetAsync($"http://127.0.0.1:5000/scrape?criteria={Uri.EscapeDataString(criteria)}");
+                var response = await client.GetAsync($"http://127.0.0.1:5000/scrape?criteria={Uri.EscapeDataString(criteria)}&quantity={quantity}");
                 string result = await response.Content.ReadAsStringAsync();
                 
                 if (response.IsSuccessStatusCode)
