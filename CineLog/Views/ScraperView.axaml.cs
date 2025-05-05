@@ -162,7 +162,7 @@ namespace CineLog.Views
                 Quantity.Text = currentQuantity.ToString();
 
                 int timeSeconds = currentQuantity / 50 * 10;
-                Time.Text = $"Time estimation: {timeSeconds} seconds";
+                Time.Text = $"Estimated time: {timeSeconds} seconds";
             }
         }
     }
