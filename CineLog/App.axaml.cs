@@ -17,12 +17,13 @@ namespace CineLog
     public partial class App : Application
     {
         private Process? _pythonServerProcess;
+        private CancellationTokenSource? _workerTokenSource;
+        private Task? _workerTask;
 
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
             StartPythonServer();
-            // _ = StartWorkerThreadsAsync();
         }
 
         public override void OnFrameworkInitializationCompleted()
@@ -42,8 +43,10 @@ namespace CineLog
                 desktop.Exit += (sender, args) => OnExit(sender!, args);
             }
 
-
             base.OnFrameworkInitializationCompleted();
+
+            _workerTokenSource = new CancellationTokenSource();
+            _workerTask = StartWorkerThreadsAsync(_workerTokenSource.Token);
         }
 
         private void StartPythonServer()
@@ -109,7 +112,16 @@ namespace CineLog
             _pythonServerProcess?.Dispose();
         }
 
-        private static async Task StartWorkerThreadsAsync()
+        public void RestartWorkerThreads()
+        {
+            _workerTokenSource?.Cancel();
+            _workerTokenSource?.Dispose();
+
+            _workerTokenSource = new CancellationTokenSource();
+            _workerTask = StartWorkerThreadsAsync(_workerTokenSource.Token);
+        }
+
+        private static async Task StartWorkerThreadsAsync(CancellationToken token)
         {
             const int maxConcurrentTasks = 2;
 
@@ -123,9 +135,10 @@ namespace CineLog
                 using var throttler = new SemaphoreSlim(maxConcurrentTasks);
                 var tasks = dbTitles.Select(async title =>
                 {
-                    await throttler.WaitAsync();
+                    await throttler.WaitAsync(token);
                     try
                     {
+                        token.ThrowIfCancellationRequested();
                         await DatabaseHandler.UpdateTitleInfo(title.Id);
                     }
                     finally
@@ -135,7 +148,7 @@ namespace CineLog
                 });
 
                 await Task.WhenAll(tasks);
-            });
+            }, token);
 
             await infoGatherer;
             var episodeFetcher = Task.Run(async () =>
@@ -148,9 +161,10 @@ namespace CineLog
                 using var throttler = new SemaphoreSlim(maxConcurrentTasks);
                 var tasks = dbTitles.Select(async title =>
                 {
-                    await throttler.WaitAsync();
+                    await throttler.WaitAsync(token);
                     try
                     {
+                        token.ThrowIfCancellationRequested();
                         await DatabaseHandler.FetchEpisodes(title.Id);
                     }
                     finally
@@ -160,7 +174,7 @@ namespace CineLog
                 });
 
                 await Task.WhenAll(tasks);
-            });
+            }, token);
 
             await episodeFetcher;
         }

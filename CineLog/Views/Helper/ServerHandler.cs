@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Avalonia;
 
 namespace CineLog.Views.Helper
 {
@@ -18,6 +19,12 @@ namespace CineLog.Views.Helper
                 if (response.IsSuccessStatusCode)
                 {
                     Console.WriteLine("ScrapeMultipleTitles completed successfully.");
+                    if (Application.Current is App app)
+                    {
+                        Console.WriteLine("Restarting thread");
+                        app.RestartWorkerThreads();
+
+                    }
                     return result;
                 }
 
