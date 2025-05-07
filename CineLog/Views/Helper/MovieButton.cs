@@ -181,7 +181,7 @@ namespace CineLog.Views.Helper
             if (isChecked) DatabaseHandler.AddMovieToList(list.Uuid!, Id);
             else DatabaseHandler.RemoveMovieFromList(list.Uuid!, Id);
 
-            EventAggregator.Instance.Publish("ListUpdated", list);
+            EventAggregator.Instance.Publish(list);
         }
 
         public Border GetImageBorder()

@@ -1,0 +1,17 @@
+<UserControl x:Class="CineLog.Views.NotificationView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Width="300" Height="100">
+
+    <Border x:Name="Border"
+            CornerRadius="8"
+            Padding="10"
+            Background="DarkBlue"
+            Cursor="Hand">
+        <TextBlock x:Name="MessageText"
+                   Foreground="White"
+                   FontWeight="Bold"
+                   TextWrapping="Wrap"
+                   Text="⚠ Scrape completed"/>
+    </Border>
+</UserControl>

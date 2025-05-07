@@ -22,7 +22,7 @@ namespace CineLog.Views
         public HomeView()
         {
             InitializeComponent();
-            EventAggregator.Instance.Subscribe("ListUpdated", LoadListUI);
+            EventAggregator.Instance.Subscribe<DatabaseHandler.CustomList>(LoadListUI);
 
             DatabaseHandler.CreateListsTable();
             DatabaseHandler.CreateCalendarTable();

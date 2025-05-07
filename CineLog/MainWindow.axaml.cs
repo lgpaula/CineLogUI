@@ -4,6 +4,8 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using CineLog.ViewModels;
+using CineLog.Views;
+using CineLog.Views.Helper;
 
 namespace CineLog
 {
@@ -14,6 +16,7 @@ namespace CineLog
         public MainWindow()
         {
             InitializeComponent();
+            EventAggregator.Instance.Subscribe<NotificationEvent>(e => ShowNotification(e.Message));
         }
 
         private void InitializeComponent()
@@ -31,6 +34,13 @@ namespace CineLog
             {
                 ViewModel.HandleButtonClick(viewName);
             }
+        }
+
+        public void ShowNotification(string message)
+        {
+            var view = new NotificationView { Message = message };
+            var overlayArea = this.FindControl<StackPanel>("OverlayArea");
+            overlayArea!.Children.Add(view);
         }
     }
 }

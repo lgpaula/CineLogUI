@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CineLog.Views.Helper
 {
@@ -8,22 +9,24 @@ namespace CineLog.Views.Helper
         private static EventAggregator? _instance;
         public static EventAggregator Instance => _instance ??= new EventAggregator();
 
-        private readonly Dictionary<string, List<Action<DatabaseHandler.CustomList>>> _subscribers = new();
+        private readonly Dictionary<Type, List<Delegate>> _subscribers = [];
 
-        public void Subscribe(string eventName, Action<DatabaseHandler.CustomList> callback)
+        public void Subscribe<T>(Action<T> callback)
         {
-            if (!_subscribers.ContainsKey(eventName))
-                _subscribers[eventName] = [];
+            var eventType = typeof(T);
+            if (!_subscribers.ContainsKey(eventType))
+                _subscribers[eventType] = [];
 
-            _subscribers[eventName].Add(callback);
+            _subscribers[eventType].Add(callback);
         }
 
-        public void Publish(string eventName, DatabaseHandler.CustomList customList)
+        public void Publish<T>(T eventData)
         {
-            if (_subscribers.ContainsKey(eventName))
+            var eventType = typeof(T);
+            if (_subscribers.TryGetValue(eventType, out var callbacks))
             {
-                foreach (var callback in _subscribers[eventName])
-                    callback(customList);
+                foreach (var callback in callbacks.Cast<Action<T>>())
+                    callback(eventData);
             }
         }
     }
