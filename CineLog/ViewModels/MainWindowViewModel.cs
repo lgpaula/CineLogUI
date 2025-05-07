@@ -22,7 +22,6 @@ namespace CineLog.ViewModels
         public void HandleButtonClick(string viewName)
         {
             Console.WriteLine($"Button clicked: {viewName}");
-            EventAggregator.Instance.Publish(new NotificationEvent { Message = $"✅ Button clicked: {viewName}" });
 
             CurrentView = viewName switch
             {

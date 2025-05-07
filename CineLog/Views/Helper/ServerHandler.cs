@@ -20,6 +20,7 @@ namespace CineLog.Views.Helper
                 {
                     Console.WriteLine("ScrapeMultipleTitles completed successfully.");
                     EventAggregator.Instance.Publish(new NotificationEvent { Message = "✅ Scraping done successfully!" });
+
                     if (Application.Current is App app)
                     {
                         Console.WriteLine("Restarting thread");
