@@ -19,6 +19,7 @@ namespace CineLog.Views.Helper
                 if (response.IsSuccessStatusCode)
                 {
                     Console.WriteLine("ScrapeMultipleTitles completed successfully.");
+                    EventAggregator.Instance.Publish(new NotificationEvent { Message = "✅ Scraping done successfully!" });
                     if (Application.Current is App app)
                     {
                         Console.WriteLine("Restarting thread");
@@ -37,7 +38,7 @@ namespace CineLog.Views.Helper
             }
         }
 
-        public static async Task<string> ScrapeSingleTitle(string title_id)
+        public static async Task<string> ScrapeSingleTitle(string title_id) // takes about 8 seconds per title
         {
             try
             {

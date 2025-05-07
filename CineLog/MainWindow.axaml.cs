@@ -1,5 +1,7 @@
 // using System;
 // using Avalonia;
+using System;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
@@ -16,7 +18,7 @@ namespace CineLog
         public MainWindow()
         {
             InitializeComponent();
-            EventAggregator.Instance.Subscribe<NotificationEvent>(e => ShowNotification(e.Message));
+            EventAggregator.Instance.Subscribe<NotificationEvent>(async e => await ShowNotificationAsync(e.Message));
         }
 
         private void InitializeComponent()
@@ -36,11 +38,14 @@ namespace CineLog
             }
         }
 
-        public void ShowNotification(string message)
+        public async Task ShowNotificationAsync(string message)
         {
             var view = new NotificationView { Message = message };
             var overlayArea = this.FindControl<StackPanel>("OverlayArea");
-            overlayArea!.Children.Add(view);
+            overlayArea!.Children.Insert(0, view);
+
+            await Task.Delay(TimeSpan.FromSeconds(5));
+            overlayArea.Children.Remove(view);
         }
     }
 }

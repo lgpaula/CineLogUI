@@ -2,6 +2,7 @@ using System;
 using ReactiveUI;
 using CineLog.Views;
 using Avalonia.Controls;
+using CineLog.Views.Helper;
 
 namespace CineLog.ViewModels
 {
@@ -21,6 +22,8 @@ namespace CineLog.ViewModels
         public void HandleButtonClick(string viewName)
         {
             Console.WriteLine($"Button clicked: {viewName}");
+            EventAggregator.Instance.Publish(new NotificationEvent { Message = $"✅ Button clicked: {viewName}" });
+
             CurrentView = viewName switch
             {
                 "Home" => new HomeView(),

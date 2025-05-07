@@ -65,7 +65,7 @@
                     VerticalAlignment="Top"
                     Margin="10"
                     Spacing="10"
-                    IsHitTestVisible="False" />
+                    IsHitTestVisible="True" />
     </Grid>
 
 </Window>
