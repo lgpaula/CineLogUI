@@ -116,10 +116,12 @@ namespace CineLog.Views
             return [.. panel.Children.OfType<CheckBox>()];
         }
 
-        private static async Task StartScraping(ScraperCriteria criteria, int? quantity)
+        private async Task StartScraping(ScraperCriteria criteria, int? quantity)
         {
             string stringCriteria = ConvertCriteria(criteria);
             await ServerHandler.ScrapeMultipleTitles(stringCriteria, quantity);
+
+            scrapeButton.IsEnabled = true;
         }
 
         private static List<string> GetSelectedCheckBoxes(List<CheckBox> checkBoxes)
