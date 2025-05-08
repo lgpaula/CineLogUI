@@ -3,29 +3,39 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Avalonia;
 using System.Text.Json;
+using System.Text;
 
 namespace CineLog.Views.Helper
 {
     public static class ServerHandler
     {
-        public static async Task<string> ScrapeMultipleTitles(string criteria, int? quantity)
+        public static async Task<string> ScrapeMultipleTitles(string criteriaJson, int? quantity)
         {
             using var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(120);
             try
             {
-                var response = await client.GetAsync($"http://127.0.0.1:5000/scrape?criteria={Uri.EscapeDataString(criteria)}&quantity={quantity}");
-                string resultJson = await response.Content.ReadAsStringAsync();
+                var contentObj = new
+                {
+                    criteria = JsonSerializer.Deserialize<object>(criteriaJson),
+                    quantity = quantity ?? 50
+                };
+
+                var contentJson = JsonSerializer.Serialize(contentObj);
+                var content = new StringContent(contentJson, Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync("http://127.0.0.1:5000/scrape", content);
+                string result = await response.Content.ReadAsStringAsync();
                 
                 if (response.IsSuccessStatusCode)
                 {
-                    using JsonDocument doc = JsonDocument.Parse(resultJson);
-                    JsonElement root = doc.RootElement;
-
-                    int numberOfTitles = root.GetProperty("data").GetInt32();
                     Console.WriteLine("ScrapeMultipleTitles completed successfully.");
-                    
-                    EventAggregator.Instance.Publish(new NotificationEvent { Message = $"✅ Scraping done successfully! Added {numberOfTitles} new titles." });
+                    var jsonResult = JsonSerializer.Deserialize<JsonElement>(result);
+                    if (jsonResult.TryGetProperty("result", out var count))
+                    {
+                        int insertedCount = count.GetInt32();
+                        EventAggregator.Instance.Publish(new NotificationEvent { Message = $"✅ Scraping done successfully! Added {insertedCount} new titles." });
+                    }
 
                     if (Application.Current is App app)
                     {
@@ -33,10 +43,10 @@ namespace CineLog.Views.Helper
                         app.RestartWorkerThreads();
                     }
 
-                    return resultJson;
+                    return result;
                 }
 
-                return $"Flask Error: {resultJson}";
+                return $"Flask Error: {result}";
             }
             catch (Exception ex)
             {
