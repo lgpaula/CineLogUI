@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Avalonia;
+using System.Text.Json;
 
 namespace CineLog.Views.Helper
 {
@@ -14,12 +15,17 @@ namespace CineLog.Views.Helper
             try
             {
                 var response = await client.GetAsync($"http://127.0.0.1:5000/scrape?criteria={Uri.EscapeDataString(criteria)}&quantity={quantity}");
-                string result = await response.Content.ReadAsStringAsync();
+                string resultJson = await response.Content.ReadAsStringAsync();
                 
                 if (response.IsSuccessStatusCode)
                 {
+                    using JsonDocument doc = JsonDocument.Parse(resultJson);
+                    JsonElement root = doc.RootElement;
+
+                    int numberOfTitles = root.GetProperty("data").GetInt32();
                     Console.WriteLine("ScrapeMultipleTitles completed successfully.");
-                    EventAggregator.Instance.Publish(new NotificationEvent { Message = "✅ Scraping done successfully!" });
+                    
+                    EventAggregator.Instance.Publish(new NotificationEvent { Message = $"✅ Scraping done successfully! Added {numberOfTitles} new titles." });
 
                     if (Application.Current is App app)
                     {
@@ -27,10 +33,10 @@ namespace CineLog.Views.Helper
                         app.RestartWorkerThreads();
                     }
 
-                    return result;
+                    return resultJson;
                 }
 
-                return $"Flask Error: {result}";
+                return $"Flask Error: {resultJson}";
             }
             catch (Exception ex)
             {
