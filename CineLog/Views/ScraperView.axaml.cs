@@ -99,7 +99,8 @@ namespace CineLog.Views
 
             _ = StartScraping(criteria, TryParseInt(Quantity.Text));
 
-            EventAggregator.Instance.Publish(new NotificationEvent { Message = $"✅ Scraping started, {Quantity}" });
+            EventAggregator.Instance.Publish(new NotificationEvent { Message = $"✅ Scraping started. {Time.Text}. Please wait." });
+            scrapeButton.IsEnabled = false;
         }
 
         private static List<string> GetSelectedIds(List<CheckBox> checkBoxes)

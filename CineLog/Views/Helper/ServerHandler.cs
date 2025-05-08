@@ -25,8 +25,8 @@ namespace CineLog.Views.Helper
                     {
                         Console.WriteLine("Restarting thread");
                         app.RestartWorkerThreads();
-
                     }
+
                     return result;
                 }
 

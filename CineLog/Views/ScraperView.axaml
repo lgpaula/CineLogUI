@@ -14,7 +14,7 @@
 
     <DockPanel LastChildFill="True">
         <!-- Bottom button -->
-        <Button DockPanel.Dock="Bottom" x:Name="scrapeButton" Content="Scrape" Click="OnScrapeButtonClick" HorizontalAlignment="Left" Margin="10"/>
+        <Button DockPanel.Dock="Bottom" x:Name="scrapeButton" Content="Scrape" Click="OnScrapeButtonClick" HorizontalAlignment="Left" Margin="10" IsEnabled="true"/>
 
         <!-- Scrollable content -->
         <ScrollViewer Margin="0,0,0,10">
