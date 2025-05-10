@@ -12,6 +12,7 @@ namespace CineLog.Views.Helper
     {
         private static readonly string dbPath = "/home/legion/CLionProjects/pyScraper/scraper/cinelog.db";
         private static readonly string connectionString = $"Data Source={dbPath};Version=3;";
+        private static readonly string[] dbPeopleTables = ["creators_table", "cast_table", "directors_table", "writers_table"];
 
         public static List<Movie> GetMovies(SQLQuerier sqlQuerier, FilterSettings? filterSettings = null)
         {
@@ -193,6 +194,54 @@ namespace CineLog.Views.Helper
             }
 
             return result;
+        }
+
+        private static bool TableExists(SQLiteConnection conn, string tableName)
+        {
+            using var cmd = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name=@name", conn);
+            cmd.Parameters.AddWithValue("@name", tableName);
+            using var reader = cmd.ExecuteReader();
+            return reader.HasRows;
+        }
+
+        public static async Task<List<(string id, string name)>> QueryDatabaseAsync(string selectedType, string searchText)
+        {
+            var results = new List<(string, string)>();
+            using var connection = new SQLiteConnection(connectionString);
+            await connection.OpenAsync();
+
+            if (selectedType == "Company" && !TableExists(connection, "companies_table")) return results;
+            if (selectedType == "People" && dbPeopleTables.All(t => !TableExists(connection, t))) return results;
+
+            if (selectedType == "Company")
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT id, name FROM companies_table WHERE LOWER(name) LIKE @search || '%' LIMIT 3;";
+                command.Parameters.AddWithValue("@search", searchText.ToLower());
+
+                using var reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    results.Add((reader.GetString(0), reader.GetString(1)));
+                }
+            }
+            else if (selectedType == "People")
+            {
+                var unionQuery = string.Join("\nUNION\n", dbPeopleTables.Select(t =>
+                    $"SELECT DISTINCT id, name FROM {t} WHERE LOWER(name) LIKE @search || '%'"));
+
+                var command = connection.CreateCommand();
+                command.CommandText = $"{unionQuery} LIMIT 3;";
+                command.Parameters.AddWithValue("@search", searchText.ToLower());
+
+                using var reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    results.Add((reader.GetString(0), reader.GetString(1)));
+                }
+            }
+
+            return results;
         }
 
 #region List related

@@ -6,17 +6,19 @@ using Newtonsoft.Json;
 using CineLog.Views.Helper;
 using Avalonia;
 using System;
+using Avalonia.Interactivity;
+using Avalonia.Layout;
+using System.Collections.ObjectModel;
+using Avalonia.Input;
+using Avalonia.Controls.Templates;
+using Avalonia.Data;
 
 namespace CineLog.Views
 {
     public partial class ScraperView : UserControl
     {
         private List<CheckBox>? _genreCheckBoxes;
-        private List<CheckBox>? _companyCheckBoxes;
         private List<CheckBox>? _typeCheckBoxes;
-        private List<IdNameItem>? _allCompanyItems;
-        private int _loadedCompanyCount = 0;
-        private const int CompanyBatchSize = 50;
 
         public ScraperView()
         {
@@ -31,51 +33,9 @@ namespace CineLog.Views
         {
             var genresPanel = this.FindControl<WrapPanel>("GenresPanel");
             var typePanel = this.FindControl<WrapPanel>("TitleTypePanel");
-            var companiesPanel = this.FindControl<WrapPanel>("CompaniesPanel");
 
             _genreCheckBoxes = GetCheckBoxes(genresPanel!);
             _typeCheckBoxes = GetCheckBoxes(typePanel!);
-            _allCompanyItems = [.. DatabaseHandler.GetAllItems("companies_table").OrderBy(i => i.Name)];
-            AddCompanyCheckboxesChunk();
-            CompanyScrollViewer.ScrollChanged += OnCompanyScrollChanged!;
-        }
-
-        private void AddCompanyCheckboxesChunk()
-        {
-            int remaining = _allCompanyItems!.Count - _loadedCompanyCount;
-            if (remaining <= 0) return;
-
-            int toLoad = Math.Min(CompanyBatchSize, remaining);
-            var nextItems = _allCompanyItems
-                .Skip(_loadedCompanyCount)
-                .Take(toLoad);
-
-            foreach (var item in nextItems)
-            {
-                var cb = new CheckBox
-                {
-                    Content = item.Name,
-                    Tag = item.Id,
-                    Margin = new Thickness(5),
-                    Width = 300
-                };
-                CompaniesPanel.Children.Add(cb);
-            }
-
-            _loadedCompanyCount += toLoad;
-        }
-
-        private void OnCompanyScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-            if (e.Source is not ScrollViewer scroll) return;
-
-            double offset = scroll.Offset.Y;
-            double max = scroll.Extent.Height - scroll.Viewport.Height;
-
-            if (max - offset < 200)
-            {
-                AddCompanyCheckboxesChunk();
-            }
         }
 
         private void OnScrapeButtonClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -85,11 +45,9 @@ namespace CineLog.Views
             {
                 types = [.. _typeCheckBoxes!.Select(cb => cb.Content?.ToString() ?? "")];
             }
-            _companyCheckBoxes = GetCheckBoxes(CompaniesPanel!);
             var criteria = new ScraperCriteria
             {
                 Genres = GetSelectedCheckBoxes(_genreCheckBoxes!),
-                Companies = GetSelectedIds(_companyCheckBoxes!),
                 Types = types,
                 YearFrom = TryParseInt(YearStart.Text),
                 YearTo = TryParseInt(YearEnd.Text),
@@ -103,11 +61,109 @@ namespace CineLog.Views
             scrapeButton.IsEnabled = false;
         }
 
-        private static List<string> GetSelectedIds(List<CheckBox> checkBoxes)
+        private void OnAddExtraFilterClick(object? sender, RoutedEventArgs e)
         {
-            return [.. checkBoxes
-                .Where(cb => cb.IsChecked == true)
-                .Select(cb => cb.Tag)
+            var parentPanel = this.FindControl<StackPanel>("ExtraFilterPanel");
+            var rowPanel = new StackPanel 
+            { 
+                Orientation = Orientation.Vertical, 
+                Margin = new Thickness(0, 0, 0, 10) 
+            };
+
+            var searchPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 10
+            };
+            var comboBox = new ComboBox 
+            {
+                Width = 120,
+                ItemsSource = new List<string> { "Company", "People", "Keyword" } // struct?
+            };
+            var textBox = new TextBox
+            {
+                Width = 200,
+                Watermark = "Type to search...",
+                IsEnabled = false
+            };
+            var deleteButton = new Button
+            {
+                Content = "X"
+            };
+
+            comboBox.SelectionChanged += (_, _) =>
+            {
+                textBox.IsEnabled = comboBox.SelectedItem != null;
+            };
+
+            searchPanel.Children.Add(comboBox);
+            searchPanel.Children.Add(textBox);
+            searchPanel.Children.Add(deleteButton);
+
+            // suggestions
+            var suggestionsPanel = new ItemsControl
+            {
+                Name = "SuggestionsPanel",
+                ItemTemplate = new FuncDataTemplate<IdNameItem>((item, _) =>
+                {
+                    var textBlock = new TextBlock
+                    {
+                        Margin = new Thickness(5)
+                    };
+                    textBlock.Bind(TextBlock.TextProperty, new Binding("Name"));
+                    textBlock.PointerPressed += Suggestion_Clicked!;
+                    return textBlock;
+                })
+            };
+            var suggestions = new ObservableCollection<IdNameItem>();
+            suggestionsPanel.ItemsSource = suggestions;
+
+            // handle input + suggestions
+            textBox.GetObservable(TextBox.TextProperty).Subscribe(async text =>
+            {
+                var selected = comboBox.SelectedItem?.ToString();
+                if (!string.IsNullOrWhiteSpace(selected) && text?.Length >= 3)
+                {
+                    var results = await DatabaseHandler.QueryDatabaseAsync(selected, text);
+                    suggestions.Clear();
+                    if (results.Count != 0)
+                    {
+                        foreach (var (id, name) in results)
+                        {
+                            suggestions.Add(new IdNameItem { Id = id, Name = name });
+                        }
+                    }
+                    else
+                    {
+                        suggestions.Add(new IdNameItem { Id = "", Name = $"No results for \"{text}\"" });
+                    }
+                }
+            });
+
+            deleteButton.Click += (_, _) =>
+            {
+                parentPanel!.Children.Remove(rowPanel);
+            };
+
+            rowPanel.Children.Add(searchPanel);
+            rowPanel.Children.Add(suggestionsPanel);
+            parentPanel!.Children.Add(rowPanel);
+        }
+
+        private void Suggestion_Clicked(object sender, PointerPressedEventArgs e)
+        {
+            if (sender is TextBlock tb && tb.DataContext is IdNameItem item)
+            {
+                tb.Text = item.Name;
+                tb.Tag = item.Id;
+            }
+        }
+
+        private static List<string> GetSelectedIds(IEnumerable<Control> controls)
+        {
+            return [.. controls
+                .Where(c => (c as CheckBox)?.IsChecked == true)
+                .Select(c => c.Tag)
                 .OfType<string>()];
         }
 
