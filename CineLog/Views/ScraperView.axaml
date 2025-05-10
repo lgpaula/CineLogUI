@@ -1,6 +1,9 @@
 <UserControl x:Class="CineLog.Views.ScraperView"
              xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
 
     <UserControl.Styles>
 		<Style Selector="TextBox.CustomTextBox:focus /template/ Border#PART_BorderElement">
@@ -13,14 +16,23 @@
 	</UserControl.Styles>
 
     <DockPanel LastChildFill="True">
-        <!-- Bottom button -->
-        <Button DockPanel.Dock="Bottom" x:Name="scrapeButton" Content="Scrape" Click="OnScrapeButtonClick" HorizontalAlignment="Left" Margin="10"/>
+
+        <!-- Bottom Controls -->
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="10" Spacing="10">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="5">
+                <TextBlock VerticalAlignment="Center" Foreground="White">Quantity:</TextBlock>
+                <Button x:Name="DecreaseButton" Content="-" Foreground="White"/>
+                <TextBlock Classes="CustomTextBox" x:Name="Quantity" Width="40" Text="50" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Button x:Name="IncreaseButton" Content="+" Foreground="White"/>
+                <TextBlock Classes="TimeEstimationTextBox" x:Name="Time" Text="Estimated time: 10 seconds" Foreground="Red" Margin="10,0,0,0" VerticalAlignment="Center"/>
+            </StackPanel>
+            <Button x:Name="scrapeButton" Content="Scrape" Click="OnScrapeButtonClick" HorizontalAlignment="Right" Margin="10,0,0,0"/>
+        </StackPanel>
 
         <!-- Scrollable content -->
         <ScrollViewer Margin="0,0,0,10">
             <StackPanel>
-                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
-                    ColumnDefinitions="150,*" Margin="10">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="150,*" Margin="10">
 
                     <!-- Rating -->
                     <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Rating</TextBlock>
@@ -77,16 +89,9 @@
                     </StackPanel>
                     <Rectangle Grid.Row="5" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
 
-                    <!-- Company -->
-                    <TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center">Company (Bitwise OR)</TextBlock>
-                    <ScrollViewer x:Name="CompanyScrollViewer" Grid.Row="6" Grid.Column="1" VerticalScrollBarVisibility="Auto" MaxHeight="200">
-                        <WrapPanel x:Name="CompaniesPanel" Orientation="Horizontal" HorizontalAlignment="Center"/>
-                    </ScrollViewer>
-                    <Rectangle Grid.Row="7" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
-
                     <!-- Type -->
-                    <TextBlock Grid.Row="8" Grid.Column="0" VerticalAlignment="Center">Type (Bitwise OR)</TextBlock>
-                    <WrapPanel x:Name="TitleTypePanel" Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center">Type (Bitwise OR)</TextBlock>
+                    <WrapPanel x:Name="TitleTypePanel" Grid.Row="6" Grid.Column="1" Orientation="Horizontal">
                         <CheckBox Content="Movie" Foreground="White" Margin="5"/>
                         <CheckBox Content="Series" Foreground="White" Margin="5"/>
                         <CheckBox Content="Short" Foreground="White" Margin="5"/>
@@ -94,17 +99,14 @@
                         <CheckBox Content="TV Special" Foreground="White" Margin="5"/>
                         <CheckBox Content="TV Mini-Series" Foreground="White" Margin="5"/>
                     </WrapPanel>
-                    <Rectangle Grid.Row="9" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+                    <Rectangle Grid.Row="7" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
 
-                    <!-- Quantity -->
-                    <TextBlock Grid.Row="10" Grid.Column="0" VerticalAlignment="Center">Quantity</TextBlock>
-                    <StackPanel Grid.Row="10" Grid.Column="1" Orientation="Horizontal" Spacing="5">
-                        <Button x:Name="DecreaseButton" Content="-" Foreground="White" VerticalAlignment="Center"/>
-                        <TextBlock Classes="CustomTextBox" x:Name="Quantity" Width="40" Text="50" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        <Button x:Name="IncreaseButton" Content="+" Foreground="White" VerticalAlignment="Center"/>
-                        <TextBlock Classes="TimeEstimationTextBox" x:Name="Time" Text="Estimated time: 10 seconds" Foreground="Red" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </StackPanel>
-                    <Rectangle Grid.Row="11" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
+                    <!-- Extra -->
+                    <TextBlock Grid.Row="8" Grid.RowSpan="2" Grid.Column="0" VerticalAlignment="Center">Extra</TextBlock>
+                    <StackPanel Grid.Row="8" Grid.Column="1" x:Name="ExtraFilterPanel" Orientation="Vertical" Spacing="5"/>
+                    <Button Grid.Row="9" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="30" Height="30" Content="+" Click="OnAddExtraFilterClick"/>
+
+                    <Rectangle Grid.Row="10" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
                 </Grid>
             </StackPanel>
         </ScrollViewer>
