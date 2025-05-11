@@ -12,6 +12,8 @@ using System.Collections.ObjectModel;
 using Avalonia.Input;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
+using Avalonia.VisualTree;
+using Avalonia.Media;
 
 namespace CineLog.Views
 {
@@ -64,61 +66,92 @@ namespace CineLog.Views
         private void OnAddExtraFilterClick(object? sender, RoutedEventArgs e)
         {
             var parentPanel = this.FindControl<StackPanel>("ExtraFilterPanel");
-            var rowPanel = new StackPanel 
-            { 
-                Orientation = Orientation.Vertical, 
-                Margin = new Thickness(0, 0, 0, 10) 
+
+            var rowPanel = new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Margin = new Thickness(0, 0, 0, 10)
             };
 
-            var searchPanel = new StackPanel
+            // Horizontal row with ComboBox and Delete button
+            var filterRow = new StackPanel
             {
                 Orientation = Orientation.Horizontal,
                 Spacing = 10
             };
-            var comboBox = new ComboBox 
+
+            var comboBox = new ComboBox
             {
                 Width = 120,
-                ItemsSource = new List<string> { "Company", "People", "Keyword" } // struct?
+                ItemsSource = new List<string> { "Company", "People", "Keyword" }
             };
+
+            var deleteButton = new Button
+            {
+                Content = "X"
+            };
+
+            filterRow.Children.Add(comboBox);
+            filterRow.Children.Add(deleteButton);
+
+            // Vertical stack: TextBox + Suggestions
             var textBox = new TextBox
             {
                 Width = 200,
                 Watermark = "Type to search...",
                 IsEnabled = false
             };
-            var deleteButton = new Button
-            {
-                Content = "X"
-            };
 
-            comboBox.SelectionChanged += (_, _) =>
-            {
-                textBox.IsEnabled = comboBox.SelectedItem != null;
-            };
+            var suggestions = new ObservableCollection<IdNameItem>();
 
-            searchPanel.Children.Add(comboBox);
-            searchPanel.Children.Add(textBox);
-            searchPanel.Children.Add(deleteButton);
-
-            // suggestions
             var suggestionsPanel = new ItemsControl
             {
-                Name = "SuggestionsPanel",
+                Background = Brushes.White,
+                BorderBrush = Brushes.Gray,
+                BorderThickness = new Thickness(1),
+                MaxHeight = 100,
+                Margin = new Thickness(0, 2, 0, 0),
+                ItemsSource = suggestions,
                 ItemTemplate = new FuncDataTemplate<IdNameItem>((item, _) =>
                 {
                     var textBlock = new TextBlock
                     {
-                        Margin = new Thickness(5)
+                        Margin = new Thickness(5),
+                        Cursor = new Cursor(StandardCursorType.Hand)
                     };
                     textBlock.Bind(TextBlock.TextProperty, new Binding("Name"));
-                    textBlock.PointerPressed += Suggestion_Clicked!;
+                    textBlock.PointerPressed += (_, _) =>
+                    {
+                        if (!string.IsNullOrEmpty(item.Id)) textBox.Text = item.Name;
+                        suggestions.Clear();
+                    };
                     return textBlock;
                 })
             };
-            var suggestions = new ObservableCollection<IdNameItem>();
-            suggestionsPanel.ItemsSource = suggestions;
 
-            // handle input + suggestions
+            var textWithSuggestions = new StackPanel
+            {
+                Orientation = Orientation.Vertical
+            };
+            textWithSuggestions.Children.Add(textBox);
+            textWithSuggestions.Children.Add(suggestionsPanel);
+
+            // Main combined panel
+            var searchWithSuggestionsPanel = new StackPanel
+            {
+                Orientation = Orientation.Vertical
+            };
+            searchWithSuggestionsPanel.Children.Add(filterRow);
+            searchWithSuggestionsPanel.Children.Add(textWithSuggestions);
+
+            // Enable TextBox when filter type is selected
+            comboBox.SelectionChanged += (_, _) =>
+            {
+                textBox.IsEnabled = comboBox.SelectedItem != null;
+                suggestions.Clear();
+            };
+
+            // Search on text input
             textBox.GetObservable(TextBox.TextProperty).Subscribe(async text =>
             {
                 var selected = comboBox.SelectedItem?.ToString();
@@ -138,6 +171,10 @@ namespace CineLog.Views
                         suggestions.Add(new IdNameItem { Id = "", Name = $"No results for \"{text}\"" });
                     }
                 }
+                else
+                {
+                    suggestions.Clear();
+                }
             });
 
             deleteButton.Click += (_, _) =>
@@ -145,17 +182,31 @@ namespace CineLog.Views
                 parentPanel!.Children.Remove(rowPanel);
             };
 
-            rowPanel.Children.Add(searchPanel);
-            rowPanel.Children.Add(suggestionsPanel);
+            rowPanel.Children.Add(searchWithSuggestionsPanel);
             parentPanel!.Children.Add(rowPanel);
         }
 
-        private void Suggestion_Clicked(object sender, PointerPressedEventArgs e)
+        private void Suggestion_Clicked(object? sender, PointerPressedEventArgs e)
         {
             if (sender is TextBlock tb && tb.DataContext is IdNameItem item)
             {
-                tb.Text = item.Name;
-                tb.Tag = item.Id;
+                Console.WriteLine("clicked: " + item.Name);
+                var parent = tb.FindAncestorOfType<StackPanel>();
+                if (parent != null)
+                {
+                    var textBox = parent.GetVisualDescendants().OfType<TextBox>().FirstOrDefault();
+                    if (textBox != null)
+                    {
+                        textBox.Text = item.Name;
+
+                        // Clear suggestions
+                        var suggestionsPanel = parent.GetVisualDescendants().OfType<ItemsControl>().FirstOrDefault();
+                        if (suggestionsPanel?.ItemsSource is ObservableCollection<IdNameItem> suggestions)
+                        {
+                            suggestions.Clear();
+                        }
+                    }
+                }
             }
         }
 
@@ -241,7 +292,7 @@ namespace CineLog.Views
 
     public class IdNameItem
     {
-        public string Id { get; set; } = "";
-        public string Name { get; set; } = "";
+        public string? Id { get; set; }
+        public string? Name { get; set; }
     }
 }
