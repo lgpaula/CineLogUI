@@ -73,11 +73,22 @@ namespace CineLog.Views
                 Margin = new Thickness(0, 0, 0, 10)
             };
 
-            // Horizontal row with ComboBox and Delete button
-            var filterRow = new StackPanel
+            var grid = new Grid
             {
-                Orientation = Orientation.Horizontal,
-                Spacing = 10
+                ColumnDefinitions =
+                {
+                    new ColumnDefinition(GridLength.Auto),
+                    new ColumnDefinition(new GridLength(5)),
+                    new ColumnDefinition(GridLength.Auto),
+                    new ColumnDefinition(new GridLength(5)),
+                    new ColumnDefinition(GridLength.Auto)
+                },
+                RowDefinitions =
+                {
+                    new RowDefinition(GridLength.Auto),
+                    new RowDefinition(new GridLength(5)),
+                    new RowDefinition(GridLength.Auto)
+                }
             };
 
             var comboBox = new ComboBox
@@ -85,33 +96,38 @@ namespace CineLog.Views
                 Width = 120,
                 ItemsSource = new List<string> { "Company", "People", "Keyword" }
             };
+            Grid.SetColumn(comboBox, 0);
+            Grid.SetRow(comboBox, 0);
 
-            var deleteButton = new Button
-            {
-                Content = "X"
-            };
-
-            filterRow.Children.Add(comboBox);
-            filterRow.Children.Add(deleteButton);
-
-            // Vertical stack: TextBox + Suggestions
             var textBox = new TextBox
             {
                 Width = 200,
                 Watermark = "Type to search...",
                 IsEnabled = false
             };
+            Grid.SetColumn(textBox, 2);
+            Grid.SetRow(textBox, 0);
+
+            var deleteButton = new Button
+            {
+                Content = "X"
+            };
+            Grid.SetColumn(deleteButton, 4);
+            Grid.SetRow(deleteButton, 0);
 
             var suggestions = new ObservableCollection<IdNameItem>();
 
             var suggestionsPanel = new ItemsControl
             {
                 Background = Brushes.White,
+                Foreground = Brushes.Black,
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
+                Width = 200,
                 MaxHeight = 100,
                 Margin = new Thickness(0, 2, 0, 0),
                 ItemsSource = suggestions,
+                IsVisible = false, // initially hidden
                 ItemTemplate = new FuncDataTemplate<IdNameItem>((item, _) =>
                 {
                     var textBlock = new TextBlock
@@ -122,36 +138,29 @@ namespace CineLog.Views
                     textBlock.Bind(TextBlock.TextProperty, new Binding("Name"));
                     textBlock.PointerPressed += (_, _) =>
                     {
-                        if (!string.IsNullOrEmpty(item.Id)) textBox.Text = item.Name;
+                        if (!string.IsNullOrEmpty(item.Id))
+                        {
+                            textBox.Text = item.Name;
+                        }
                         suggestions.Clear();
+                        suggestionsPanel.IsVisible = false;
                     };
                     return textBlock;
                 })
             };
 
-            var textWithSuggestions = new StackPanel
-            {
-                Orientation = Orientation.Vertical
-            };
-            textWithSuggestions.Children.Add(textBox);
-            textWithSuggestions.Children.Add(suggestionsPanel);
+            Grid.SetColumn(suggestionsPanel, 1);
+            Grid.SetRow(suggestionsPanel, 1);
 
-            // Main combined panel
-            var searchWithSuggestionsPanel = new StackPanel
-            {
-                Orientation = Orientation.Vertical
-            };
-            searchWithSuggestionsPanel.Children.Add(filterRow);
-            searchWithSuggestionsPanel.Children.Add(textWithSuggestions);
-
-            // Enable TextBox when filter type is selected
+            // Enable text box only when an option is selected
             comboBox.SelectionChanged += (_, _) =>
             {
                 textBox.IsEnabled = comboBox.SelectedItem != null;
                 suggestions.Clear();
+                suggestionsPanel.IsVisible = false;
             };
 
-            // Search on text input
+            // Text change logic
             textBox.GetObservable(TextBox.TextProperty).Subscribe(async text =>
             {
                 var selected = comboBox.SelectedItem?.ToString();
@@ -159,7 +168,8 @@ namespace CineLog.Views
                 {
                     var results = await DatabaseHandler.QueryDatabaseAsync(selected, text);
                     suggestions.Clear();
-                    if (results.Count != 0)
+
+                    if (results.Count > 0)
                     {
                         foreach (var (id, name) in results)
                         {
@@ -170,10 +180,13 @@ namespace CineLog.Views
                     {
                         suggestions.Add(new IdNameItem { Id = "", Name = $"No results for \"{text}\"" });
                     }
+
+                    suggestionsPanel.IsVisible = true;
                 }
                 else
                 {
                     suggestions.Clear();
+                    suggestionsPanel.IsVisible = false;
                 }
             });
 
@@ -182,9 +195,15 @@ namespace CineLog.Views
                 parentPanel!.Children.Remove(rowPanel);
             };
 
-            rowPanel.Children.Add(searchWithSuggestionsPanel);
+            grid.Children.Add(comboBox);
+            grid.Children.Add(textBox);
+            grid.Children.Add(deleteButton);
+            grid.Children.Add(suggestionsPanel);
+
+            rowPanel.Children.Add(grid);
             parentPanel!.Children.Add(rowPanel);
         }
+
 
         private void Suggestion_Clicked(object? sender, PointerPressedEventArgs e)
         {
