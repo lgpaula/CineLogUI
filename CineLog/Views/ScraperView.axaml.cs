@@ -127,30 +127,30 @@ namespace CineLog.Views
                 MaxHeight = 100,
                 Margin = new Thickness(0, 2, 0, 0),
                 ItemsSource = suggestions,
-                IsVisible = false, // initially hidden
-                ItemTemplate = new FuncDataTemplate<IdNameItem>((item, _) =>
-                {
-                    var textBlock = new TextBlock
-                    {
-                        Margin = new Thickness(5),
-                        Cursor = new Cursor(StandardCursorType.Hand)
-                    };
-                    textBlock.Bind(TextBlock.TextProperty, new Binding("Name"));
-                    textBlock.PointerPressed += (_, _) =>
-                    {
-                        if (!string.IsNullOrEmpty(item.Id))
-                        {
-                            textBox.Text = item.Name;
-                        }
-                        suggestions.Clear();
-                        suggestionsPanel.IsVisible = false;
-                    };
-                    return textBlock;
-                })
+                IsVisible = false,
             };
+            suggestionsPanel.ItemTemplate = new FuncDataTemplate<IdNameItem>((item, _) =>
+            {
+                var textBlock = new TextBlock
+                {
+                    Margin = new Thickness(5),
+                    Cursor = new Cursor(StandardCursorType.Hand)
+                };
+                textBlock.Bind(TextBlock.TextProperty, new Binding("Name"));
+                textBlock.PointerPressed += (_, _) =>
+                {
+                    if (!string.IsNullOrEmpty(item.Id))
+                    {
+                        textBox.Text = item.Name;
+                    }
+                    suggestions.Clear();
+                    suggestionsPanel.IsVisible = false;
+                };
+                return textBlock;
+            });
 
-            Grid.SetColumn(suggestionsPanel, 1);
-            Grid.SetRow(suggestionsPanel, 1);
+            Grid.SetColumn(suggestionsPanel, 2);
+            Grid.SetRow(suggestionsPanel, 2);
 
             // Enable text box only when an option is selected
             comboBox.SelectionChanged += (_, _) =>
