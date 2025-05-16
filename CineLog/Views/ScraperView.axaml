@@ -102,7 +102,7 @@
                     <Rectangle Grid.Row="7" Grid.ColumnSpan="2" Height="1" Fill="Gray" Margin="10"/>
 
                     <!-- Extra -->
-                    <TextBlock Grid.Row="8" Grid.RowSpan="2" Grid.Column="0" VerticalAlignment="Center">Extra</TextBlock>
+                    <TextBlock Grid.Row="8" Grid.RowSpan="2" Grid.Column="0" VerticalAlignment="Center">Extra (Bitiwse OR)</TextBlock>
                     <StackPanel Grid.Row="8" Grid.Column="1" x:Name="ExtraFilterPanel" Orientation="Vertical" Spacing="5"/>
                     <Button Grid.Row="9" Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="30" Content="+" Click="OnAddExtraFilterClick"/>
 

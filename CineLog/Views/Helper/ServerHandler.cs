@@ -34,6 +34,7 @@ namespace CineLog.Views.Helper
                     if (jsonResult.TryGetProperty("result", out var count))
                     {
                         int insertedCount = count.GetInt32();
+                        Console.WriteLine($"Scraped {insertedCount} titles.");
                         EventAggregator.Instance.Publish(new NotificationEvent { Message = $"✅ Scraping done successfully! Added {insertedCount} new titles." });
                     }
 

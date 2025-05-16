@@ -40,7 +40,7 @@ namespace CineLog.Views
             _typeCheckBoxes = GetCheckBoxes(typePanel!);
         }
 
-        private void OnScrapeButtonClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        private void OnScrapeButtonClick(object? sender, RoutedEventArgs e)
         {
             var types = GetSelectedCheckBoxes(_typeCheckBoxes!);
             if (types.Count == 0)
@@ -51,6 +51,8 @@ namespace CineLog.Views
             {
                 Genres = GetSelectedCheckBoxes(_genreCheckBoxes!),
                 Types = types,
+                Companies = GetSelectedIds(FilterTypes.Company),
+                Names = GetSelectedIds(FilterTypes.People),
                 YearFrom = TryParseInt(YearStart.Text),
                 YearTo = TryParseInt(YearEnd.Text),
                 RatingFrom = TryParseFloat(MinRating.Text),
@@ -94,7 +96,7 @@ namespace CineLog.Views
             var comboBox = new ComboBox
             {
                 Width = 120,
-                ItemsSource = new List<string> { "Company", "People", "Keyword" }
+                ItemsSource = Enum.GetValues(typeof(FilterTypes))
             };
             Grid.SetColumn(comboBox, 0);
             Grid.SetRow(comboBox, 0);
@@ -142,6 +144,7 @@ namespace CineLog.Views
                     if (!string.IsNullOrEmpty(item.Id))
                     {
                         textBox.Text = item.Name;
+                        textBox.Tag = item.Id;
                     }
                     suggestions.Clear();
                     suggestionsPanel.IsVisible = false;
@@ -229,12 +232,29 @@ namespace CineLog.Views
             }
         }
 
-        private static List<string> GetSelectedIds(IEnumerable<Control> controls)
+        private List<string> GetSelectedIds(FilterTypes type)
         {
-            return [.. controls
-                .Where(c => (c as CheckBox)?.IsChecked == true)
-                .Select(c => c.Tag)
-                .OfType<string>()];
+            var parentPanel = this.FindControl<StackPanel>("ExtraFilterPanel");
+            var ids = new List<string>();
+
+            foreach (var row in parentPanel!.Children.OfType<StackPanel>())
+            {
+                var grid = row.Children.OfType<Grid>().FirstOrDefault();
+                if (grid is null) continue;
+
+                var comboBox = grid.Children.OfType<ComboBox>().FirstOrDefault();
+                var textBox = grid.Children.OfType<TextBox>().FirstOrDefault();
+
+                if (comboBox?.SelectedItem is FilterTypes selectedType && selectedType == type &&
+                    !string.IsNullOrWhiteSpace(textBox?.Text))
+                {
+                    var id = textBox.Tag?.ToString();
+                    if (!string.IsNullOrEmpty(id))
+                        ids.Add(id);
+                }
+            }
+
+            return ids;
         }
 
         private static List<CheckBox> GetCheckBoxes(WrapPanel panel)
@@ -271,6 +291,7 @@ namespace CineLog.Views
             {
                 { "genres", criteria.Genres },
                 { "companies", criteria.Companies },
+                { "role", criteria.Names },
                 { "types", criteria.Types },
                 { "yearFrom", criteria.YearFrom },
                 { "yearTo", criteria.YearTo },
@@ -302,6 +323,7 @@ namespace CineLog.Views
     {
         public List<string> Genres { get; set; }
         public List<string> Companies { get; set; }
+        public List<string> Names { get; set; }
         public List<string> Types { get; set; }
         public int? YearFrom { get; set; }
         public int? YearTo { get; set; }
@@ -313,5 +335,12 @@ namespace CineLog.Views
     {
         public string? Id { get; set; }
         public string? Name { get; set; }
+    }
+
+    public enum FilterTypes
+    {
+        Company,
+        People,
+        Keyword
     }
 }
