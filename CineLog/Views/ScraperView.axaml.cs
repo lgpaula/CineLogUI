@@ -340,7 +340,6 @@ namespace CineLog.Views
     public enum FilterTypes
     {
         Company,
-        People,
-        Keyword
+        People
     }
 }
