@@ -2,7 +2,7 @@
 
 CineLogUI is a user interface project designed for managing and exploring movie logs efficiently.
 
-CineLogUI works in unison with pyScraper https://github.com/lgpaula/pyScraper
+CineLogUI works in unison with [pyScraper](https://github.com/lgpaula/pyScraper)
 
 ## Features
 
