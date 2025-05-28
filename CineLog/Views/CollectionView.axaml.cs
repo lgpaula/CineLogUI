@@ -12,17 +12,17 @@ namespace CineLog.Views
 {
     public partial class CollectionView : UserControl
     {
-        public string viewName = string.Empty;
-        private int _currentOffset = 0;
-        private const int count = 50;
+        private readonly string _viewName = string.Empty;
+        private int _currentOffset;
+        private const int Count = 50;
         private WrapPanel? _moviesContainer;
         private ScrollViewer? _scrollViewer;
-        private DatabaseHandler.FilterSettings filterSettings = new();
+        private DatabaseHandler.FilterSettings _filterSettings = new();
         private Dictionary<string, Action<string, string>> _prefixHandlers = [];
 
         public CollectionView(string viewName)
         {
-            this.viewName = viewName;
+            _viewName = viewName;
             InitializeComponent();
             AttachedToVisualTree += OnLoaded;
         }
@@ -41,7 +41,7 @@ namespace CineLog.Views
                         ?? throw new NullReferenceException("ScrollViewer not found in XAML");
 
             LoadNextPage();
-            _scrollViewer.ScrollChanged += (sender, e) => OnScrollChanged();
+            _scrollViewer.ScrollChanged += (_, _) => OnScrollChanged();
             SortComboBox.SelectionChanged += SortComboBox_SelectionChanged;
 
             _prefixHandlers = new Dictionary<string, Action<string, string>>
@@ -55,12 +55,12 @@ namespace CineLog.Views
         private void LoadNextPage()
         {
             var sqlQuery = new DatabaseHandler.SQLQuerier {
-                List_uuid = viewName,
-                Limit = count,
+                List_uuid = _viewName,
+                Limit = Count,
                 Offset = _currentOffset
             };
 
-            var movies = DatabaseHandler.GetMovies(sqlQuery, filterSettings);
+            var movies = DatabaseHandler.GetMovies(sqlQuery, _filterSettings);
 
             if (movies.Count == 0) return;
 
@@ -72,7 +72,7 @@ namespace CineLog.Views
                 _moviesContainer?.Children.Add(movieButton);
             }
 
-            _currentOffset += count;
+            _currentOffset += Count;
         }
 
         private void OnScrollChanged()
@@ -85,11 +85,10 @@ namespace CineLog.Views
 
         private async void MovieButton_Click(object? sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.Tag is string movieId)
-            {
-                var selectedTitle = await DatabaseHandler.GetTitleInfo(movieId);
-                ShowMovieDetails(selectedTitle);
-            }
+            if (sender is not Button { Tag: string movieId }) return;
+
+            var selectedTitle = await DatabaseHandler.GetTitleInfo(movieId);
+            ShowMovieDetails(selectedTitle);
         }
 
         private void ShowMovieDetails(DatabaseHandler.TitleInfo selectedTitle)
@@ -204,54 +203,52 @@ namespace CineLog.Views
 
         private void AddToCalendar(object? sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.Tag is string title_id)
-            {
-                var scheduleList = DatabaseHandler.GetSchedule(title_id);
-                Console.WriteLine("shcedule listL: " + scheduleList);
-                CalendarView.AddMovieToCalendar(scheduleList, title_id);
-            }
+            if (sender is not Button { Tag: string titleId }) return;
+
+            var scheduleList = DatabaseHandler.GetSchedule(titleId);
+            CalendarView.AddMovieToCalendar(scheduleList, titleId);
+            
+            EventAggregator.Instance.Publish(new NotificationEvent { Message = $"✅ Added {titleId} to calendar." });
         }
 
         private async void OpenFilterModal(object? sender, RoutedEventArgs e)
         {
-            var modal = new FilterModal(filterSettings);
+            var modal = new FilterModal(_filterSettings);
             if (VisualRoot is not Window window) return;
 
             var result = await modal.ShowDialog<DatabaseHandler.FilterSettings?>(window);
+            if (result == null) return;
 
-            if (result != null)
-            {
-                filterSettings = result;
-                UpdateFilterChip();
-                ApplyFilter();
-            }
+            _filterSettings = result;
+            UpdateFilterChip();
+            ApplyFilter();
         }
 
         private void UpdateFilterChip()
         {
             FilterChipPanel.Children.Clear();
 
-            foreach (var genre in filterSettings.Genre!) AddFilterChip("Genre", genre.Item2);
-            foreach (var company in filterSettings.Company!) AddFilterChip("Company", company.Item2);
-            foreach (var name in filterSettings.Name!) AddFilterChip("Name", name.Item2);
+            foreach (var genre in _filterSettings.Genre!) AddFilterChip("Genre", genre.Item2);
+            foreach (var company in _filterSettings.Company!) AddFilterChip("Company", company.Item2);
+            foreach (var name in _filterSettings.Name!) AddFilterChip("Name", name.Item2);
 
-            if (!string.IsNullOrWhiteSpace(filterSettings.Type)) AddFilterChip("Type", filterSettings.Type);
-            if (!string.IsNullOrWhiteSpace(filterSettings.SearchTerm)) AddFilterChip("SearchTerm", filterSettings.SearchTerm);
+            if (!string.IsNullOrWhiteSpace(_filterSettings.Type)) AddFilterChip("Type", _filterSettings.Type);
+            if (!string.IsNullOrWhiteSpace(_filterSettings.SearchTerm)) AddFilterChip("SearchTerm", _filterSettings.SearchTerm);
 
-            if (filterSettings.MinRating != 0) AddFilterChip("MinRating", filterSettings.MinRating.ToString()!);
-            if (filterSettings.MaxRating != 10) AddFilterChip("MaxRating", filterSettings.MaxRating.ToString()!);
+            if (_filterSettings.MinRating != 0) AddFilterChip("MinRating", _filterSettings.MinRating.ToString()!);
+            if (_filterSettings.MaxRating != 10) AddFilterChip("MaxRating", _filterSettings.MaxRating.ToString()!);
 
-            if (filterSettings.YearStart != 1874) AddFilterChip("YearStart", filterSettings.YearStart.ToString()!);
-            if (filterSettings.YearEnd != DateTime.Now.Year + 1) AddFilterChip("YearEnd", filterSettings.YearEnd.ToString()!);
+            if (_filterSettings.YearStart != 1874) AddFilterChip("YearStart", _filterSettings.YearStart.ToString()!);
+            if (_filterSettings.YearEnd != DateTime.Now.Year + 1) AddFilterChip("YearEnd", _filterSettings.YearEnd.ToString()!);
         }
 
         private void AddFilterChip(string source, string filterText)
         {
-            var tag = (source + filterText).ToString();
+            var tag = source + filterText;
 
             foreach (var child in FilterChipPanel.Children)
             {
-                if (child is Control control && control.Tag?.ToString() == tag) return;
+                if (child is not null && child.Tag?.ToString() == tag) return;
             }
 
             var border = new Border
@@ -297,94 +294,87 @@ namespace CineLog.Views
 
         private void RemoveFilterChip(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button &&
-                button.Parent is StackPanel stack &&
-                stack.Parent is Border border &&
-                button.Tag is FilterChipTag tag)
+            if (sender is not Button { Parent: StackPanel { Parent: Border border }, Tag: FilterChipTag tag }) return;
+            
+            FilterChipPanel.Children.Remove(border);
+            var source = tag.Source;
+            var value = tag.Value;
+
+            switch (source)
             {
-                FilterChipPanel.Children.Remove(border);
-                string source = tag.Source;
-                string value = tag.Value;
-
-                switch (source)
-                {
-                    case "Genre":
-                        filterSettings.Genre?.RemoveAll(g => g.Item2 == value);
-                        break;
-                    case "Company":
-                        filterSettings.Company?.RemoveAll(c => c.Item2 == value);
-                        break;
-                    case "Name":
-                        filterSettings.Name?.RemoveAll(c => c.Item2 == value);
-                        break;
-                    case "Type":
-                        if (filterSettings.Type == value) filterSettings.Type = null;
-                        break;
-                    case "SearchTerm":
-                        if (filterSettings.SearchTerm == value) filterSettings.SearchTerm = null;
-                        break;
-                    case "MinRating":
-                        filterSettings.MinRating = 0;
-                        break;
-                    case "MaxRating":
-                        filterSettings.MaxRating = 10;
-                        break;
-                    case "YearStart":
-                        filterSettings.YearStart = 1874;
-                        break;
-                    case "YearEnd":
-                        filterSettings.YearEnd = DateTime.Now.Year + 1;
-                        break;
-                }
-
-                UpdateFilterChip();
-                ApplyFilter();
+                case "Genre":
+                    _filterSettings.Genre?.RemoveAll(g => g.Item2 == value);
+                    break;
+                case "Company":
+                    _filterSettings.Company?.RemoveAll(c => c.Item2 == value);
+                    break;
+                case "Name":
+                    _filterSettings.Name?.RemoveAll(c => c.Item2 == value);
+                    break;
+                case "Type":
+                    if (_filterSettings.Type == value) _filterSettings.Type = null;
+                    break;
+                case "SearchTerm":
+                    if (_filterSettings.SearchTerm == value) _filterSettings.SearchTerm = null;
+                    break;
+                case "MinRating":
+                    _filterSettings.MinRating = 0;
+                    break;
+                case "MaxRating":
+                    _filterSettings.MaxRating = 10;
+                    break;
+                case "YearStart":
+                    _filterSettings.YearStart = 1874;
+                    break;
+                case "YearEnd":
+                    _filterSettings.YearEnd = DateTime.Now.Year + 1;
+                    break;
             }
+
+            UpdateFilterChip();
+            ApplyFilter();
         }
 
         private void SortComboBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            if (sender is ComboBox comboBox && comboBox.SelectedItem is ComboBoxItem item)
-            {
-                filterSettings.SortBy = item.Tag!.ToString();
-                ApplyFilter();
-            }
+            if (sender is not ComboBox { SelectedItem: ComboBoxItem item }) return;
+
+            _filterSettings.SortBy = item.Tag!.ToString();
+            ApplyFilter();
         }
 
         private void FilterBySpecific(object? sender, RoutedEventArgs e)
         {
-            if (sender is Button btn) {
-                string id = btn.Tag!.ToString()!;
-                string prefix = id[..2];
-                string name = btn.Content!.ToString()!;
+            if (sender is not Button btn) return;
+            var id = btn.Tag!.ToString()!;
+            var prefix = id[..2];
+            var name = btn.Content!.ToString()!;
 
-                if (_prefixHandlers.TryGetValue(prefix, out var handler))
-                {
-                    handler(name, id);
-                    UpdateFilterChip();
-                    ApplyFilter();
-                }
-                else
-                {
-                    Console.WriteLine("Unknown button type: " + id);
-                    return;
-                }
+            if (_prefixHandlers.TryGetValue(prefix, out var handler))
+            {
+                handler(name, id);
+                UpdateFilterChip();
+                ApplyFilter();
+            }
+            else
+            {
+                Console.WriteLine("Unknown button type: " + id);
             }
         }
 
         private void HandleInterest(string name, string id)
         {
-            filterSettings.Genre!.Add(new Tuple<string, string>(id, name));
+            _filterSettings.Genre!.Add(new Tuple<string, string>(id, name));
         }
 
         private void HandleName(string name, string id)
         {
-            filterSettings.Name!.Add(new Tuple<string, string>(id, name));
+            _filterSettings.Name!.Add(new Tuple<string, string>(id, name));
         }
 
         private void HandleCompany(string name, string id)
         {
-            filterSettings.Company!.Add(new Tuple<string, string>(id, name));
+            _filterSettings.Company!.Add(new Tuple<string, string>(id, name));
         }
 
         #endregion
@@ -392,7 +382,7 @@ namespace CineLog.Views
 
     public class FilterChipTag(string source, string value)
     {
-        public string Source { get; set; } = source;
-        public string Value { get; set; } = value;
+        public string Source { get; } = source;
+        public string Value { get; } = value;
     }
 }
