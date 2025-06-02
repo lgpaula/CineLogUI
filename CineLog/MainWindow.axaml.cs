@@ -38,7 +38,7 @@ namespace CineLog
             }
         }
 
-        public async Task ShowNotificationAsync(string message)
+        private async Task ShowNotificationAsync(string message)
         {
             var view = new NotificationView { Message = message };
             var overlayArea = this.FindControl<StackPanel>("OverlayArea");

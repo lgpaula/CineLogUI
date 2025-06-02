@@ -12,36 +12,29 @@ namespace CineLog.Views
     {
         private Window? _owner;
         private Point _offset;
-        private List<CheckBox>? _genreCheckBoxes;
-        private List<CheckBox>? _companyCheckBoxes;
+        private readonly List<CheckBox>? _genreCheckBoxes;
+        private readonly List<CheckBox>? _companyCheckBoxes;
         private List<Tuple<string, string>>? _names;
 
-        public FilterModal()
-        {
-            throw new InvalidOperationException("This constructor is only for Avalonia XAML loader compatibility.");
-        }
-
-        public FilterModal(DatabaseHandler.FilterSettings filterSettings)
+        public FilterModal(DatabaseHandler.FilterSettings? filterSettings)
         {
             InitializeComponent();
             _genreCheckBoxes = AddCheckboxesToPanel(GenresPanel, DatabaseHandler.GetAllItems("genres_table"));
             _companyCheckBoxes = AddCheckboxesToPanel(CompaniesPanel, DatabaseHandler.GetAllItems("companies_table"));
 
-            Opened += (s, e) =>
+            Opened += (_, _) =>
             {
                 _owner = (Window)Owner!;
-                if (_owner != null)
-                {
-                    _offset = new Point(
-                        Position.X - _owner.Position.X,
-                        Position.Y - _owner.Position.Y
-                    );
+                if (_owner == null) return;
+                _offset = new Point(
+                    Position.X - _owner.Position.X,
+                    Position.Y - _owner.Position.Y
+                );
                     
-                    _owner.PositionChanged += Owner_PositionChanged;
-                }
+                _owner.PositionChanged += Owner_PositionChanged;
             };
             
-            Closed += (s, e) =>
+            Closed += (_, _) =>
             {
                 if (_owner != null) _owner.PositionChanged -= Owner_PositionChanged;
             };
@@ -80,8 +73,7 @@ namespace CineLog.Views
             foreach (var rb in TitleTypePanel.Children.OfType<RadioButton>())
             {
                 var tag = rb.Tag?.ToString();
-                if (tag == filterSettings.Type) rb.IsChecked = true;
-                else rb.IsChecked = false;
+                rb.IsChecked = tag == filterSettings.Type;
             }
 
             SearchBox.Text = filterSettings.SearchTerm ?? "";
@@ -133,23 +125,23 @@ namespace CineLog.Views
 
         private void OnApplyClicked(object? sender, RoutedEventArgs e)
         {
-            float minRating = 0.0f;
-            float maxRating = 10.0f;
+            var minRating = 0.0f;
+            var maxRating = 10.0f;
 
             // Read Rating values
             var minRatingBox = this.FindControl<TextBox>("MinRating");
             var maxRatingBox = this.FindControl<TextBox>("MaxRating");
-            if (minRatingBox != null && float.TryParse(minRatingBox.Text, out float minRatingParsed)) minRating = minRatingParsed;
-            if (maxRatingBox != null && float.TryParse(maxRatingBox.Text, out float maxratingParsed)) maxRating = maxratingParsed;
+            if (minRatingBox != null && float.TryParse(minRatingBox.Text, out var minRatingParsed)) minRating = minRatingParsed;
+            if (maxRatingBox != null && float.TryParse(maxRatingBox.Text, out var maxratingParsed)) maxRating = maxratingParsed;
 
             // Read Year values
-            int yearStart = 1874;
-            int yearEnd = DateTime.Now.Year;
+            var yearStart = 1874;
+            var yearEnd = DateTime.Now.Year;
 
             var minYearBox = this.FindControl<TextBox>("YearStart");
             var maxYearBox = this.FindControl<TextBox>("YearEnd");
-            if (minYearBox != null && int.TryParse(minYearBox.Text, out int minYearParsed)) yearStart = minYearParsed;
-            if (maxYearBox != null && int.TryParse(maxYearBox.Text, out int maxYearParsed)) yearEnd = maxYearParsed;
+            if (minYearBox != null && int.TryParse(minYearBox.Text, out var minYearParsed)) yearStart = minYearParsed;
+            if (maxYearBox != null && int.TryParse(maxYearBox.Text, out var maxYearParsed)) yearEnd = maxYearParsed;
 
             // Read Title Type (Movie or Series)
             string? selectedType = null;
@@ -158,11 +150,9 @@ namespace CineLog.Views
             {
                 foreach (var child in typePanel.Children)
                 {
-                    if (child is RadioButton radioButton && radioButton.IsChecked == true && radioButton.Tag is string typeTag)
-                    {
-                        selectedType = typeTag;
-                        break;
-                    }
+                    if (child is not RadioButton { IsChecked: true, Tag: string typeTag }) continue;
+                    selectedType = typeTag;
+                    break;
                 }
             }
 

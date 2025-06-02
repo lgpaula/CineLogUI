@@ -12,7 +12,6 @@ using System.Collections.ObjectModel;
 using Avalonia.Input;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
-using Avalonia.VisualTree;
 using Avalonia.Media;
 
 namespace CineLog.Views
@@ -62,7 +61,7 @@ namespace CineLog.Views
             _ = StartScraping(criteria, TryParseInt(Quantity.Text));
 
             EventAggregator.Instance.Publish(new NotificationEvent { Message = $"✅ Scraping started. {Time.Text}. Please wait." });
-            scrapeButton.IsEnabled = false;
+            ScrapeButton.IsEnabled = false;
         }
 
         private void OnAddExtraFilterClick(object? sender, RoutedEventArgs e)
@@ -96,7 +95,7 @@ namespace CineLog.Views
             var comboBox = new ComboBox
             {
                 Width = 120,
-                ItemsSource = Enum.GetValues(typeof(FilterTypes))
+                ItemsSource = Enum.GetValues<FilterTypes>()
             };
             Grid.SetColumn(comboBox, 0);
             Grid.SetRow(comboBox, 0);
@@ -207,31 +206,6 @@ namespace CineLog.Views
             parentPanel!.Children.Add(rowPanel);
         }
 
-
-        private void Suggestion_Clicked(object? sender, PointerPressedEventArgs e)
-        {
-            if (sender is TextBlock tb && tb.DataContext is IdNameItem item)
-            {
-                Console.WriteLine("clicked: " + item.Name);
-                var parent = tb.FindAncestorOfType<StackPanel>();
-                if (parent != null)
-                {
-                    var textBox = parent.GetVisualDescendants().OfType<TextBox>().FirstOrDefault();
-                    if (textBox != null)
-                    {
-                        textBox.Text = item.Name;
-
-                        // Clear suggestions
-                        var suggestionsPanel = parent.GetVisualDescendants().OfType<ItemsControl>().FirstOrDefault();
-                        if (suggestionsPanel?.ItemsSource is ObservableCollection<IdNameItem> suggestions)
-                        {
-                            suggestions.Clear();
-                        }
-                    }
-                }
-            }
-        }
-
         private List<string> GetSelectedIds(FilterTypes type)
         {
             var parentPanel = this.FindControl<StackPanel>("ExtraFilterPanel");
@@ -245,13 +219,12 @@ namespace CineLog.Views
                 var comboBox = grid.Children.OfType<ComboBox>().FirstOrDefault();
                 var textBox = grid.Children.OfType<TextBox>().FirstOrDefault();
 
-                if (comboBox?.SelectedItem is FilterTypes selectedType && selectedType == type &&
-                    !string.IsNullOrWhiteSpace(textBox?.Text))
-                {
-                    var id = textBox.Tag?.ToString();
-                    if (!string.IsNullOrEmpty(id))
-                        ids.Add(id);
-                }
+                if (comboBox?.SelectedItem is not FilterTypes selectedType || selectedType != type ||
+                    string.IsNullOrWhiteSpace(textBox?.Text)) continue;
+
+                var id = textBox.Tag?.ToString();
+                if (!string.IsNullOrEmpty(id))
+                    ids.Add(id);
             }
 
             return ids;
@@ -264,10 +237,10 @@ namespace CineLog.Views
 
         private async Task StartScraping(ScraperCriteria criteria, int? quantity)
         {
-            string stringCriteria = ConvertCriteria(criteria);
+            var stringCriteria = ConvertCriteria(criteria);
             await ServerHandler.ScrapeMultipleTitles(stringCriteria, quantity);
 
-            scrapeButton.IsEnabled = true;
+            ScrapeButton.IsEnabled = true;
         }
 
         private static List<string> GetSelectedCheckBoxes(List<CheckBox> checkBoxes)
@@ -306,35 +279,33 @@ namespace CineLog.Views
 
         private void ChangeQuantity(int delta)
         {
-            if (int.TryParse(Quantity.Text, out int currentQuantity))
-            {
-                currentQuantity += delta;
-                currentQuantity = Math.Clamp(currentQuantity, 50, 1000);
+            if (!int.TryParse(Quantity.Text, out int currentQuantity)) return;
+            currentQuantity += delta;
+            currentQuantity = Math.Clamp(currentQuantity, 50, 1000);
 
-                Quantity.Text = currentQuantity.ToString();
+            Quantity.Text = currentQuantity.ToString();
 
-                int timeSeconds = currentQuantity / 50 * 10;
-                Time.Text = $"Estimated time: {timeSeconds} seconds";
-            }
+            var timeSeconds = currentQuantity / 50 * 10;
+            Time.Text = $"Estimated time: {timeSeconds} seconds";
         }
     }
 
     public struct ScraperCriteria
     {
-        public List<string> Genres { get; set; }
-        public List<string> Companies { get; set; }
-        public List<string> Names { get; set; }
-        public List<string> Types { get; set; }
-        public int? YearFrom { get; set; }
-        public int? YearTo { get; set; }
-        public float? RatingFrom { get; set; }
-        public float? RatingTo { get; set; }
+        public List<string> Genres { get; init; }
+        public List<string> Companies { get; init; }
+        public List<string> Names { get; init; }
+        public List<string> Types { get; init; }
+        public int? YearFrom { get; init; }
+        public int? YearTo { get; init; }
+        public float? RatingFrom { get; init; }
+        public float? RatingTo { get; init; }
     }
 
     public class IdNameItem
     {
-        public string? Id { get; set; }
-        public string? Name { get; set; }
+        public string? Id { get; init; }
+        public string? Name { get; init; }
     }
 
     public enum FilterTypes

@@ -14,7 +14,7 @@ using System.Linq;
 
 namespace CineLog
 {
-    public partial class App : Application
+    public class App : Application
     {
         private Process? _pythonServerProcess;
         private CancellationTokenSource? _workerTokenSource;
@@ -73,7 +73,7 @@ namespace CineLog
         private static async Task WaitForFlaskReady()
         {
             using var client = new HttpClient();
-            for (int i = 0; i < 20; i++) // try for 10 seconds
+            for (var i = 0; i < 20; i++) // try for 10 seconds
             {
                 try
                 {
@@ -84,7 +84,10 @@ namespace CineLog
                         return;
                     }
                 }
-                catch { }
+                catch
+                {
+                    // ignored
+                }
 
                 await Task.Delay(500);
             }

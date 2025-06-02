@@ -2,21 +2,17 @@ using System;
 using ReactiveUI;
 using CineLog.Views;
 using Avalonia.Controls;
-using CineLog.Views.Helper;
 
 namespace CineLog.ViewModels
 {
     public class MainWindowViewModel : ReactiveObject
     {
-        private UserControl _currentView;
+        private UserControl _currentView = new HomeView(); // Default view
+
         public UserControl CurrentView
         {
             get => _currentView;
             set => this.RaiseAndSetIfChanged(ref _currentView, value);
-        }
-
-        public MainWindowViewModel() {
-            _currentView = new HomeView(); // Default view
         }
 
         public void HandleButtonClick(string viewName)

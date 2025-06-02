@@ -22,7 +22,7 @@ namespace CineLog.Views
         public HomeView()
         {
             InitializeComponent();
-            EventAggregator.Instance.Subscribe<DatabaseHandler.CustomList>(LoadListUI);
+            EventAggregator.Instance.Subscribe<DatabaseHandler.CustomList>(LoadListUi);
 
             DatabaseHandler.CreateListsTable();
             DatabaseHandler.CreateCalendarTable();
@@ -40,18 +40,18 @@ namespace CineLog.Views
 
             var collection = new DatabaseHandler.CustomList("CollectionContainer");
 
-            LoadListUI(collection);
+            LoadListUi(collection);
 
             var lists = DatabaseHandler.GetListsFromDatabase();
             foreach (var list in lists)
             {
-                LoadListUI(list);
+                LoadListUi(list);
             }
         }
 
-        private void LoadListUI(DatabaseHandler.CustomList customList)
+        private void LoadListUi(DatabaseHandler.CustomList customList)
         {
-            StackPanel? panel = _panelsList.FirstOrDefault(p => p.Name == (customList.Uuid ?? customList.Name));
+            var panel = _panelsList.FirstOrDefault(p => p.Name == (customList.Uuid ?? customList.Name));
             panel ??= CreateListPanel(customList);
 
             var sqlQuery = new DatabaseHandler.SQLQuerier {
@@ -61,33 +61,28 @@ namespace CineLog.Views
 
             var moviesInDatabase = DatabaseHandler.GetMovies(sqlQuery);
 
-            var movieButtonsInUI = new Dictionary<string, Button>();
+            var movieButtonsInUi = new Dictionary<string, Button>();
             foreach (var child in panel.Children)
             {
-                if (child is Button button && button.Tag is string movieId)
-                    movieButtonsInUI[movieId] = button;
+                if (child is Button { Tag: string movieId } button)
+                    movieButtonsInUi[movieId] = button;
             }
 
             var movieIdsInDatabase = new HashSet<string>(moviesInDatabase.ConvertAll(m => m.Id));
-            var movieIdsInUI = new HashSet<string>(movieButtonsInUI.Keys);
+            var movieIdsInUi = new HashSet<string>(movieButtonsInUi.Keys);
 
             foreach (var movie in moviesInDatabase)
             {
-                if (!movieIdsInUI.Contains(movie.Id))
-                {
-                    Button movieButton = movie.CreateMovieButton();
-                    movieButton.Tag = movie.Id;
-                    movieButton.Cursor = new Cursor(StandardCursorType.Arrow);
-                    panel.Children.Add(movieButton);
-                }
+                if (movieIdsInUi.Contains(movie.Id)) continue;
+                var movieButton = movie.CreateMovieButton();
+                movieButton.Tag = movie.Id;
+                movieButton.Cursor = new Cursor(StandardCursorType.Arrow);
+                panel.Children.Add(movieButton);
             }
 
-            foreach (var movieId in movieIdsInUI)
+            foreach (var movieId in movieIdsInUi.Where(movieId => !movieIdsInDatabase.Contains(movieId)))
             {
-                if (!movieIdsInDatabase.Contains(movieId))
-                {
-                    panel.Children.Remove(movieButtonsInUI[movieId]);
-                }
+                panel.Children.Remove(movieButtonsInUi[movieId]);
             }
         }
 
@@ -110,13 +105,11 @@ namespace CineLog.Views
                 Margin = new Thickness(0, 0, 5, 0)
             };
 
-            listTitle.LostFocus += (s, e) =>
+            listTitle.LostFocus += (_, _) =>
             {
-                if (listTitle.Text != customList.Name)
-                {
-                    DatabaseHandler.UpdateListName(customList, listTitle.Text!);
-                    customList.Name = listTitle.Text;
-                }
+                if (listTitle.Text == customList.Name) return;
+                DatabaseHandler.UpdateListName(customList, listTitle.Text!);
+                customList.Name = listTitle.Text;
             };
 
             StackPanel listPanel = new()
@@ -270,11 +263,11 @@ namespace CineLog.Views
         #endregion
         private class ListPanelGroup
         {
-            public StackPanel? ContentPanel { get; set; }
-            public Button? ShowButton { get; set; }
-            public Button? HideButton { get; set; }
-            public Button? DeleteButton { get; set; }
-            public Button? SeeAllButton { get; set; }
+            public StackPanel? ContentPanel { get; init; }
+            public Button? ShowButton { get; init; }
+            public Button? HideButton { get; init; }
+            public Button? DeleteButton { get; init; }
+            public Button? SeeAllButton { get; init; }
 
         }
 
