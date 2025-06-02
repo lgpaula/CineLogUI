@@ -18,7 +18,6 @@ public class App : Application
 {
     private Process? _pythonServerProcess;
     private CancellationTokenSource? _workerTokenSource;
-    private Task? _workerTask;
 
     public override void Initialize()
     {
@@ -40,13 +39,13 @@ public class App : Application
                 }
             });
 
-            desktop.Exit += (sender, args) => OnExit(sender!, args);
+            desktop.Exit += (_, _) => OnExit();
         }
 
         base.OnFrameworkInitializationCompleted();
 
         _workerTokenSource = new CancellationTokenSource();
-        _workerTask = StartWorkerThreadsAsync(_workerTokenSource.Token);
+        _ = StartWorkerThreadsAsync(_workerTokenSource.Token);
     }
 
     private void StartPythonServer()
@@ -109,7 +108,7 @@ public class App : Application
         }
     }
 
-    private void OnExit(object sender, ControlledApplicationLifetimeExitEventArgs e)
+    private void OnExit()
     {
         _pythonServerProcess?.Kill();
         _pythonServerProcess?.Dispose();
@@ -121,7 +120,7 @@ public class App : Application
         _workerTokenSource?.Dispose();
 
         _workerTokenSource = new CancellationTokenSource();
-        _workerTask = StartWorkerThreadsAsync(_workerTokenSource.Token);
+        _ = StartWorkerThreadsAsync(_workerTokenSource.Token);
     }
 
     private static async Task StartWorkerThreadsAsync(CancellationToken token)
