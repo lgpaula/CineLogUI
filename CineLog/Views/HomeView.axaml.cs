@@ -54,8 +54,8 @@ namespace CineLog.Views
             var panel = _panelsList.FirstOrDefault(p => p.Name == (customList.Uuid ?? customList.Name));
             panel ??= CreateListPanel(customList);
 
-            var sqlQuery = new DatabaseHandler.SQLQuerier {
-                List_uuid = customList.Uuid,
+            var sqlQuery = new DatabaseHandler.SqlQuerier {
+                ListUuid = customList.Uuid,
                 Limit = 20
             };
 

@@ -9,7 +9,7 @@ namespace CineLog.Views.Helper
 {
     public static class ServerHandler
     {
-        public static async Task<string> ScrapeMultipleTitles(string criteriaJson, int? quantity)
+        public static async Task ScrapeMultipleTitles(string criteriaJson, int? quantity)
         {
             using var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(120);
@@ -25,80 +25,59 @@ namespace CineLog.Views.Helper
                 var content = new StringContent(contentJson, Encoding.UTF8, "application/json");
 
                 var response = await client.PostAsync("http://127.0.0.1:5000/scrape", content);
-                string result = await response.Content.ReadAsStringAsync();
-                
-                if (response.IsSuccessStatusCode)
+                var result = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode) return;
+                Console.WriteLine("ScrapeMultipleTitles completed successfully.");
+                var jsonResult = JsonSerializer.Deserialize<JsonElement>(result);
+                if (jsonResult.TryGetProperty("result", out var count))
                 {
-                    Console.WriteLine("ScrapeMultipleTitles completed successfully.");
-                    var jsonResult = JsonSerializer.Deserialize<JsonElement>(result);
-                    if (jsonResult.TryGetProperty("result", out var count))
-                    {
-                        int insertedCount = count.GetInt32();
-                        Console.WriteLine($"Scraped {insertedCount} titles.");
-                        EventAggregator.Instance.Publish(new NotificationEvent { Message = $"✅ Scraping done successfully! Added {insertedCount} new titles." });
-                    }
-
-                    if (Application.Current is App app)
-                    {
-                        Console.WriteLine("Restarting thread");
-                        app.RestartWorkerThreads();
-                    }
-
-                    return result;
+                    var insertedCount = count.GetInt32();
+                    Console.WriteLine($"Scraped {insertedCount} titles.");
+                    EventAggregator.Instance.Publish(new NotificationEvent { Message = $"✅ Scraping done successfully! Added {insertedCount} new titles." });
                 }
 
-                return $"Flask Error: {result}";
+                if (Application.Current is not App app) return;
+                Console.WriteLine("Restarting thread");
+                app.RestartWorkerThreads();
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error calling Flask API: " + ex.Message);
-                return "Error";
             }
         }
 
-        public static async Task<string> ScrapeSingleTitle(string title_id) // takes about 8 seconds per title
+        public static async Task ScrapeSingleTitle(string titleId) // takes about 8 seconds per title
         {
             try
             {
                 using var client = new HttpClient();
-                var response = await client.PostAsync($"http://127.0.0.1:5000/scrape/{title_id}", null);
-                string result = await response.Content.ReadAsStringAsync();
+                var response = await client.PostAsync($"http://127.0.0.1:5000/scrape/{titleId}", null);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine("ScrapeSingleTitle completed successfully.");
-                    return result;
-                }
-
-                return $"Flask Error: {result}";
+                if (!response.IsSuccessStatusCode) return;
+                Console.WriteLine("ScrapeSingleTitle completed successfully.");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Scraper call failed: {ex.Message}");
-                return "Error";
             }
         }
 
-        public static async Task<string> FetchEpisodesDates(string title_id, string season_count)
+        public static async Task FetchEpisodesDates(string titleId, string seasonCount)
         {
             try
             {
                 using var client = new HttpClient();
-                var response = await client.GetAsync($"http://127.0.0.1:5000/fetch_episodes?title_id={title_id}&season_count={season_count}");
-                string result = await response.Content.ReadAsStringAsync();
+                var response = await client.GetAsync($"http://127.0.0.1:5000/fetch_episodes?title_id={titleId}&season_count={seasonCount}");
 
                 if (response.IsSuccessStatusCode)
                 {
                     Console.WriteLine("FetchEpisodesDates completed successfully.");
-                    return result;
                 }
-
-                return $"Flask Error: {result}";
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Fetch dates failed: {ex.Message}");
-                return "Error";
             }
         }
     }

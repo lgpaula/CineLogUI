@@ -54,8 +54,8 @@ namespace CineLog.Views
 
         private void LoadNextPage()
         {
-            var sqlQuery = new DatabaseHandler.SQLQuerier {
-                List_uuid = _viewName,
+            var sqlQuery = new DatabaseHandler.SqlQuerier {
+                ListUuid = _viewName,
                 Limit = Count,
                 Offset = _currentOffset
             };
@@ -138,6 +138,20 @@ namespace CineLog.Views
 
             this.FindControl<TextBlock>("DescriptionText")!.Text = selectedTitle.Plot ?? "";
 
+            InsertButtons("GenresButtons", selectedTitle.Genres);
+            InsertButtons("CastButtons", selectedTitle.Stars);
+            InsertButtons("WritersButtons", selectedTitle.Writers);
+            InsertButtons("DirectorsButtons", selectedTitle.Directors);
+            InsertButtons("CreatorsButtons", selectedTitle.Creators);
+            InsertButtons("ProductionButtons", selectedTitle.Companies);
+
+            var detailsBorder = this.FindControl<Border>("DetailsBorder")!;
+            detailsBorder.ClipToBounds = true;
+            detailsBorder.IsVisible = true;
+
+            this.FindControl<Button>("Calendar")!.Tag = movie.Id;
+            return;
+
             void InsertButtons(string panelName, List<Tuple<string, string>>? items)
             {
                 var panel = this.FindControl<WrapPanel>(panelName)!;
@@ -167,19 +181,6 @@ namespace CineLog.Views
                     panel.Children.Add(button);
                 }
             }
-
-            InsertButtons("GenresButtons", selectedTitle.Genres);
-            InsertButtons("CastButtons", selectedTitle.Stars);
-            InsertButtons("WritersButtons", selectedTitle.Writers);
-            InsertButtons("DirectorsButtons", selectedTitle.Directors);
-            InsertButtons("CreatorsButtons", selectedTitle.Creators);
-            InsertButtons("ProductionButtons", selectedTitle.Companies);
-
-            var detailsBorder = this.FindControl<Border>("DetailsBorder")!;
-            detailsBorder.ClipToBounds = true;
-            detailsBorder.IsVisible = true;
-
-            this.FindControl<Button>("Calendar")!.Tag = movie.Id;
         }
 
         private void RenewList()

@@ -132,7 +132,7 @@ namespace CineLog
             {
                 await WaitForFlaskReady();
 
-                var sqlQuery = new DatabaseHandler.SQLQuerier();
+                var sqlQuery = new DatabaseHandler.SqlQuerier();
                 var dbTitles = DatabaseHandler.GetMovies(sqlQuery);
 
                 using var throttler = new SemaphoreSlim(maxConcurrentTasks);
@@ -158,7 +158,7 @@ namespace CineLog
             {
                 await WaitForFlaskReady();
 
-                var sqlQuery = new DatabaseHandler.SQLQuerier();
+                var sqlQuery = new DatabaseHandler.SqlQuerier();
                 var dbTitles = DatabaseHandler.GetMovies(sqlQuery);
 
                 using var throttler = new SemaphoreSlim(maxConcurrentTasks);

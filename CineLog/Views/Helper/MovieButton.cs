@@ -11,25 +11,15 @@ using Avalonia.Animation;
 
 namespace CineLog.Views.Helper 
 {
-    public class Movie
+    public class Movie(string id, string title, string posterUrl)
     {
-        public string Id { get; set; }
-        public string Title { get; set; }
-        public string PosterUrl { get; set; }
+        public string Id { get; } = id;
+        private string Title { get; } = title;
+        private string PosterUrl { get; } = posterUrl;
         private readonly HttpClient _httpClient = new();
 
-        public Movie(string id, string title, string posterUrl)
+        public Movie(string id) : this(id, DatabaseHandler.GetMovieTitle(id), DatabaseHandler.GetPosterUrl(id))
         {
-            Id = id;
-            Title = title;
-            PosterUrl = posterUrl;
-        }
-
-        public Movie(string id) 
-        {
-            Id = id;
-            Title = DatabaseHandler.GetMovieTitle(id);
-            PosterUrl = DatabaseHandler.GetPosterUrl(id);
         }
 
         public Button CreateMovieButton(double percentage = 1.0)
@@ -65,7 +55,7 @@ namespace CineLog.Views.Helper
                 [
                     new DoubleTransition
                     {
-                        Property = Rectangle.OpacityProperty,
+                        Property = Visual.OpacityProperty,
                         Duration = TimeSpan.FromMilliseconds(250)
                     }
                 ]
@@ -103,19 +93,19 @@ namespace CineLog.Views.Helper
 
             button.Content = grid;
 
-            button.PointerEntered += (_, __) =>
+            button.PointerEntered += (_, _) =>
             {
                 overlayRect.Opacity = 1;
                 titleText.Opacity = 1;
             };
 
-            button.PointerExited += (_, __) =>
+            button.PointerExited += (_, _) =>
             {
                 overlayRect.Opacity = 0;
                 titleText.Opacity = 0;
             };
 
-            button.PointerPressed += (s, e) =>
+            button.PointerPressed += (_, _) =>
             {
                 var contextMenu = CreateContextMenu();
                 button.ContextMenu = contextMenu;
@@ -143,7 +133,7 @@ namespace CineLog.Views.Helper
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                checkBox.IsCheckedChanged += (sender, e) =>
+                checkBox.IsCheckedChanged += (_, _) =>
                 {
                     var isChecked = checkBox.IsChecked ?? false;
                     OnListCheckChanged(list, isChecked);
@@ -164,7 +154,7 @@ namespace CineLog.Views.Helper
                             }
                         }
                     },
-                    StaysOpenOnClick = true // this is critical!
+                    StaysOpenOnClick = true
                 };
 
                 listSubMenu.Items.Add(menuItem);
@@ -184,7 +174,7 @@ namespace CineLog.Views.Helper
             EventAggregator.Instance.Publish(list);
         }
 
-        public Border GetImageBorder()
+        private Border GetImageBorder()
         {
             Image movieImage = new()
             {
@@ -227,7 +217,7 @@ namespace CineLog.Views.Helper
                 using var response = await _httpClient.GetAsync(PosterUrl);
                 response.EnsureSuccessStatusCode();
 
-                using var stream = await response.Content.ReadAsStreamAsync();
+                await using var stream = await response.Content.ReadAsStreamAsync();
                 image.Source = new Bitmap(stream);
             }
             catch (Exception ex)

@@ -4,6 +4,7 @@ using Avalonia.Media;
 using Avalonia.Layout;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Avalonia.Controls.Primitives;
 using Avalonia;
 using System.Text.Json;
@@ -71,21 +72,21 @@ namespace CineLog.Views
             _monthLabel!.Text = _currentMonth.ToString("MMMM yyyy");
 
             var firstOf = new DateTime(_currentMonth.Year, _currentMonth.Month, 1);
-            int startOffset = ((int)firstOf.DayOfWeek + 6) % 7;
-            int daysInThis = DateTime.DaysInMonth(_currentMonth.Year, _currentMonth.Month);
+            var startOffset = ((int)firstOf.DayOfWeek + 6) % 7;
+            var daysInThis = DateTime.DaysInMonth(_currentMonth.Year, _currentMonth.Month);
             var prevMonth = _currentMonth.AddMonths(-1);
-            int daysInPrev = DateTime.DaysInMonth(prevMonth.Year, prevMonth.Month);
+            var daysInPrev = DateTime.DaysInMonth(prevMonth.Year, prevMonth.Month);
 
             // fetch all (date, title_id) in this month
             var lastOf = firstOf.AddMonths(1).AddDays(-1);
             var idByDate = DatabaseHandler.LoadEntriesForMonth(firstOf, lastOf);
 
-            for (int i = 0; i < 42; i++)
+            for (var i = 0; i < 42; i++)
             {
                 DateTime date;
                 if (i < startOffset)
                 {
-                    int day = daysInPrev - startOffset + i + 1;
+                    var day = daysInPrev - startOffset + i + 1;
                     date = new DateTime(prevMonth.Year, prevMonth.Month, day);
                 }
                 else if (i < startOffset + daysInThis)
@@ -94,12 +95,12 @@ namespace CineLog.Views
                 }
                 else
                 {
-                    int day = i - (startOffset + daysInThis) + 1;
+                    var day = i - (startOffset + daysInThis) + 1;
                     var nxt = _currentMonth.AddMonths(1);
                     date = new DateTime(nxt.Year, nxt.Month, day);
                 }
 
-                bool isToday = date.Date == DateTime.Today;
+                var isToday = date.Date == DateTime.Today;
                 var border = new Border
                 {
                     BorderBrush = IsInCurrentMonth(date) ? Brushes.Gray : Brushes.Transparent,
@@ -115,7 +116,7 @@ namespace CineLog.Views
 
         private static Grid CreateDayCell(DateTime date, Dictionary<DateTime, List<string>> map)
         {
-            bool isCur = date.Month == _currentMonth.Month;
+            var isCur = date.Month == _currentMonth.Month;
 
             var grid = new Grid
             {
@@ -140,9 +141,8 @@ namespace CineLog.Views
 
             if (map.TryGetValue(date.Date, out var titles))
             {
-                foreach (var id in titles)
+                foreach (var btn in titles.Select(id => new Movie(id).CreateMovieButton(0.4)))
                 {
-                    var btn = new Movie(id).CreateMovieButton(0.4);
                     btn.Cursor = new Cursor(StandardCursorType.Arrow);
                     wrapPanel.Children.Add(btn);
                 }

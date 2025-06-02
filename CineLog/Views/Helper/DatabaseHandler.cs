@@ -5,6 +5,7 @@ using System.Data.SQLite;
 using System.Collections.Generic;
 using Dapper;
 using System.Threading.Tasks;
+// ReSharper disable InconsistentNaming
 
 namespace CineLog.Views.Helper
 {
@@ -14,7 +15,7 @@ namespace CineLog.Views.Helper
         private static readonly string connectionString = $"Data Source={dbPath};Version=3;";
         private static readonly string[] dbPeopleTables = ["creators_table", "cast_table", "directors_table", "writers_table"];
 
-        public static List<Movie> GetMovies(SQLQuerier sqlQuerier, FilterSettings? filterSettings = null)
+        public static List<Movie> GetMovies(SqlQuerier sqlQuerier, FilterSettings? filterSettings = null)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
@@ -43,12 +44,12 @@ namespace CineLog.Views.Helper
                 FROM titles_table t");
 
             // If list
-            if (!string.IsNullOrEmpty(sqlQuerier!.List_uuid))
+            if (!string.IsNullOrEmpty(sqlQuerier.ListUuid))
             {
                 joinClauses.Add("JOIN list_movies_table lm ON t.title_id = lm.movie_id");
                 joinClauses.Add("JOIN lists_table l ON lm.list_id = l.uuid");
                 whereClauses.Add("l.uuid = @ListId");
-                parameters.Add("ListId", sqlQuerier.List_uuid);
+                parameters.Add("ListId", sqlQuerier.ListUuid);
             }
             else whereClauses.Add("1 = 1");
 
@@ -59,7 +60,7 @@ namespace CineLog.Views.Helper
 
             if (whereClauses.Count > 0) query.Append("\nWHERE " + string.Join(" AND ", whereClauses));
 
-            if (filterSettings != null && filterSettings.SortBy != null) query.Append("\nORDER BY t." + filterSettings.SortBy);
+            if (filterSettings is { SortBy: not null }) query.Append("\nORDER BY t." + filterSettings.SortBy);
             else query.Append("\nORDER BY t.created_on DESC");
 
             query.Append("\nLIMIT @Limit OFFSET @Offset");
@@ -141,21 +142,20 @@ namespace CineLog.Views.Helper
                 parameters.Add("Types", filterSettings.Type.Split(','));
             }
 
-            if (!string.IsNullOrWhiteSpace(filterSettings.SearchTerm))
-            {
-                joins.Add("LEFT JOIN title_cast ts ON ts.title_id = t.title_id");
-                joins.Add("LEFT JOIN cast_table cast_t ON cast_t.id = ts.cast_id");
+            if (string.IsNullOrWhiteSpace(filterSettings.SearchTerm)) return;
+            joins.Add("LEFT JOIN title_cast ts ON ts.title_id = t.title_id");
+            joins.Add("LEFT JOIN cast_table cast_t ON cast_t.id = ts.cast_id");
 
-                joins.Add("LEFT JOIN title_director td ON td.title_id = t.title_id");
-                joins.Add("LEFT JOIN directors_table dir_t ON dir_t.id = td.directors_id");
+            joins.Add("LEFT JOIN title_director td ON td.title_id = t.title_id");
+            joins.Add("LEFT JOIN directors_table dir_t ON dir_t.id = td.directors_id");
 
-                joins.Add("LEFT JOIN title_writer tw ON tw.title_id = t.title_id");
-                joins.Add("LEFT JOIN writers_table wri_t ON wri_t.id = tw.writers_id");
+            joins.Add("LEFT JOIN title_writer tw ON tw.title_id = t.title_id");
+            joins.Add("LEFT JOIN writers_table wri_t ON wri_t.id = tw.writers_id");
 
-                joins.Add("LEFT JOIN title_creator tcr ON tcr.title_id = t.title_id");
-                joins.Add("LEFT JOIN creators_table cr_t ON cr_t.id = tcr.creators_id");
+            joins.Add("LEFT JOIN title_creator tcr ON tcr.title_id = t.title_id");
+            joins.Add("LEFT JOIN creators_table cr_t ON cr_t.id = tcr.creators_id");
 
-                whereClauses.Add(@"(
+            whereClauses.Add(@"(
                     LOWER(t.title_name) LIKE @SearchTerm OR
                     LOWER(cast_t.name) LIKE @SearchTerm OR
                     LOWER(dir_t.name) LIKE @SearchTerm OR
@@ -163,8 +163,7 @@ namespace CineLog.Views.Helper
                     LOWER(cr_t.name) LIKE @SearchTerm
                 )");
 
-                parameters.Add("SearchTerm", $"%{filterSettings.SearchTerm.ToLower()}%");
-            }
+            parameters.Add("SearchTerm", $"%{filterSettings.SearchTerm.ToLower()}%");
         }
 
         public static IEnumerable<IdNameItem> GetAllItems(string table)
@@ -207,7 +206,7 @@ namespace CineLog.Views.Helper
         public static async Task<List<(string id, string name)>> QueryDatabaseAsync(string selectedType, string searchText)
         {
             var results = new List<(string, string)>();
-            using var connection = new SQLiteConnection(connectionString);
+            await using var connection = new SQLiteConnection(connectionString);
             await connection.OpenAsync();
 
             if (selectedType == "Company" && !TableExists(connection, "companies_table")) return results;
@@ -219,7 +218,7 @@ namespace CineLog.Views.Helper
                 command.CommandText = "SELECT id, name FROM companies_table WHERE LOWER(name) LIKE @search || '%' LIMIT 3;";
                 command.Parameters.AddWithValue("@search", searchText.ToLower());
 
-                using var reader = await command.ExecuteReaderAsync();
+                await using var reader = await command.ExecuteReaderAsync();
                 while (await reader.ReadAsync())
                 {
                     results.Add((reader.GetString(0), reader.GetString(1)));
@@ -234,7 +233,7 @@ namespace CineLog.Views.Helper
                 command.CommandText = $"{unionQuery} LIMIT 3;";
                 command.Parameters.AddWithValue("@search", searchText.ToLower());
 
-                using var reader = await command.ExecuteReaderAsync();
+                await using var reader = await command.ExecuteReaderAsync();
                 while (await reader.ReadAsync())
                 {
                     results.Add((reader.GetString(0), reader.GetString(1)));
@@ -276,7 +275,7 @@ namespace CineLog.Views.Helper
 
             try
             {
-                int exists = connection.ExecuteScalar<int>(
+                var exists = connection.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM list_movies_table WHERE list_id = @ListId AND movie_id = @MovieId",
                     new { ListId = listId, MovieId = movieId }, transaction
                 );
@@ -306,7 +305,7 @@ namespace CineLog.Views.Helper
 
             try
             {
-                string query = @"
+                const string query = @"
                     DELETE FROM list_movies_table 
                     WHERE list_id = @ListId AND movie_id = @MovieId;";
 
@@ -320,18 +319,18 @@ namespace CineLog.Views.Helper
             }
         }
 
-        public static bool IsMovieInList(string list_id, string movieId)
+        public static bool IsMovieInList(string listId, string movieId)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
-            string query = @"
+            const string query = @"
                 SELECT COUNT(*) 
                 FROM list_movies_table lm
                 JOIN lists_table l ON lm.list_id = l.uuid
                 WHERE l.uuid = @ListId AND lm.movie_id = @MovieId";
 
-            int count = connection.ExecuteScalar<int>(query, new { ListId = list_id, MovieId = movieId });
+            var count = connection.ExecuteScalar<int>(query, new { ListId = listId, MovieId = movieId });
             return count > 0;
         }
 
@@ -371,14 +370,14 @@ namespace CineLog.Views.Helper
             ");
         }
 
-        public static void AddMovieToDate(string date, string title_id)
+        public static void AddMovieToDate(string date, string titleId)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
             
             connection.Execute(
                 @"INSERT OR IGNORE INTO calendar_table(date, title_id) VALUES(@Date, @Title);",
-                    new { Date = date, Title = title_id }
+                    new { Date = date, Title = titleId }
             );
         }
 
@@ -400,8 +399,8 @@ namespace CineLog.Views.Helper
 
         public static CustomList CreateNewList() 
         {
-            string listName = "My List";
-            string uuid = GetNewListUuid();
+            const string listName = "My List";
+            var uuid = GetNewListUuid();
 
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
@@ -430,27 +429,17 @@ namespace CineLog.Views.Helper
             connection.Open();
             var uuid = list.Uuid;
 
-            string query = "UPDATE lists_table SET name = @newName WHERE uuid = @uuid";
+            const string query = "UPDATE lists_table SET name = @newName WHERE uuid = @uuid";
             connection.Execute(query, new { newName, uuid });
         }
 
-        internal static object GetListUuid(string listName)
+        internal static string GetListName(string listId)
         {
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
-            string query = "SELECT uuid FROM lists_table WHERE name = @listName";
-            var result = connection.ExecuteScalar<string>(query, new { listName });
-            return result!;
-        }
-
-        internal static string GetListName(string list_id)
-        {
-            using var connection = new SQLiteConnection(connectionString);
-            connection.Open();
-
-            string query = "SELECT name FROM lists_table WHERE uuid = @list_id";
-            var result = connection.ExecuteScalar<string>(query, new { list_id });
+            const string query = "SELECT name FROM lists_table WHERE uuid = @list_id";
+            var result = connection.ExecuteScalar<string>(query, new { list_id = listId });
             return result!;
         }
 
@@ -462,10 +451,10 @@ namespace CineLog.Views.Helper
         {
             await UpdateTitleInfo(id);
 
-            using var connection = new SQLiteConnection(connectionString);
+            await using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
-            string query = @"SELECT * FROM titles_table WHERE title_id = @id";
+            const string query = "SELECT * FROM titles_table WHERE title_id = @id";
             var result = connection.QuerySingleOrDefault<TitleInfo>(query, new { id });
 
             result.Genres = await GetJoinedTuples(connection, "genres_table", "title_genre", "genres_id", id);
@@ -485,7 +474,7 @@ namespace CineLog.Views.Helper
             string joinColumn,
             string titleId)
         {
-            string query = $@"
+            var query = $@"
                 SELECT e.id, e.name
                 FROM {entityTable} e
                 JOIN {joinTable} j ON e.id = j.{joinColumn}
@@ -497,11 +486,11 @@ namespace CineLog.Views.Helper
 
         public static async Task UpdateTitleInfo(string id)
         {
-            using var connection = new SQLiteConnection(connectionString);
+            await using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
-            string checkQuery = "SELECT updated FROM titles_table WHERE title_id = @id";
-            bool isUpdated = connection.ExecuteScalar<bool>(checkQuery, new { id });
+            const string checkQuery = "SELECT updated FROM titles_table WHERE title_id = @id";
+            var isUpdated = connection.ExecuteScalar<bool>(checkQuery, new { id });
 
             if (!isUpdated)
             {
@@ -511,7 +500,7 @@ namespace CineLog.Views.Helper
 
         public static async Task FetchEpisodes(string id)
         {
-            using var connection = new SQLiteConnection(connectionString);
+            await using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
             const string query = @"
@@ -519,12 +508,12 @@ namespace CineLog.Views.Helper
                 FROM titles_table
                 WHERE title_id = @id";
 
-            var (TitleType, SeasonCount, YearEnd) = connection.QuerySingleOrDefault<(string TitleType, string SeasonCount, int? YearEnd)>(query, new { id });
+            var (titleType, seasonCount, yearEnd) = connection.QuerySingleOrDefault<(string TitleType, string SeasonCount, int? YearEnd)>(query, new { id });
 
-            if (TitleType == "Movie") return;
-            if (YearEnd is not null) return;
+            if (titleType == "Movie") return;
+            if (yearEnd is not null) return;
 
-            await ServerHandler.FetchEpisodesDates(id, SeasonCount);
+            await ServerHandler.FetchEpisodesDates(id, seasonCount);
         }
 
         internal static string GetPosterUrl(string id)
@@ -532,7 +521,7 @@ namespace CineLog.Views.Helper
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
-            string query = "SELECT poster_url FROM titles_table WHERE title_id = @id";
+            const string query = "SELECT poster_url FROM titles_table WHERE title_id = @id";
             var result = connection.ExecuteScalar<string>(query, new { id });
             return result!;
         }
@@ -542,7 +531,7 @@ namespace CineLog.Views.Helper
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
-            string query = "SELECT title_name FROM titles_table WHERE title_id = @id";
+            const string query = "SELECT title_name FROM titles_table WHERE title_id = @id";
             var result = connection.ExecuteScalar<string>(query, new { id });
             return result!;
         }
@@ -552,7 +541,7 @@ namespace CineLog.Views.Helper
             using var connection = new SQLiteConnection(connectionString);
             connection.Open();
 
-            string query = "SELECT schedule_list FROM titles_table WHERE title_id = @id";
+            const string query = "SELECT schedule_list FROM titles_table WHERE title_id = @id";
             var result = connection.ExecuteScalar<string>(query, new { id });
 
             return result!;
@@ -560,22 +549,22 @@ namespace CineLog.Views.Helper
 
         public struct TitleInfo
         {
-            public string Title_Id { get; set; }
-            public string Title_name { get; set; }
-            public string Poster_url { get; set; }
-            public int? Year_start { get; set; }
-            public int? Year_end { get; set; }
-            public string? Plot { get; set; }
-            public string? Runtime { get; set; }
-            public string? Rating { get; set; }
+            public string Title_Id { get; init; }
+            public string Title_name { get; init; }
+            public string Poster_url { get; init; }
+            public int? Year_start { get; init; }
+            public int? Year_end { get; init; }
+            public string? Plot { get; init; }
+            public string? Runtime { get; init; }
+            public string? Rating { get; init; }
             public List<Tuple<string, string>>? Genres { get; set; }
             public List<Tuple<string, string>>? Stars { get; set; }
             public List<Tuple<string, string>>? Writers { get; set; }
             public List<Tuple<string, string>>? Directors { get; set; }
             public List<Tuple<string, string>>? Creators { get; set; }
             public List<Tuple<string, string>>? Companies { get; set; }
-            public string? Schedule_list { get; set; }
-            public string? Season_count { get; set; }
+            public string? Schedule_list { get; init; }
+            public string? Season_count { get; init; }
         }
 #endregion
 
@@ -583,29 +572,27 @@ namespace CineLog.Views.Helper
         {
             public float? MinRating { get; set; } = 0;
             public float? MaxRating { get; set; } = 10;
-            public List<Tuple<string, string>>? Genre { get; set; } = [];
+            public List<Tuple<string, string>>? Genre { get; init; } = [];
             public int YearStart { get; set; } = 1874;
             public int YearEnd { get; set; } = DateTime.Now.Year + 1;
-            public List<Tuple<string, string>>? Company { get; set; } = [];
+            public List<Tuple<string, string>>? Company { get; init; } = [];
             public string? Type { get; set; }
             public string? SearchTerm { get; set; }
             public string? SortBy { get; set; } = "created_on DESC";
-            public List<Tuple<string, string>>? Name { get; set; } = [];
-
-            public FilterSettings() { }
+            public List<Tuple<string, string>>? Name { get; init; } = [];
         }
 
-        public class SQLQuerier
+        public class SqlQuerier
         {
-            public string? List_uuid { get; set; }
-            public int Limit { get; set; } = -1;
-            public int Offset { get; set; } = 0;
+            public string? ListUuid { get; init; }
+            public int Limit { get; init; } = -1;
+            public int Offset { get; init; }
         }
 
         public class CustomList(string listName, string? uuid = null)
         {
             public string? Name { get; set; } = listName;
-            public string? Uuid { get; set; } = uuid;
+            public string? Uuid { get; } = uuid;
         }
     }
 }

@@ -23,11 +23,9 @@ namespace CineLog.Views.Helper
         public void Publish<T>(T eventData)
         {
             var eventType = typeof(T);
-            if (_subscribers.TryGetValue(eventType, out var callbacks))
-            {
-                foreach (var callback in callbacks.Cast<Action<T>>())
-                    callback(eventData);
-            }
+            if (!_subscribers.TryGetValue(eventType, out var callbacks)) return;
+            foreach (var callback in callbacks.Cast<Action<T>>())
+                callback(eventData);
         }
     }
 }
