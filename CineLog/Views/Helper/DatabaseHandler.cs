@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Data.SQLite;
 using System.Collections.Generic;
+using System.IO;
 using Dapper;
 using System.Threading.Tasks;
 // ReSharper disable InconsistentNaming
@@ -11,7 +12,8 @@ namespace CineLog.Views.Helper;
 
 public static class DatabaseHandler
 {
-    private static readonly string dbPath = "/home/legion/CLionProjects/pyScraper/scraper/cinelog.db";
+    private static readonly string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    private static readonly string dbPath = Path.Combine(appDataPath, "CineLog", "cinelog.db");
     private static readonly string connectionString = $"Data Source={dbPath};Version=3;";
     private static readonly string[] dbPeopleTables = ["creators_table", "cast_table", "directors_table", "writers_table"];
 
@@ -593,5 +595,11 @@ public static class DatabaseHandler
     {
         public string? Name { get; set; } = listName;
         public string? Uuid { get; } = uuid;
+    }
+
+    public static void CreateDbDirectory()
+    {
+        Console.WriteLine("dbpath: " + dbPath);
+        Directory.CreateDirectory(Path.GetDirectoryName(dbPath) ?? string.Empty);
     }
 }

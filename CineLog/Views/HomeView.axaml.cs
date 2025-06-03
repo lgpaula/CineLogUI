@@ -24,6 +24,7 @@ public partial class HomeView : UserControl
         InitializeComponent();
         EventAggregator.Instance.Subscribe<DatabaseHandler.CustomList>(LoadListUi);
 
+        DatabaseHandler.CreateDbDirectory();
         DatabaseHandler.CreateListsTable();
         DatabaseHandler.CreateCalendarTable();
         LoadMoviesAndLists();
