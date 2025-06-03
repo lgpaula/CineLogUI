@@ -67,6 +67,11 @@ public class App : Application
             }
         };
         _pythonServerProcess.Start();
+        
+        _pythonServerProcess.OutputDataReceived += (_, e) => Console.WriteLine("[Python STDOUT] " + e.Data);
+        _pythonServerProcess.ErrorDataReceived += (_, e) => Console.WriteLine("[Python STDERR] " + e.Data);
+        _pythonServerProcess.BeginOutputReadLine();
+        _pythonServerProcess.BeginErrorReadLine();
     }
 
     private static async Task WaitForFlaskReady()
