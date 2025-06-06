@@ -5,13 +5,13 @@ namespace CineLog.Views;
 
 public partial class NotificationView : UserControl
 {
-    public static readonly StyledProperty<string> MessageProperty =
+    private static readonly StyledProperty<string> MessageProperty =
         AvaloniaProperty.Register<NotificationView, string>(nameof(Message));
 
     public string Message
     {
         get => GetValue(MessageProperty);
-        set => SetValue(MessageProperty, value);
+        init => SetValue(MessageProperty, value);
     }
 
     public NotificationView()
@@ -32,5 +32,5 @@ public partial class NotificationView : UserControl
 
 public class NotificationEvent
 {
-    public string Message { get; set; } = "";
+    public string Message { get; init; } = "";
 }

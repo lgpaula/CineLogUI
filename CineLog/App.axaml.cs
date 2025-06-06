@@ -11,6 +11,8 @@ using System;
 using CineLog.Views.Helper;
 using System.Threading;
 using System.Linq;
+using System.Runtime.InteropServices;
+using CineLog.Views;
 
 namespace CineLog;
 
@@ -57,21 +59,26 @@ public class App : Application
         {
             StartInfo = new ProcessStartInfo
             {
-                FileName = "python3", // Change to "python" if on Windows
+                FileName = GetDefaultPythonExecutable(),
                 Arguments = "scraper_api.py",
-                WorkingDirectory = "/home/legion/CLionProjects/pyScraper/scraper", //Directory.GetCurrentDirectory(),
+                WorkingDirectory = "/home/legion/CLionProjects/pyScraper/data_scraper",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             }
         };
+
         _pythonServerProcess.Start();
-        
         _pythonServerProcess.OutputDataReceived += (_, e) => Console.WriteLine("[Python STDOUT] " + e.Data);
         _pythonServerProcess.ErrorDataReceived += (_, e) => Console.WriteLine("[Python STDERR] " + e.Data);
         _pythonServerProcess.BeginOutputReadLine();
         _pythonServerProcess.BeginErrorReadLine();
+    }
+    
+    private static string GetDefaultPythonExecutable()
+    {
+        return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "python" : "python3";
     }
 
     private static async Task WaitForFlaskReady()
@@ -97,6 +104,7 @@ public class App : Application
         }
 
         Console.WriteLine("Flask did not become ready in time.");
+        EventAggregator.Instance.Publish(new NotificationEvent { Message = "X The server failed to start. Scraping and updating will not work" });
     }
 
     private static bool IsServerRunning()
