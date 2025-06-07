@@ -8,6 +8,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using System.Threading.Tasks;
 using System;
+using System.IO;
 using CineLog.Views.Helper;
 using System.Threading;
 using System.Linq;
@@ -52,6 +53,7 @@ public class App : Application
 
     private void StartPythonServer()
     {
+        Console.WriteLine("Current Directory: " + GetWorkingDir());
         if (IsServerRunning()) return;
         _ = WaitForFlaskReady();
 
@@ -61,7 +63,7 @@ public class App : Application
             {
                 FileName = GetDefaultPythonExecutable(),
                 Arguments = "scraper_api.py",
-                WorkingDirectory = "/home/legion/CLionProjects/pyScraper/data_scraper",
+                WorkingDirectory = GetWorkingDir(),
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -80,6 +82,31 @@ public class App : Application
     {
         return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "python" : "python3";
     }
+    
+    private static string GetWorkingDir()
+    {
+        var baseDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", ".."));
+
+        string[] relativePaths =
+        [
+            Path.Combine("backend", "data_scraper"),
+            Path.Combine("pyScraper", "data_scraper")
+        ];
+
+        foreach (var relPath in relativePaths)
+        {
+            var fullPath = Path.Combine(baseDir, relPath);
+            if (Directory.Exists(fullPath))
+            {
+                return fullPath;
+            }
+        }
+
+        throw new DirectoryNotFoundException("No valid working directory found relative to current directory.");
+    }
+    
+    // dev Current Directory: /home/legion/CLionProjects/CineLogUI/CineLog
+    // deploy Current Directory: /home/legion/CLionProjects/CineLogAppRelease/frontend/linux
 
     private static async Task WaitForFlaskReady()
     {
