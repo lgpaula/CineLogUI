@@ -8,9 +8,12 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using System.Threading.Tasks;
 using System;
+using System.IO;
 using CineLog.Views.Helper;
 using System.Threading;
 using System.Linq;
+using System.Runtime.InteropServices;
+using CineLog.Views;
 
 namespace CineLog;
 
@@ -50,6 +53,7 @@ public class App : Application
 
     private void StartPythonServer()
     {
+        Console.WriteLine("Current Directory: " + GetWorkingDir());
         if (IsServerRunning()) return;
         _ = WaitForFlaskReady();
 
@@ -57,17 +61,52 @@ public class App : Application
         {
             StartInfo = new ProcessStartInfo
             {
-                FileName = "python3", // Change to "python" if on Windows
+                FileName = GetDefaultPythonExecutable(),
                 Arguments = "scraper_api.py",
-                WorkingDirectory = "/home/legion/CLionProjects/pyScraper/scraper", //Directory.GetCurrentDirectory(),
+                WorkingDirectory = GetWorkingDir(),
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             }
         };
+
         _pythonServerProcess.Start();
+        _pythonServerProcess.OutputDataReceived += (_, e) => Console.WriteLine("[Python STDOUT] " + e.Data);
+        _pythonServerProcess.ErrorDataReceived += (_, e) => Console.WriteLine("[Python STDERR] " + e.Data);
+        _pythonServerProcess.BeginOutputReadLine();
+        _pythonServerProcess.BeginErrorReadLine();
     }
+    
+    private static string GetDefaultPythonExecutable()
+    {
+        return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "python" : "python3";
+    }
+    
+    private static string GetWorkingDir()
+    {
+        var baseDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", ".."));
+
+        string[] relativePaths =
+        [
+            Path.Combine("backend", "data_scraper"),
+            Path.Combine("pyScraper", "data_scraper")
+        ];
+
+        foreach (var relPath in relativePaths)
+        {
+            var fullPath = Path.Combine(baseDir, relPath);
+            if (Directory.Exists(fullPath))
+            {
+                return fullPath;
+            }
+        }
+
+        throw new DirectoryNotFoundException("No valid working directory found relative to current directory.");
+    }
+    
+    // dev Current Directory: /home/legion/CLionProjects/CineLogUI/CineLog
+    // deploy Current Directory: /home/legion/CLionProjects/CineLogAppRelease/frontend/linux
 
     private static async Task WaitForFlaskReady()
     {
@@ -92,6 +131,7 @@ public class App : Application
         }
 
         Console.WriteLine("Flask did not become ready in time.");
+        EventAggregator.Instance.Publish(new NotificationEvent { Message = "X The server failed to start. Scraping and updating will not work" });
     }
 
     private static bool IsServerRunning()
