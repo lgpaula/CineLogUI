@@ -14,6 +14,7 @@ using System.Threading;
 using System.Linq;
 using System.Runtime.InteropServices;
 using CineLog.Views;
+using Serilog;
 
 namespace CineLog;
 
@@ -21,9 +22,18 @@ public class App : Application
 {
     private Process? _pythonServerProcess;
     private CancellationTokenSource? _workerTokenSource;
+    public static ILogger? Logger;
+    private static readonly string BaseDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", ".."));
 
     public override void Initialize()
     {
+        Directory.CreateDirectory(Path.Combine(BaseDir, "logs"));
+        Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.File("logs/frontend.log", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+
+        Logger.Information("App initializing...");
         AvaloniaXamlLoader.Load(this);
         StartPythonServer();
     }
@@ -85,8 +95,6 @@ public class App : Application
     
     private static string GetWorkingDir()
     {
-        var baseDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", ".."));
-
         string[] relativePaths =
         [
             Path.Combine("backend", "data_scraper"),
@@ -95,7 +103,7 @@ public class App : Application
 
         foreach (var relPath in relativePaths)
         {
-            var fullPath = Path.Combine(baseDir, relPath);
+            var fullPath = Path.Combine(BaseDir, relPath);
             if (Directory.Exists(fullPath))
             {
                 return fullPath;
@@ -131,7 +139,7 @@ public class App : Application
         }
 
         Console.WriteLine("Flask did not become ready in time.");
-        EventAggregator.Instance.Publish(new NotificationEvent { Message = "X The server failed to start. Scraping and updating will not work" });
+        EventAggregator.Instance.Publish(new NotificationEvent { Message = "\u274c The server failed to start. Scraping and updating will not work" });
     }
 
     private static bool IsServerRunning()

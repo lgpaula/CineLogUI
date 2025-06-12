@@ -62,6 +62,7 @@ public partial class ScraperView : UserControl
 
         EventAggregator.Instance.Publish(new NotificationEvent { Message = $"✅ Scraping started. {Time.Text}. Please wait." });
         ScrapeButton.IsEnabled = false;
+        App.Logger?.Information($"Scraping started with criteria: {JsonConvert.SerializeObject(criteria)}");
     }
 
     private void OnAddExtraFilterClick(object? sender, RoutedEventArgs e)
