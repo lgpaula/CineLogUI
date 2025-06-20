@@ -27,7 +27,6 @@ public class App : Application
 
     public override void Initialize()
     {
-        Directory.CreateDirectory(Path.Combine(BaseDir, "logs"));
         Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .WriteTo.File("logs/frontend.log", rollingInterval: RollingInterval.Day)
