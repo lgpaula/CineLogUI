@@ -32,7 +32,7 @@ public partial class MainWindow : Window
 
     private void ViewChanger(object sender, RoutedEventArgs e)
     {
-        if (sender is Button button && button.Tag is string viewName)
+        if (sender is Button { Tag: string viewName })
         {
             ViewModel.HandleButtonClick(viewName);
         }

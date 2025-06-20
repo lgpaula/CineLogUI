@@ -17,7 +17,7 @@ public class MainWindowViewModel : ReactiveObject
 
     public void HandleButtonClick(string viewName)
     {
-        Console.WriteLine($"Button clicked: {viewName}");
+        App.Logger?.Information($"Button clicked: {viewName}");
 
         CurrentView = viewName switch
         {
